@@ -7,8 +7,8 @@ license.workspace = true
 authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
-keywords.workspace = true
-categories.workspace = true
+keywords = ["engineering", "structural", "cross-section", "mechanics", "geometry"]
+categories = ["science", "mathematics", "algorithms"]
 description = "Cross-section properties (area, centroid, second moment of area, section/plastic modulus, torsion) for common structural sections."
 readme = "README.md"
 
