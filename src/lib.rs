@@ -30,8 +30,28 @@
 //! adopted: the in-memory + JSON/CSV model keeps the dependency tree small and
 //! fully license-clean (all of `serde`, `serde_json`, and `csv` are
 //! MIT/Apache-2.0 compatible).
-
-#![forbid(unsafe_code)]
+//!
+//! ## Example
+//!
+//! ```rust
+//! use tpt_eng_materials::{Material, MaterialCategory, MaterialLibrary, Property};
+//!
+//! let mut lib = MaterialLibrary::new();
+//! lib.add(
+//!     Material::new("steel-s355", "S355", MaterialCategory::Metal)
+//!         .with_property(
+//!             "youngs-modulus",
+//!             Property::Scalar {
+//!                 value: 210.0,
+//!                 unit: "GPa".into(),
+//!             },
+//!         ),
+//! );
+//! let e = lib.get_by_id("steel-s355").unwrap().value("youngs-modulus", 0.0).unwrap();
+//! assert!((e - 210.0).abs() < 1e-12);
+//! ```
+//!
+//! #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
 pub mod category;

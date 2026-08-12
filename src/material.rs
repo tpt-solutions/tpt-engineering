@@ -80,7 +80,7 @@ impl Material {
     /// Evaluate a named property at temperature `temp`. Returns `None` if the
     /// property is absent.
     pub fn value(&self, key: &str, temp: f64) -> Option<f64> {
-        self.properties.get(key).map(|p| p.value_at(temp))
+        self.properties.get(key).and_then(|p| p.value_at(temp))
     }
 
     /// Evaluate the anisotropic value of a named property in a direction.

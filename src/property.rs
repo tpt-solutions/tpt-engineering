@@ -9,6 +9,11 @@
 //! * [`Property::Anisotropic`] — per-direction scalars (a hook for directional
 //!   or tensor-valued properties), accessed via
 //!   [`Property::value_in_direction`].
+//!
+//! Value retrieval never returns `f64::NAN`: [`Property::value_at`] and the
+//! representative-value helpers [`Property::average`] and
+//! [`Property::interpolate`] return `Option<f64>`, yielding `None` when a
+//! value cannot be produced (e.g. an empty temperature-dependent sample set).
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -77,23 +82,64 @@ impl Property {
 
     /// Evaluate the property at temperature `temp`.
     ///
+    /// Returns `None` when no value can be produced — in particular an
+    /// [`Property::Anisotropic`] with no recorded directions, which has no
+    /// representative scalar.
+    ///
     /// * [`Property::Scalar`] returns its constant value.
     /// * [`Property::TemperatureDependent`] linearly interpolates between the
     ///   bracketing samples and clamps to the end samples outside the range.
     /// * [`Property::Anisotropic`] returns the arithmetic mean of its
     ///   directional values (a representative isotropic estimate; use
     ///   [`Property::value_in_direction`] for a specific direction).
-    pub fn value_at(&self, temp: f64) -> f64 {
+    pub fn value_at(&self, temp: f64) -> Option<f64> {
         match self {
-            Property::Scalar { value, .. } => *value,
+            Property::Scalar { value, .. } => Some(*value),
             Property::TemperatureDependent { points, .. } => interpolate(points, temp),
-            Property::Anisotropic { values, .. } => {
-                if values.is_empty() {
-                    return f64::NAN;
-                }
-                values.values().sum::<f64>() / values.len() as f64
-            }
+            Property::Anisotropic { values, .. } => Self::average_anisotropic(values),
         }
+    }
+
+    /// The representative value of the property as a single number.
+    ///
+    /// * [`Property::Scalar`] returns `Some(value)`.
+    /// * [`Property::TemperatureDependent`] returns the arithmetic mean of its
+    ///   sampled values, or `None` if it has no samples.
+    /// * [`Property::Anisotropic`] returns the arithmetic mean of its directional
+    ///   values, or `None` if it has no directions.
+    pub fn average(&self) -> Option<f64> {
+        match self {
+            Property::Scalar { value, .. } => Some(*value),
+            Property::TemperatureDependent { points, .. } => {
+                if points.is_empty() {
+                    return None;
+                }
+                Some(points.iter().map(|p| p.value).sum::<f64>() / points.len() as f64)
+            }
+            Property::Anisotropic { values, .. } => Self::average_anisotropic(values),
+        }
+    }
+
+    /// Interpolate the property value at `temp`.
+    ///
+    /// Returns `None` for [`Property::Anisotropic`] (direction-specific values
+    /// are not temperature-sampled) and for an empty
+    /// [`Property::TemperatureDependent`] sample set; otherwise the same value
+    /// [`Property::value_at`] would return.
+    pub fn interpolate(&self, temp: f64) -> Option<f64> {
+        match self {
+            Property::Scalar { value, .. } => Some(*value),
+            Property::TemperatureDependent { points, .. } => interpolate(points, temp),
+            Property::Anisotropic { .. } => None,
+        }
+    }
+
+    /// Arithmetic mean of anisotropic directional values, or `None` if empty.
+    fn average_anisotropic(values: &BTreeMap<String, f64>) -> Option<f64> {
+        if values.is_empty() {
+            return None;
+        }
+        Some(values.values().sum::<f64>() / values.len() as f64)
     }
 
     /// Value in a specific direction, for anisotropic properties. Returns `None`
@@ -115,10 +161,10 @@ impl Property {
 }
 
 /// Linearly interpolate `(temperature, value)` samples at `temp`, clamping
-/// outside the sampled range. Returns `NaN` for an empty sample set.
-fn interpolate(points: &[TempPoint], temp: f64) -> f64 {
+/// outside the sampled range. Returns `None` for an empty sample set.
+fn interpolate(points: &[TempPoint], temp: f64) -> Option<f64> {
     if points.is_empty() {
-        return f64::NAN;
+        return None;
     }
     let mut pts = points.to_vec();
     pts.sort_by(|a, b| {
@@ -127,23 +173,23 @@ fn interpolate(points: &[TempPoint], temp: f64) -> f64 {
             .unwrap_or(std::cmp::Ordering::Equal)
     });
     if temp <= pts[0].temp {
-        return pts[0].value;
+        return Some(pts[0].value);
     }
     if temp >= pts[pts.len() - 1].temp {
-        return pts[pts.len() - 1].value;
+        return Some(pts[pts.len() - 1].value);
     }
     for w in pts.windows(2) {
         let (lo, hi) = (&w[0], &w[1]);
         if temp >= lo.temp && temp <= hi.temp {
             let span = hi.temp - lo.temp;
             if span == 0.0 {
-                return lo.value;
+                return Some(lo.value);
             }
             let t = (temp - lo.temp) / span;
-            return lo.value + t * (hi.value - lo.value);
+            return Some(lo.value + t * (hi.value - lo.value));
         }
     }
-    pts[pts.len() - 1].value
+    Some(pts[pts.len() - 1].value)
 }
 
 #[cfg(test)]
@@ -156,7 +202,7 @@ mod tests {
             value: 200.0,
             unit: "GPa".into(),
         };
-        assert!((p.value_at(0.0) - 200.0).abs() < 1e-15);
+        assert!((p.value_at(0.0).unwrap() - 200.0).abs() < 1e-15);
         assert_eq!(p.unit(), "GPa");
         assert!(!p.is_temperature_dependent());
     }
@@ -177,10 +223,10 @@ mod tests {
             ],
         };
         assert!(p.is_temperature_dependent());
-        assert!((p.value_at(50.0) - 200.0).abs() < 1e-15);
+        assert!((p.value_at(50.0).unwrap() - 200.0).abs() < 1e-15);
         // clamps below/above the range
-        assert!((p.value_at(-50.0) - 210.0).abs() < 1e-15);
-        assert!((p.value_at(500.0) - 190.0).abs() < 1e-15);
+        assert!((p.value_at(-50.0).unwrap() - 210.0).abs() < 1e-15);
+        assert!((p.value_at(500.0).unwrap() - 190.0).abs() < 1e-15);
     }
 
     #[test]
@@ -196,7 +242,32 @@ mod tests {
         };
         assert!(p.is_anisotropic());
         assert!((p.value_in_direction("x").unwrap() - 200.0).abs() < 1e-15);
-        assert!((p.value_at(0.0) - 105.0).abs() < 1e-15); // mean
+        assert!((p.value_at(0.0).unwrap() - 105.0).abs() < 1e-15); // mean
         assert_eq!(p.directions(), vec!["x".to_string(), "y".to_string()]);
+    }
+
+    #[test]
+    fn empty_inputs_return_none() {
+        let scalar = Property::Scalar {
+            value: 1.0,
+            unit: "x".into(),
+        };
+        let td = Property::TemperatureDependent {
+            unit: "x".into(),
+            points: vec![],
+        };
+        let aniso = Property::Anisotropic {
+            unit: "x".into(),
+            values: BTreeMap::new(),
+        };
+        // value_at still resolves for scalar and anisotropic-with-data; None only
+        // when there is genuinely no value to report.
+        assert_eq!(scalar.value_at(0.0), Some(1.0));
+        assert_eq!(td.value_at(0.0), None);
+        assert_eq!(aniso.value_at(0.0), None);
+        assert_eq!(td.average(), None);
+        assert_eq!(aniso.average(), None);
+        assert_eq!(td.interpolate(0.0), None);
+        assert_eq!(aniso.interpolate(0.0), None);
     }
 }
