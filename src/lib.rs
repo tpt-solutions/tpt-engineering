@@ -40,7 +40,7 @@ pub mod limit_states;
 pub mod load;
 
 pub use combinations::{CombinationFactor, LoadCombination};
-pub use design::{CheckResult, DesignBasis, evaluate_check};
+pub use design::{evaluate_check, CheckResult, DesignBasis};
 pub use factors::{FactorSet, LoadFactor};
 pub use limit_states::{DemandCapacity, LimitState};
 pub use load::{LoadCase, LoadType};
@@ -49,7 +49,7 @@ pub use load::{LoadCase, LoadType};
 pub mod prelude {
     pub use crate::{
         combinations::{CombinationFactor, LoadCombination},
-        design::{CheckResult, DesignBasis, evaluate_check},
+        design::{evaluate_check, CheckResult, DesignBasis},
         factors::{FactorSet, LoadFactor},
         limit_states::{DemandCapacity, LimitState},
         load::{LoadCase, LoadType},

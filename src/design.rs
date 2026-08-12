@@ -156,7 +156,9 @@ mod tests {
         let mut demands = HashMap::new();
         demands.insert("G".into(), 10.0);
         demands.insert("Q".into(), 4.0);
-        let comb = LoadCombination::new("ULS", "ULS").with_factor("G", 1.35).with_factor("Q", 1.5);
+        let comb = LoadCombination::new("ULS", "ULS")
+            .with_factor("G", 1.35)
+            .with_factor("Q", 1.5);
         let r = evaluate_check(&comb, &demands, 30.0, 1.0, LimitState::Ultimate);
         assert!((r.combined_demand - 19.5).abs() < 1e-12);
         assert!((r.utilization - 19.5 / 30.0).abs() < 1e-12);
@@ -169,7 +171,9 @@ mod tests {
             .with_case(LoadCase::new("G", "dead", LoadType::Dead))
             .with_case(LoadCase::new("Q", "live", LoadType::Live))
             .with_combination(
-                LoadCombination::new("C1", "C1").with_factor("G", 1.35).with_factor("Q", 1.5),
+                LoadCombination::new("C1", "C1")
+                    .with_factor("G", 1.35)
+                    .with_factor("Q", 1.5),
             )
             .with_combination(LoadCombination::new("C2", "C2").with_factor("G", 1.0));
         let mut fs = FactorSet::new();
