@@ -1,0 +1,17 @@
+[package]
+name = "tpt-eng-gdt"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+description = "Geometric dimensioning and tolerancing: datums, tolerance frames, tolerance zones, fits, allowances, stack-up inputs"
+readme = "README.md"
+keywords = ["gdt", "tolerance", "datum", "engineering", "manufacturing"]
+categories = ["science", "manufacturing"]
+
+[dependencies]
+glam.workspace = true
+serde.workspace = true
+tpt-eng-geometry.workspace = true
