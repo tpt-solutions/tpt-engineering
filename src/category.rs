@@ -72,7 +72,7 @@ impl FromStr for MaterialCategory {
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s.trim().to_ascii_lowercase().as_str() {
-            "metal" => Ok(MaterialCategory::Metal),
+            "metal" | "steel" | "steel-alloy" => Ok(MaterialCategory::Metal),
             "polymer" | "plastic" => Ok(MaterialCategory::Polymer),
             "ceramic" | "glass" => Ok(MaterialCategory::Ceramic),
             "composite" => Ok(MaterialCategory::Composite),
@@ -102,8 +102,14 @@ mod tests {
 
     #[test]
     fn parse_aliases() {
-        assert_eq!("steel".parse::<MaterialCategory>().unwrap(), MaterialCategory::Metal);
-        assert_eq!("plastic".parse::<MaterialCategory>().unwrap(), MaterialCategory::Polymer);
+        assert_eq!(
+            "steel".parse::<MaterialCategory>().unwrap(),
+            MaterialCategory::Metal
+        );
+        assert_eq!(
+            "plastic".parse::<MaterialCategory>().unwrap(),
+            MaterialCategory::Polymer
+        );
         assert!("nonsense".parse::<MaterialCategory>().is_err());
     }
 }

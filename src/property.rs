@@ -121,7 +121,11 @@ fn interpolate(points: &[TempPoint], temp: f64) -> f64 {
         return f64::NAN;
     }
     let mut pts = points.to_vec();
-    pts.sort_by(|a, b| a.temp.partial_cmp(&b.temp).unwrap_or(std::cmp::Ordering::Equal));
+    pts.sort_by(|a, b| {
+        a.temp
+            .partial_cmp(&b.temp)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
     if temp <= pts[0].temp {
         return pts[0].value;
     }
@@ -162,8 +166,14 @@ mod tests {
         let p = Property::TemperatureDependent {
             unit: "GPa".into(),
             points: vec![
-                TempPoint { temp: 0.0, value: 210.0 },
-                TempPoint { temp: 100.0, value: 190.0 },
+                TempPoint {
+                    temp: 0.0,
+                    value: 210.0,
+                },
+                TempPoint {
+                    temp: 100.0,
+                    value: 190.0,
+                },
             ],
         };
         assert!(p.is_temperature_dependent());

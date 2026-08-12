@@ -93,7 +93,9 @@ impl Material {
 
     /// Whether the material has any temperature-dependent property.
     pub fn has_temperature_dependence(&self) -> bool {
-        self.properties.values().any(|p| p.is_temperature_dependent())
+        self.properties
+            .values()
+            .any(|p| p.is_temperature_dependent())
     }
 
     /// Whether the material has any anisotropic property.
@@ -109,26 +111,36 @@ mod tests {
 
     #[test]
     fn build_and_query() {
-        let m = Material::new("steel-s355", "Structural steel S355", MaterialCategory::Metal)
-            .with_description("European structural steel")
-            .with_source(DataSource::standard("EN 10025"))
-            .with_property(
-                "youngs-modulus",
-                Property::Scalar {
-                    value: 210.0,
-                    unit: "GPa".into(),
-                },
-            )
-            .with_property(
-                "yield-strength",
-                Property::TemperatureDependent {
-                    unit: "MPa".into(),
-                    points: vec![
-                        crate::property::TempPoint { temp: 20.0, value: 355.0 },
-                        crate::property::TempPoint { temp: 100.0, value: 345.0 },
-                    ],
-                },
-            );
+        let m = Material::new(
+            "steel-s355",
+            "Structural steel S355",
+            MaterialCategory::Metal,
+        )
+        .with_description("European structural steel")
+        .with_source(DataSource::standard("EN 10025"))
+        .with_property(
+            "youngs-modulus",
+            Property::Scalar {
+                value: 210.0,
+                unit: "GPa".into(),
+            },
+        )
+        .with_property(
+            "yield-strength",
+            Property::TemperatureDependent {
+                unit: "MPa".into(),
+                points: vec![
+                    crate::property::TempPoint {
+                        temp: 20.0,
+                        value: 355.0,
+                    },
+                    crate::property::TempPoint {
+                        temp: 100.0,
+                        value: 345.0,
+                    },
+                ],
+            },
+        );
         assert_eq!(m.category, MaterialCategory::Metal);
         assert!((m.value("youngs-modulus", 0.0).unwrap() - 210.0).abs() < 1e-15);
         assert!((m.value("yield-strength", 60.0).unwrap() - 350.0).abs() < 1e-15);

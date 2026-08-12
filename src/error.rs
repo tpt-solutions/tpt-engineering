@@ -58,7 +58,9 @@ impl From<csv::Error> for MaterialError {
 
 impl From<std::io::Error> for MaterialError {
     fn from(e: std::io::Error) -> Self {
-        MaterialError::Io { what: e.to_string() }
+        MaterialError::Io {
+            what: e.to_string(),
+        }
     }
 }
 

@@ -27,18 +27,10 @@ pub const ALLOWED_LICENSES: &[&str] = &[
 ];
 
 /// A library (collection) of materials.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct MaterialLibrary {
     /// The materials in the library.
     pub materials: Vec<Material>,
-}
-
-impl Default for MaterialLibrary {
-    fn default() -> Self {
-        MaterialLibrary {
-            materials: Vec::new(),
-        }
-    }
 }
 
 impl MaterialLibrary {
@@ -142,11 +134,9 @@ impl MaterialLibrary {
                     if v.is_empty() {
                         continue;
                     }
-                    let value: f64 = v
-                        .parse()
-                        .map_err(|_| MaterialError::Parse {
-                            what: format!("property `{pname}` value `{v}` is not a number"),
-                        })?;
+                    let value: f64 = v.parse().map_err(|_| MaterialError::Parse {
+                        what: format!("property `{pname}` value `{v}` is not a number"),
+                    })?;
                     m = m.with_property(
                         pname.clone(),
                         crate::property::Property::Scalar {
@@ -216,14 +206,9 @@ impl MaterialLibrary {
                 problems.push(format!("`{}` has no recorded source", m.id));
             }
             if let Some(lic) = m.metadata.attributes.get("license") {
-                let allowed = ALLOWED_LICENSES
-                    .iter()
-                    .any(|a| a.eq_ignore_ascii_case(lic));
+                let allowed = ALLOWED_LICENSES.iter().any(|a| a.eq_ignore_ascii_case(lic));
                 if !allowed {
-                    problems.push(format!(
-                        "`{}` records disallowed license `{lic}`",
-                        m.id
-                    ));
+                    problems.push(format!("`{}` records disallowed license `{lic}`", m.id));
                 }
             }
         }
