@@ -7,8 +7,8 @@ license.workspace = true
 authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
-keywords.workspace = true
-categories.workspace = true
+keywords = ["engineering", "standards", "structural", "load", "design"]
+categories = ["science", "data-structures"]
 description = "Engineering standards modeling as structured, parameterized data: load cases, combinations, factors, and limit-state logic (no copyrighted standard text)."
 readme = "README.md"
 
