@@ -8,6 +8,48 @@
 
 use crate::section::Section;
 
+/// Error returned when a [`CustomPolygon`] fails [`CustomPolygon::validate`].
+#[derive(Debug, Clone, PartialEq)]
+pub enum PolygonError {
+    /// Fewer than three vertices — not a closed polygon.
+    TooFewVertices {
+        /// Number of vertices supplied.
+        count: usize,
+    },
+    /// A vertex coordinate is non-finite (`NaN` or infinite).
+    NonFiniteVertex {
+        /// Index of the offending vertex.
+        index: usize,
+    },
+    /// The polygon's signed area is (numerically) zero: collinear or degenerate
+    /// vertices, which would silently yield zero properties.
+    ZeroArea {
+        /// The (numerically) zero signed area.
+        area: f64,
+    },
+}
+
+impl std::fmt::Display for PolygonError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PolygonError::TooFewVertices { count } => {
+                write!(f, "polygon needs at least 3 vertices, got {count}")
+            }
+            PolygonError::NonFiniteVertex { index } => {
+                write!(f, "vertex {index} is non-finite")
+            }
+            PolygonError::ZeroArea { area } => {
+                write!(
+                    f,
+                    "polygon has zero area (degenerate): signed area = {area}"
+                )
+            }
+        }
+    }
+}
+
+impl std::error::Error for PolygonError {}
+
 /// A simply-connected polygon cross-section defined by its boundary vertices in
 /// counter-clockwise (or clockwise) order.
 #[derive(Debug, Clone, PartialEq)]
@@ -17,6 +59,33 @@ pub struct CustomPolygon {
 }
 
 impl CustomPolygon {
+    /// Validate that the polygon is a usable, non-degenerate cross-section.
+    ///
+    /// Rejects fewer than three vertices, non-finite vertex coordinates, and a
+    /// (numerically) zero signed area — all cases where the geometry would
+    /// otherwise silently return zero properties.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PolygonError`] describing the first problem found.
+    pub fn validate(&self) -> Result<(), PolygonError> {
+        if self.vertices.len() < 3 {
+            return Err(PolygonError::TooFewVertices {
+                count: self.vertices.len(),
+            });
+        }
+        for (i, &(x, y)) in self.vertices.iter().enumerate() {
+            if !x.is_finite() || !y.is_finite() {
+                return Err(PolygonError::NonFiniteVertex { index: i });
+            }
+        }
+        let a = self.signed_area();
+        if a.abs() < 1e-12 {
+            return Err(PolygonError::ZeroArea { area: a });
+        }
+        Ok(())
+    }
+
     /// Create a polygon from its boundary vertices.
     pub fn new(vertices: Vec<(f64, f64)>) -> Self {
         CustomPolygon { vertices }
@@ -254,6 +323,11 @@ mod tests {
         let (zx, _) = s.plastic_modulus();
         // Zx = b h²/4 = 0.25 for a unit square.
         assert!((zx - 0.25).abs() < 0.01, "got {zx}");
+    }
+
+    #[test]
+    fn validate_accepts_well_formed_polygon() {
+        assert!(square().validate().is_ok());
     }
 
     #[test]

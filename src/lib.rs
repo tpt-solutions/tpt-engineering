@@ -28,7 +28,20 @@
 //!
 //! Geometry integration with `tpt-eng3` (`tpt-eng-geometry`) is deferred until
 //! that repository/crate exists.
-
+//!
+//! ## Example
+//!
+//! ```rust
+//! use tpt_eng_sections::{ISection, Section};
+//!
+//! // W-shape: depth 10, flange width 6, flange thickness 1, web thickness 0.5.
+//! let s = ISection::new(10.0, 6.0, 1.0, 0.5);
+//! // Area = 2*6*1 + 0.5*(10 - 2) = 16.
+//! assert!((s.area() - 16.0).abs() < 1e-9);
+//! let props = s.properties();
+//! assert!(props.area > 0.0);
+//! ```
+//!
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
