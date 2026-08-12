@@ -29,7 +29,31 @@
 //! Every factor, combination, and factor set is plain data the caller provides.
 //! See the module examples for building a [`design::DesignBasis`] from your own
 //! (correctly licensed) values.
-
+//!
+//! ## Example
+//!
+//! ```rust
+//! use std::collections::HashMap;
+//! use tpt_eng_standards::{
+//!     DesignBasis, LimitState, LoadCase, LoadCombination, LoadType,
+//! };
+//!
+//! let basis = DesignBasis::new()
+//!     .with_case(LoadCase::new("G", "dead", LoadType::Dead))
+//!     .with_case(LoadCase::new("Q", "live", LoadType::Live))
+//!     .with_combination(
+//!         LoadCombination::new("ULS", "ULS")
+//!             .with_factor("G", 1.35)
+//!             .with_factor("Q", 1.5),
+//!     );
+//! let mut demands = HashMap::new();
+//! demands.insert("G".to_string(), 10.0);
+//! demands.insert("Q".to_string(), 4.0);
+//! let results = basis.run_checks(&demands, 30.0, 1.0, LimitState::Ultimate);
+//! // 1.35*10 + 1.5*4 = 19.5
+//! assert!((results[0].combined_demand - 19.5).abs() < 1e-9);
+//! ```
+//!
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
