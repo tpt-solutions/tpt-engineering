@@ -1,0 +1,17 @@
+[package]
+name = "tpt-eng-mesh"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+description = "Mesh representation, normals, quality metrics, refinement/repair, and format-conversion hooks"
+readme = "README.md"
+keywords = ["mesh", "cad", "engineering", "geometry", "stl"]
+categories = ["science", "graphics"]
+
+[dependencies]
+glam.workspace = true
+serde.workspace = true
+tpt-eng-geometry.workspace = true
