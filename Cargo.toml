@@ -1,0 +1,19 @@
+[package]
+name = "tpt-eng-cad"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+description = "Solid modeling and CAD kernel behavior: solid primitives, boolean operations, B-Rep, feature modeling, metadata"
+readme = "README.md"
+keywords = ["cad", "solid", "csg", "brep", "engineering"]
+categories = ["science", "graphics"]
+
+[dependencies]
+glam.workspace = true
+serde.workspace = true
+tpt-eng-geometry.workspace = true
+tpt-eng-mesh.workspace = true
+tpt-eng-nurbs.workspace = true
