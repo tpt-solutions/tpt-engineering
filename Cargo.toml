@@ -1,0 +1,20 @@
+[package]
+name = "tpt-eng-sections"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Cross-section properties (area, centroid, second moment of area, section/plastic modulus, torsion) for common structural sections."
+readme = "README.md"
+
+[dependencies]
+tpt-eng-core = { workspace = true }
+tpt-eng-math = { workspace = true }
+
+[lints]
+workspace = true
