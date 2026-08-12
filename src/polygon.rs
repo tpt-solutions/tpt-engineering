@@ -222,12 +222,7 @@ mod tests {
     use tpt_eng_math::helpers::is_approx_equal;
 
     fn square() -> CustomPolygon {
-        CustomPolygon::new(vec![
-            (0.0, 0.0),
-            (1.0, 0.0),
-            (1.0, 1.0),
-            (0.0, 1.0),
-        ])
+        CustomPolygon::new(vec![(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)])
     }
 
     #[test]

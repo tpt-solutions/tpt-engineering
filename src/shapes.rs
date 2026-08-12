@@ -120,14 +120,12 @@ impl Section for Tube {
         (0.0, 0.0)
     }
     fn second_moments(&self) -> (f64, f64, f64) {
-        let i = std::f64::consts::PI
-            / 64.0
+        let i = std::f64::consts::PI / 64.0
             * (self.outer_diameter.powi(4) - self.inner_diameter.powi(4));
         (i, i, 0.0)
     }
     fn section_modulus(&self) -> (f64, f64) {
-        let i = std::f64::consts::PI
-            / 64.0
+        let i = std::f64::consts::PI / 64.0
             * (self.outer_diameter.powi(4) - self.inner_diameter.powi(4));
         let s = i / (self.outer_diameter / 2.0);
         (s, s)
@@ -137,9 +135,7 @@ impl Section for Tube {
         (z, z)
     }
     fn torsional_constant(&self) -> f64 {
-        std::f64::consts::PI
-            / 32.0
-            * (self.outer_diameter.powi(4) - self.inner_diameter.powi(4))
+        std::f64::consts::PI / 32.0 * (self.outer_diameter.powi(4) - self.inner_diameter.powi(4))
     }
 }
 
@@ -240,7 +236,7 @@ impl Channel {
         [
             Rect::new(0.0, tf, tw, h - 2.0 * tf), // web (excluding flange corners)
             Rect::new(0.0, 0.0, bf, tf),          // bottom flange
-            Rect::new(0.0, h - tf, bf, tf),        // top flange
+            Rect::new(0.0, h - tf, bf, tf),       // top flange
         ]
     }
 }
@@ -266,7 +262,10 @@ impl Section for Channel {
     fn plastic_modulus(&self) -> (f64, f64) {
         let rects = self.rects();
         let (cx, cy) = compose::centroid(&rects);
-        (compose::plastic_x(&rects, cy), compose::plastic_y(&rects, cx))
+        (
+            compose::plastic_x(&rects, cy),
+            compose::plastic_y(&rects, cx),
+        )
     }
     fn torsional_constant(&self) -> f64 {
         compose::torsion(&self.rects())
@@ -290,15 +289,15 @@ impl Angle {
         Angle {
             leg_a,
             leg_b,
-            thickness: thickness,
+            thickness,
         }
     }
 
     fn rects(&self) -> [Rect; 2] {
         let t = self.thickness;
         [
-            Rect::new(0.0, 0.0, t, self.leg_a),       // vertical leg
-            Rect::new(t, 0.0, self.leg_b - t, t),     // horizontal leg (no corner overlap)
+            Rect::new(0.0, 0.0, t, self.leg_a),   // vertical leg
+            Rect::new(t, 0.0, self.leg_b - t, t), // horizontal leg (no corner overlap)
         ]
     }
 }
@@ -324,7 +323,10 @@ impl Section for Angle {
     fn plastic_modulus(&self) -> (f64, f64) {
         let rects = self.rects();
         let (cx, cy) = compose::centroid(&rects);
-        (compose::plastic_x(&rects, cy), compose::plastic_y(&rects, cx))
+        (
+            compose::plastic_x(&rects, cy),
+            compose::plastic_y(&rects, cx),
+        )
     }
     fn torsional_constant(&self) -> f64 {
         compose::torsion(&self.rects())
@@ -351,7 +353,7 @@ mod tests {
     fn circle_properties() {
         let c = Circle::new(2.0); // r = 1
         assert!((c.area() - std::f64::consts::PI).abs() < 1e-12);
-        let (ix, iy, ixy) = c.second_moments();
+        let (ix, _iy, ixy) = c.second_moments();
         assert!((ix - std::f64::consts::PI / 4.0).abs() < 1e-12); // π r^4/4, r=1
         assert!(ixy.abs() < 1e-15);
         assert!((c.section_modulus().0 - std::f64::consts::PI / 4.0).abs() < 1e-12); // π d^3/32 = π/4
@@ -380,14 +382,18 @@ mod tests {
         let expected_ix =
             2.0 * (6.0 * 1.0 / 12.0 + 6.0 * 1.0 * 4.5f64.powi(2)) + 0.5 * 8.0f64.powi(3) / 12.0;
         let (ixc, _, _) = s.second_moments();
-        assert!((ixc - expected_ix).abs() < 1e-9, "got {ixc}, expected {expected_ix}");
+        assert!(
+            (ixc - expected_ix).abs() < 1e-9,
+            "got {ixc}, expected {expected_ix}"
+        );
     }
 
     #[test]
     fn channel_centroid_offsets_to_flange_side() {
         let ch = Channel::new(10.0, 4.0, 1.0, 0.5);
         let (cx, cy) = ch.centroid();
-        assert!(cy.abs() < 1e-12); // symmetric about horizontal
+        // Geometry spans y in [0, depth]; the true centroid sits at mid-depth.
+        assert!((cy - 5.0).abs() < 1e-12, "centroid y = {cy}");
         assert!(cx > 0.0, "channel centroid should be offset toward flanges");
     }
 
@@ -399,6 +405,9 @@ mod tests {
         let (cx, cy) = a.centroid();
         assert!(cx > 0.0 && cy > 0.0);
         let (_, _, ixy) = a.second_moments();
-        assert!(ixy.abs() > 0.0, "angle should have non-zero product of inertia");
+        assert!(
+            ixy.abs() > 0.0,
+            "angle should have non-zero product of inertia"
+        );
     }
 }

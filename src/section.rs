@@ -33,18 +33,6 @@ pub trait Section {
         let (sx, sy) = self.section_modulus();
         let (zx, zy) = self.plastic_modulus();
         let j = self.torsional_constant();
-        SectionProperties::new(
-            self.area(),
-            cx,
-            cy,
-            ixc,
-            iyc,
-            ixyc,
-            sx,
-            sy,
-            zx,
-            zy,
-            j,
-        )
+        SectionProperties::new(self.area(), cx, cy, ixc, iyc, ixyc, sx, sy, zx, zy, j)
     }
 }
