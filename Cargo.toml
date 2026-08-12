@@ -7,8 +7,8 @@ license.workspace = true
 authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
-keywords.workspace = true
-categories.workspace = true
+keywords = ["engineering", "materials", "material-properties", "thermodynamics", "data"]
+categories = ["science", "data-structures"]
 description = "Material property modeling with source tracking, temperature dependence, anisotropic hooks, and original/openly-licensed data only."
 readme = "README.md"
 
