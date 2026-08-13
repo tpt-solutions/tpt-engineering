@@ -11,7 +11,11 @@ fn main() {
     let kv = KnotVector::new(vec![0.0, 0.0, 0.0, 1.0, 1.0, 1.0]).unwrap();
     let arc = NurbsCurve::new(
         2,
-        vec![Point3::new(1.0, 0.0, 0.0), Point3::new(1.0, 1.0, 0.0), Point3::new(0.0, 1.0, 0.0)],
+        vec![
+            Point3::new(1.0, 0.0, 0.0),
+            Point3::new(1.0, 1.0, 0.0),
+            Point3::new(0.0, 1.0, 0.0),
+        ],
         vec![1.0, FRAC_1_SQRT_2, 1.0],
         kv,
     )

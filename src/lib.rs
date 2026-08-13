@@ -541,9 +541,17 @@ impl BsplineSurface {
         let (v0, v1) = self.knots_v.domain();
         let mut positions = Vec::with_capacity(nu * nv);
         for i in 0..nu {
-            let u = if nu == 1 { u0 } else { u0 + (u1 - u0) * (i as f32 / (nu - 1) as f32) };
+            let u = if nu == 1 {
+                u0
+            } else {
+                u0 + (u1 - u0) * (i as f32 / (nu - 1) as f32)
+            };
             for j in 0..nv {
-                let v = if nv == 1 { v0 } else { v0 + (v1 - v0) * (j as f32 / (nv - 1) as f32) };
+                let v = if nv == 1 {
+                    v0
+                } else {
+                    v0 + (v1 - v0) * (j as f32 / (nv - 1) as f32)
+                };
                 positions.push(self.eval(u, v));
             }
         }
@@ -670,7 +678,11 @@ mod tests {
         ];
         let surface = BsplineSurface::new(1, 1, cps, ku, kv).unwrap();
         let center = surface.eval(0.5, 0.5);
-        assert!((center - p(0.5, 0.5, 0.0)).length() < 1e-5, "got {:?}", center);
+        assert!(
+            (center - p(0.5, 0.5, 0.0)).length() < 1e-5,
+            "got {:?}",
+            center
+        );
         let mesh = surface.tessellate(4, 4);
         assert!(mesh.face_count() > 0);
     }
