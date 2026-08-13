@@ -7,7 +7,7 @@
 //! only and does not prescribe any particular inspection method.
 
 use tpt_eng_geometry::frame::Frame3;
-use tpt_eng_geometry::{Point3, EPSILON};
+use tpt_eng_geometry::{Point3, Vector3, EPSILON};
 
 pub use tpt_eng_geometry::Point3 as WorldPoint;
 
@@ -436,6 +436,147 @@ impl StackupMember {
     }
 }
 
+/// Result of checking measured points against a tolerance zone
+/// expressed in a datum reference frame.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ConformanceReport {
+    /// Maximum signed deviation across all samples (`<= 0` means inside the zone).
+    pub max_deviation: f32,
+    /// Whether every sampled point lies within the zone.
+    pub passed: bool,
+    /// Number of points checked.
+    pub sample_count: usize,
+}
+
+impl ToleranceZone {
+    /// Signed deviation of `p` (given in the zone's local frame) from the zone.
+    ///
+    /// `<= 0` indicates the point is inside the zone; `> 0` reports how far
+    /// outside, in the same units as the zone magnitude. `axis` is the zone's
+    /// reference axis (e.g. a datum axis) and `nominal` is the nominal point the
+    /// zone is centered on, both expressed in the local frame.
+    #[must_use]
+    pub fn deviation(&self, p: Point3, axis: Vector3, nominal: Point3) -> f32 {
+        let axis = axis.normalize();
+        let d = p - nominal;
+        let along = d.dot(axis);
+        let radial = (d - axis * along).length();
+        match self {
+            ToleranceZone::Cylindrical { diameter } => 2.0 * radial - diameter,
+            ToleranceZone::Sphere { diameter } => 2.0 * d.length() - diameter,
+            ToleranceZone::Circle { diameter } => 2.0 * radial - diameter,
+            ToleranceZone::ParallelPlanes { tolerance } => along.abs() - tolerance / 2.0,
+            ToleranceZone::TwoParallelLines { tolerance } => radial - tolerance / 2.0,
+            ToleranceZone::TotalRunoutBand { tolerance } => 2.0 * radial - tolerance,
+        }
+    }
+}
+
+impl DatumReferenceFrame {
+    /// Map a world point into this datum reference frame's local coordinates.
+    #[must_use]
+    pub fn to_local(&self, world: Point3) -> Point3 {
+        self.world_frame().to_local_point(world)
+    }
+
+    /// Check a set of measured world points against a tolerance zone.
+    ///
+    /// Each point is transformed into the DRF local frame, then its deviation
+    /// from `zone` is computed (centered on `nominal_local`, about `axis_local`).
+    /// The part is reported as passing only if no point exceeds the zone.
+    #[must_use]
+    pub fn check_conformance(
+        &self,
+        world_points: &[Point3],
+        zone: &ToleranceZone,
+        axis_local: Vector3,
+        nominal_local: Point3,
+    ) -> ConformanceReport {
+        let mut max_dev = f32::MIN;
+        for &wp in world_points {
+            let local = self.to_local(wp);
+            let dev = zone.deviation(local, axis_local, nominal_local);
+            if dev > max_dev {
+                max_dev = dev;
+            }
+        }
+        let max_dev = if world_points.is_empty() { 0.0 } else { max_dev };
+        ConformanceReport {
+            max_deviation: max_dev,
+            passed: max_dev <= 0.0,
+            sample_count: world_points.len(),
+        }
+    }
+}
+
+/// Result of a Monte-Carlo tolerance stack-up.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct MonteCarloResult {
+    /// Mean of the resulting stack-up length over all samples.
+    pub mean: f32,
+    /// Standard deviation of the resulting stack-up length.
+    pub std_dev: f32,
+    /// Approximate lower bound at ±3σ.
+    pub lower_3sigma: f32,
+    /// Approximate upper bound at ±3σ.
+    pub upper_3sigma: f32,
+}
+
+impl Stackup {
+    /// Estimate the stack-up distribution by Monte-Carlo sampling.
+    ///
+    /// Each member's deviation is sampled uniformly from its `-tol_minus ..
+    /// +tol_plus` one-sided range (the usual statistical-tolerance assumption),
+    /// added to its signed nominal. Returns the sample mean, standard deviation,
+    /// and a rough ±3σ band. `seed` initializes the internal generator.
+    #[must_use]
+    pub fn monte_carlo(&self, samples: u32, seed: u64) -> MonteCarloResult {
+        let n = samples.max(1) as usize;
+        let mut state = seed | 1;
+        let mut sum = 0.0_f64;
+        let mut sum_sq = 0.0_f64;
+        for _ in 0..n {
+            let mut total = 0.0_f64;
+            for m in &self.members {
+                let (neg, pos) = if m.sign >= 0.0 {
+                    (m.tol_minus, m.tol_plus)
+                } else {
+                    (m.tol_plus, m.tol_minus)
+                };
+                let u = lcg_uniform(&mut state);
+                let dev = (-neg as f64) + u * (neg + pos) as f64;
+                total += m.sign as f64 * (m.nominal as f64 + dev);
+            }
+            sum += total;
+            sum_sq += total * total;
+        }
+        let mean = (sum / n as f64) as f32;
+        let variance = ((sum_sq / n as f64) - (sum / n as f64).powi(2)).max(0.0);
+        let std = variance.sqrt() as f32;
+        MonteCarloResult {
+            mean,
+            std_dev: std,
+            lower_3sigma: mean - 3.0 * std,
+            upper_3sigma: mean + 3.0 * std,
+        }
+    }
+}
+
+/// Deterministic xorshift64* generator state -> next state.
+fn lcg_next(state: &mut u64) -> u64 {
+    let mut x = *state;
+    x ^= x >> 12;
+    x ^= x << 25;
+    x ^= x >> 27;
+    *state = x;
+    x.wrapping_mul(0x2545_F491_4F6C_DD1D)
+}
+
+/// Uniform `f64` in `[0, 1)` from the generator state.
+fn lcg_uniform(state: &mut u64) -> f64 {
+    (lcg_next(state) >> 11) as f64 / (1u64 << 53) as f64
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -580,5 +721,49 @@ mod tests {
         assert_eq!(frame.datum_refs.len(), 1);
         assert_eq!(frame.characteristic.category(), ToleranceCategory::Location);
         assert_eq!(frame.zone.magnitude(), 0.05);
+    }
+
+    #[test]
+    fn zone_deviation_cylindrical() {
+        let zone = ToleranceZone::Cylindrical { diameter: 0.1 };
+        let axis = Vector3::Z;
+        let nominal = Point3::ZERO;
+        // On the axis, within the diameter: deviation negative (inside).
+        assert!(zone.deviation(Point3::new(0.0, 0.0, 0.0), axis, nominal) < 0.0);
+        // At radius 0.06 (> diameter/2 = 0.05): outside by 0.02.
+        let dev = zone.deviation(Point3::new(0.06, 0.0, 0.0), axis, nominal);
+        assert!((dev - 0.02).abs() < 1e-6);
+    }
+
+    #[test]
+    fn conformance_passes_and_fails() {
+        let drf = DatumReferenceFrame::new(Datum::new('A', Frame3::IDENTITY));
+        let zone = ToleranceZone::Cylindrical { diameter: 0.1 };
+        let inside = vec![
+            Point3::new(0.0, 0.0, 0.0),
+            Point3::new(0.03, 0.0, 0.0),
+            Point3::new(0.0, 0.04, 0.0),
+        ];
+        let pass = drf.check_conformance(&inside, &zone, Vector3::Z, Point3::ZERO);
+        assert!(pass.passed);
+        assert!(pass.max_deviation <= 0.0);
+
+        let outside = vec![Point3::new(0.08, 0.0, 0.0)];
+        let fail = drf.check_conformance(&outside, &zone, Vector3::Z, Point3::ZERO);
+        assert!(!fail.passed);
+        assert!(fail.max_deviation > 0.0);
+    }
+
+    #[test]
+    fn monte_carlo_is_centered_and_bounded() {
+        // Single symmetric member: nominal 10, ±0.1 uniform -> mean ~10, std ~0.1/√3.
+        let s = Stackup::new(vec![StackupMember::symmetric(10.0, 0.1, 1.0)]);
+        let r = s.monte_carlo(200_000, 12345);
+        assert!((r.mean - 10.0).abs() < 0.01);
+        let expected_std = 0.1 / 3.0_f32.sqrt();
+        assert!((r.std_dev - expected_std).abs() < 0.005);
+        // ±3σ band should comfortably contain the analytic worst case of ±0.1.
+        assert!(r.lower_3sigma > 9.7);
+        assert!(r.upper_3sigma < 10.3);
     }
 }
