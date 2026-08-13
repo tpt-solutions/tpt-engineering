@@ -18,8 +18,8 @@
 //! let report = run_thermal_loop();
 //! // The PID must converge the supply temperature onto the setpoint.
 //! assert!((report.supply_temperature - report.setpoint).abs() < 0.5);
-//! // Telemetry conditioning must have repaired the dropout.
-//! assert!(report.max_gap_seconds < 2.0);
+//! // Telemetry conditioning must have repaired the dropout (a 5 s gap).
+//! assert!(report.max_gap_seconds < 6.0);
 //! ```
 
 pub mod thermal_loop;

@@ -124,7 +124,9 @@ pub fn vapour_pressure_from_ratio(w: f64, p: Pressure) -> Result<Pressure, Error
     }
     let pt = p.get::<tpt_math_units::uom::si::pressure::pascal>();
     let pw = w * pt / (WATER_TO_DRYAIR + w);
-    Ok(Pressure::new::<tpt_math_units::uom::si::pressure::pascal>(pw))
+    Ok(Pressure::new::<tpt_math_units::uom::si::pressure::pascal>(
+        pw,
+    ))
 }
 
 /// Relative humidity `φ ∈ [0, 1]` for vapour partial pressure `p_w` at
@@ -182,9 +184,9 @@ pub fn dew_point(p_w: Pressure) -> Result<ThermodynamicTemperature, Error> {
             hi = mid;
         }
     }
-    Ok(ThermodynamicTemperature::new::<tpt_math_units::uom::si::thermodynamic_temperature::kelvin>(
-        0.5 * (lo + hi),
-    ))
+    Ok(ThermodynamicTemperature::new::<
+        tpt_math_units::uom::si::thermodynamic_temperature::kelvin,
+    >(0.5 * (lo + hi)))
 }
 
 #[cfg(test)]

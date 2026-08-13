@@ -24,7 +24,7 @@ use tpt_eng_props_fuels::BlendedFuel;
 use tpt_eng_structural::{Beam, Load};
 use tpt_eng_timeseries_align::align_to_grid;
 use tpt_eng_timeseries_core::{Sample, Series, Timestamp};
-use tpt_eng_timeseries_gap::{detect_gaps, fill_gaps, Strategy};
+use tpt_eng_timeseries_gap::{Strategy, detect_gaps, fill_gaps};
 
 use tpt_math_units::uom::si::f64::*;
 use tpt_math_units::uom::si::{
@@ -83,8 +83,9 @@ fn simulate_and_regulate(setpoint_c: f64, fuel: &BlendedFuel) -> (f64, f64) {
     let mut telemetry: Vec<Sample<f64>> = Vec::new();
     for step in 0..steps {
         let tc = t.get::<degree_celsius>();
-        // Dropout between t = 20 s and t = 25 s (inclusive of the gap).
-        if !(20..=25).contains(&step) {
+        // Dropout: samples at t = 20..23 are missing, leaving a 5 s gap
+        // between the t = 19 and t = 24 samples.
+        if !(20..=23).contains(&step) {
             telemetry.push(Sample::new(Timestamp::from_seconds(step as f64), tc));
         }
         let measured = t.get::<degree_celsius>();
@@ -131,9 +132,7 @@ pub fn run_thermal_loop() -> ThermalLoopReport {
         Length::new::<meter>(3.0),
         Force::new::<kilonewton>(10.0),
     ));
-    let rack_max_moment = rack
-        .max_bending_moment()
-        .get::<kilonewton_meter>();
+    let rack_max_moment = rack.max_bending_moment().get::<kilonewton_meter>();
 
     ThermalLoopReport {
         node_count: n,
@@ -154,7 +153,11 @@ mod tests {
         let r = run_thermal_loop();
         assert_eq!(r.node_count, 4);
         // Nodal admittance trace of the 4-node unit loop = 4·(2) = 8.
-        assert!((r.admittance_trace - 8.0).abs() < 1e-9, "trace={}", r.admittance_trace);
+        assert!(
+            (r.admittance_trace - 8.0).abs() < 1e-9,
+            "trace={}",
+            r.admittance_trace
+        );
         // PID converged onto the setpoint.
         assert!((r.supply_temperature - r.setpoint).abs() < 0.5);
         // The 5 s dropout was detected.
