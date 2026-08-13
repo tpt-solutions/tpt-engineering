@@ -17,3 +17,6 @@ serde.workspace = true
 tpt-eng-geometry.workspace = true
 tpt-eng-mesh.workspace = true
 tpt-eng-nurbs.workspace = true
+
+[dev-dependencies]
+tpt-eng-gdt.workspace = true
