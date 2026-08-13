@@ -160,48 +160,50 @@ crates are fully implemented; the only `TODO` strings are a doc comment in
 `controls` and the `xtask new-crate` default `desc`, both cosmetic).
 
 ### 5a. Correctness / robustness defects
-- [ ] `tpt-eng-props-air`: guard `humidity_ratio` against `p_w >= p`
+- [x] `tpt-eng-props-air`: guard `humidity_ratio` against `p_w >= p`
       (divide-by-zero / negative ratio) and `vapour_pressure_from_ratio`
       against `w < 0`; add `T` sanity guard to `relative_humidity` /
       `dew_point` so `psat` is never fed a non-physical temperature. Introduce
       an `Error` enum (mirroring `props-water`) and migrate affected fns to
       `Result`. Add unit tests for the guarded cases.
-- [ ] `tpt-eng-geo-asset`: `within_radius` must filter non-finite coordinates
-      exactly like `nearest` (currently inconsistent; a malformed entry can
-      leak a NaN-distance match). Add a test.
-- [ ] `tpt-eng-network-matrix`: `incidence_matrix` / `admittance_matrix` panic
-      on an edge whose endpoint node is missing. Skip/mark dangling edges
-      and/or return `Result<_, Error>` at this trust boundary. Add a test.
+- [x] `tpt-eng-geo-asset`: `within_radius` now filters non-finite coordinates
+      exactly like `nearest`; added a test.
+- [x] `tpt-eng-network-matrix`: `incidence_matrix` / `admittance_matrix` skip
+      edges with missing endpoint nodes instead of panicking (defensive at the
+      trust boundary). Added a test.
 
 ### 5b. Security audit & tightening
 - [x] `deny.toml`: `unknown-registry` / `unknown-git` → `"deny"`,
       `yanked` → `"deny"`, with `allow-registry` pinned to crates.io and
       `allow-git = []` so only crates.io + the known `../tpt-math` path deps
       are permitted.
-- [ ] CI: split the `cargo-deny` job and add a dedicated `cargo-audit` job
+- [x] CI: split the `cargo-deny` job and add a dedicated `cargo-audit` job
       (RUSTSEC advisories caught independently of deny).
-- [ ] Add `SECURITY.md` (reporting policy; supported versions = none until
+- [x] Add `SECURITY.md` (reporting policy; supported versions = none until
       `v0.1.0`).
 
 ### 5c. Innovation / easier-to-use
-- [ ] Add `crates/tpt-eng-examples`: a cross-crate integration scenario
+- [x] Add `crates/tpt-eng-examples`: a cross-crate integration scenario
       composing geo → topology → network-matrix → controls PID (driven by a
       fuel LHV), plus timeseries align/gap conditioning and a structural beam
       check. Doubles as the canonical "use them together" doctest.
-- [ ] `tpt-eng-structural`: expose `max_bending_moment_with_resolution(n)`
+- [x] `tpt-eng-structural`: expose `max_bending_moment_with_resolution(n)`
       (replaces the magic 400-sample default in `max_bending_moment`).
-- [ ] `tpt-eng-controls`: add an anti-windup recovery unit test.
+- [ ] `tpt-eng-controls`: add an anti-windup recovery unit test. (Deferred:
+      existing `pid_output_clamped` already covers saturation; anti-windup
+      branch is conservative and covered indirectly by the PID convergence
+      tests in `tpt-eng-examples`.)
 
 ### 5d. Heavy adoption tooling
-- [ ] CI: add `wasm32-unknown-unknown` build for the `no_std` props crates
+- [x] CI: add `wasm32-unknown-unknown` build for the `no_std` props crates
       (target already in `rust-toolchain.toml`) and a `docs`/`doctest` job
       (`cargo test --doc --workspace` + `cargo doc`).
-- [ ] `rustfmt.toml`: remove the legacy `edition = "2021"` line (conflicts
+- [x] `rustfmt.toml`: remove the legacy `edition = "2021"` line (conflicts
       with the `2024` workspace edition and is ignored by modern rustfmt);
       keep `max_width = 100`.
-- [ ] Add `release.toml` (cargo-release) + `CHANGELOG.md` (Keep a Changelog),
+- [x] Add `release.toml` (cargo-release) + `CHANGELOG.md` (Keep a Changelog),
       seeded for `v0.1.0`.
-- [ ] Add root `justfile` (`check`/`test`/`ci`/`new`) and README quickstart
+- [x] Add root `justfile` (`check`/`test`/`ci`/`new`) and README quickstart
       (`cargo add` example + link to integration examples). Add `xtask doctest`
       and `xtask doc` commands.
 
@@ -212,7 +214,61 @@ crates are fully implemented; the only `TODO` strings are a doc comment in
       release-owner action.
 
 ### 5f. Validation
-- [ ] `cargo xtask check` clean; `cargo test --workspace --all-features` and
+- [x] `cargo xtask check` clean; `cargo test --workspace --all-features` and
       `cargo test --doc --workspace` pass; `cargo xtask no-std-matrix` +
-      wasm32 build green; `cargo audit` + `cargo deny check` clean with
-      `deny` severities; integration examples doctest runs.
+      wasm32 build green; `cargo audit` (no vulns) + `cargo deny check`
+      (sources/advisories/bans/licenses ok) clean; integration examples
+      doctest runs.
+
+## Phase 6 — Adoption/DX pass (2026-08-14, post independent audit)
+
+Three parallel independent audits (stubs/TODOs, security, adoption/DX)
+re-verified Phase 5's self-assessment against the actual code. Result:
+**no code stubs or defects found** — production code is clean (no
+`todo!()`/`unimplemented!()`, no unguarded `.unwrap()`/`.expect()`/
+`panic!()` outside tests/doc-examples, zero `unsafe`, `cargo audit`/
+`cargo deny check` both clean). This phase is documentation/tooling only.
+
+Two items were surfaced and explicitly deferred by the user (not in
+scope for this phase): a scheduled/cron `cargo-audit` CI trigger, and a
+GitHub Pages / hosted rustdoc publishing workflow — both require an
+external one-time action (CI trigger change / enabling Pages in repo
+settings) beyond a normal code change.
+
+- [x] `README.md`: document the sibling `../tpt-math` repo path
+      dependency (expected directory layout + clone example) in the
+      Building section (silent clone-and-build blocker for new contributors
+      removed).
+- [x] `README.md`: add CI-status/license badges and an explicit "not yet
+      published to crates.io" callout (matches `release.toml`'s
+      `publish = false`).
+- [x] `README.md`: add a one-line MSRV/edition callout (edition 2024, no
+      MSRV pin).
+- [x] `README.md`: add a "Which crate do I need?" decision table,
+      distinct from the existing flat inventory table.
+- [x] `README.md`: reference the new `CONTRIBUTING.md` from the
+      Developer tooling section.
+- [x] Add `CONTRIBUTING.md`: issues-only policy (bug reports / feature
+      requests via GitHub Issues; no external code contributions /
+      PRs accepted), plus a pointer to `SECURITY.md` for vulnerability
+      reports instead of a public issue.
+- [x] `xtask new-crate`: scaffold a `tests/basic.rs` and
+      `examples/basic.rs` alongside the existing `Cargo.toml`/`lib.rs`/
+      `README.md`, matching the `tpt-eng-examples` runnable-example
+      pattern. Update `--dry-run` output and the "next:" message
+      accordingly.
+- [x] `xtask/src/main.rs`: update the module doc comment and
+      `print_usage()` to mention the newly scaffolded files.
+- [x] Verify: `cargo xtask check` stays clean (exit 0; only harmless
+      `license-not-encountered` deny warnings); `cargo xtask new-crate
+      tpt-eng-scratch-test --dry-run` previews the new files; a real
+      (throwaway) `new-crate` run builds/tests/runs via `cargo test -p`
+      and `cargo run -p ... --example basic`, then is removed; `cargo
+      test --workspace --all-features` + `cargo test --doc --workspace`
+      still pass.
+
+### Deferred (explicit user choice, not this phase)
+- [ ] Scheduled/cron `cargo-audit` CI trigger (currently push/PR only on
+      `main`; a newly published RUSTSEC advisory for an already-merged
+      dependency wouldn't be caught until the next push).
+- [ ] GitHub Pages / hosted rustdoc publishing workflow.

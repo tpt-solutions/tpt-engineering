@@ -1,9 +1,17 @@
 # tpt-engineering
 
+[![CI](https://github.com/tpt-solutions/tpt-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/tpt-solutions/tpt-engineering/actions/workflows/ci.yml)
+[![license: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE-MIT)
+
 Applied engineering primitives for the [TPT Solutions](https://github.com/tpt-solutions)
 physical-systems verticals.
 
 Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE).
+
+> **Not yet published to [crates.io](https://crates.io).** These crates are
+> consumed as workspace/path dependencies (`publish = false` in
+> `release.toml`); there is no `v0.1.0` tag yet. APIs are unstable until the
+> first tagged release.
 
 ## Scope
 
@@ -39,13 +47,50 @@ environment).
 
 ## Building
 
+This workspace depends on the sibling [`tpt-math`](https://github.com/tpt-solutions/tpt-math)
+repo via relative `path` dependencies (`../tpt-math/crates/tpt-math-*`).
+`tpt-math` must sit **next to** this repo (same parent directory) so the
+`path = "../tpt-math/..."` entries in the workspace `Cargo.toml` resolve:
+
 ```sh
+git clone https://github.com/tpt-solutions/tpt-math.git ../tpt-math
+git clone https://github.com/tpt-solutions/tpt-engineering.git
+cd tpt-engineering
 cargo build --workspace
 cargo test --workspace
 ```
 
+Without the sibling `tpt-math` checkout the workspace will not resolve its
+`path` dependencies and `cargo build` will fail at the manifest step.
+
+- **Edition:** `2024`.
+- **MSRV:** none pinned (no `rust-version` in `[workspace.package]`). Build with a
+  current stable toolchain; the toolchain version is fixed by
+  `rust-toolchain.toml` via `rustup`.
+
 The `tpt-eng-props-*` family is `no_std`; it builds for bare-metal targets
 with the default features disabled.
+
+## Which crate do I need?
+
+The inventory above is a flat list. For choosing a starting point by task:
+
+| If you need to… | Start with |
+|-------|--------|
+| Compute water/steam thermodynamic properties (IAPWS-IF97) | `tpt-eng-props-water` |
+| Compute moist-air / psychrometric properties (ASHRAE) | `tpt-eng-props-air` |
+| Compute fuel heating values, density, combustion properties | `tpt-eng-props-fuels` |
+| Work with any/all fluid properties at once | `tpt-eng-props` (umbrella) |
+| Condition/timestamp irregular sensor streams | `tpt-eng-timeseries-core` |
+| Align multi-rate streams (e.g. 1 Hz CAN vs 10 s Modbus) onto one grid | `tpt-eng-timeseries-align` |
+| Detect staleness/dropouts and interpolate gaps | `tpt-eng-timeseries-gap` |
+| Use all time-series primitives together | `tpt-eng-timeseries` (umbrella) |
+| Register geographic assets / devices | `tpt-eng-geo-asset` |
+| Model pipes/wires/ducts as directed graphs | `tpt-eng-geo-topology` |
+| Generate incidence/admittance matrices from topology | `tpt-eng-network-matrix` |
+| Implement PID / state-space / transfer-function control | `tpt-eng-controls` |
+| Compute loads, beam/frame analysis, code checks | `tpt-eng-structural` |
+| A full worked cross-crate scenario | `tpt-eng-examples` |
 
 ## Quickstart
 
@@ -77,6 +122,9 @@ time-series conditioning → structural check), see
 `cargo xtask` provides one-stop hygiene and scaffolding (`check`, `test`,
 `doctest`, `doc`, `no-std-matrix`, `new-crate`). A root [`justfile`](justfile)
 mirrors these for non-Cargo users.
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the issues-only contribution
+policy and where to report problems.
 
 ## License
 

@@ -7,7 +7,10 @@
 //! Commands:
 //! * `new-crate <tpt-eng-name>` — scaffold a new `tpt-eng-*` crate and register
 //!   it in the workspace (`members` + `[workspace.dependencies]`) and the README
-//!   inventory. Add `--dry-run` to print the generated files instead of writing.
+//!   inventory. It generates `Cargo.toml`, `src/lib.rs`, `README.md`,
+//!   `tests/basic.rs`, and `examples/basic.rs` (matching the
+//!   `tpt-eng-examples` runnable-example pattern). Add `--dry-run` to print the
+//!   generated files instead of writing.
 //! * `no-std-matrix` — build every `no_std`-capable crate for
 //!   `thumbv6m-none-eabi` (replaces the hand-listed CI steps; see ADR 0001).
 //! * `fmt` / `clippy` / `test` / `deny` / `check` — the standard hygiene gates.
@@ -90,6 +93,7 @@ fn print_usage() {
          \n\
          commands:\n\
            new-crate <tpt-eng-name> [--desc \"...\"] [--domain \"...\"] [--no-std yes|no] [--dry-run]\n\
+           \x20\x20\x20\x20scaffolds Cargo.toml, src/lib.rs, README.md, tests/basic.rs, examples/basic.rs\n\
            no-std-matrix   build the no_std crates for {NO_STD_TARGET}\n\
            fmt | clippy | test | doctest | doc | deny | check   workspace hygiene gates"
     );
@@ -168,6 +172,8 @@ fn new_crate(args: &[String]) -> Result<(), String> {
     let cargo_toml = render_crate_cargo_toml(&name, &desc);
     let lib_rs = render_crate_lib_rs(&name, &desc);
     let readme = render_crate_readme(&name, &desc);
+    let tests_basic = render_crate_tests_basic();
+    let example_basic = render_crate_example_basic(&name);
 
     let root_cargo_path = root.join("Cargo.toml");
     let root_readme_path = root.join("README.md");
@@ -184,21 +190,31 @@ fn new_crate(args: &[String]) -> Result<(), String> {
         println!("=== would write crates/{name}/Cargo.toml ===\n{cargo_toml}");
         println!("=== would write crates/{name}/src/lib.rs ===\n{lib_rs}");
         println!("=== would write crates/{name}/README.md ===\n{readme}");
+        println!("=== would write crates/{name}/tests/basic.rs ===\n{tests_basic}");
+        println!("=== would write crates/{name}/examples/basic.rs ===\n{example_basic}");
         println!("=== Cargo.toml: member + workspace dependency added ===");
         println!("=== README.md: inventory row added ===");
         return Ok(());
     }
 
     fs::create_dir_all(crate_dir.join("src")).map_err(|e| format!("create crates/{name}: {e}"))?;
+    fs::create_dir_all(crate_dir.join("tests"))
+        .map_err(|e| format!("create crates/{name}/tests: {e}"))?;
+    fs::create_dir_all(crate_dir.join("examples"))
+        .map_err(|e| format!("create crates/{name}/examples: {e}"))?;
     write_file(&crate_dir.join("Cargo.toml"), &cargo_toml)?;
     write_file(&crate_dir.join("src").join("lib.rs"), &lib_rs)?;
     write_file(&crate_dir.join("README.md"), &readme)?;
+    write_file(&crate_dir.join("tests").join("basic.rs"), &tests_basic)?;
+    write_file(&crate_dir.join("examples").join("basic.rs"), &example_basic)?;
     write_file(&root_cargo_path, &new_root_cargo)?;
     write_file(&root_readme_path, &new_root_readme)?;
 
     println!("created crate `{name}`.");
     println!(
-        "next: add dependencies to crates/{name}/Cargo.toml, implement, then `cargo xtask check`."
+        "next: add dependencies to crates/{name}/Cargo.toml, implement src/lib.rs,\n\
+         then run `cargo test -p {name}` and `cargo run -p {name} --example basic`,\n\
+         and finally `cargo xtask check`."
     );
     Ok(())
 }
@@ -332,7 +348,36 @@ fn render_crate_readme(name: &str, desc: &str) -> String {
          Scaffolded by `cargo xtask new-crate`. See the [workspace\n\
          README](https://github.com/tpt-solutions/tpt-engineering) for conventions.\n\
          \n\
-         Dual-licensed under MIT or Apache-2.0.\n"
+         Dual-licensed under MIT OR Apache-2.0.\n"
+    )
+}
+
+fn render_crate_tests_basic() -> String {
+    "\
+// Basic smoke test for a newly scaffolded `tpt-eng-*` crate.
+//
+// Scaffolded by `cargo xtask new-crate`. Expand with real unit/integration
+// tests as the crate's public API lands.
+
+#[test]
+fn basic() {
+    assert!(true);
+}
+"
+    .to_string()
+}
+
+fn render_crate_example_basic(name: &str) -> String {
+    format!(
+        "// Basic runnable example for `{name}`.\n\
+         //\n\
+         // Scaffolded by `cargo xtask new-crate`. Implement the crate's\n\
+         // primitives in `src/lib.rs`, then extend this example to demonstrate\n\
+         // them.\n\
+         \n\
+         fn main() {{\n\
+         \x20\x20\x20\x20println!(\"{name} scaffold example — implement src/lib.rs\");\n\
+         }}\n"
     )
 }
 
