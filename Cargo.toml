@@ -1,0 +1,66 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/tpt-eng-props-water",
+    "crates/tpt-eng-props-air",
+    "crates/tpt-eng-props-fuels",
+    "crates/tpt-eng-props",
+    "crates/tpt-eng-timeseries-core",
+    "crates/tpt-eng-timeseries-align",
+    "crates/tpt-eng-timeseries-gap",
+    "crates/tpt-eng-timeseries",
+    "crates/tpt-eng-geo-asset",
+    "crates/tpt-eng-geo-topology",
+    "crates/tpt-eng-network-matrix",
+    "crates/tpt-eng-controls",
+    "crates/tpt-eng-structural",
+]
+exclude = []
+
+[workspace.package]
+description = "tpt-engineering — applied engineering primitives for the TPT Solutions physical-systems verticals"
+authors = ["TPT Solutions"]
+edition = "2024"
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/tpt-solutions/tpt-engineering"
+repository = "https://github.com/tpt-solutions/tpt-engineering"
+
+[workspace.dependencies]
+# Cross-repo dependencies (tpt-math substrate), following tpt-science's
+# proven path-dependency pattern.
+tpt-math-units = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-units" }
+tpt-math-numeric = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-numeric" }
+tpt-math-linalg = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-linalg" }
+
+# In-repo crate dependencies (referenced by `workspace = true`).
+tpt-eng-props-water = { version = "0.1.0", path = "crates/tpt-eng-props-water" }
+tpt-eng-props-air = { version = "0.1.0", path = "crates/tpt-eng-props-air" }
+tpt-eng-props-fuels = { version = "0.1.0", path = "crates/tpt-eng-props-fuels" }
+tpt-eng-props = { version = "0.1.0", path = "crates/tpt-eng-props" }
+tpt-eng-timeseries-core = { version = "0.1.0", path = "crates/tpt-eng-timeseries-core" }
+tpt-eng-timeseries-align = { version = "0.1.0", path = "crates/tpt-eng-timeseries-align" }
+tpt-eng-timeseries-gap = { version = "0.1.0", path = "crates/tpt-eng-timeseries-gap" }
+tpt-eng-timeseries = { version = "0.1.0", path = "crates/tpt-eng-timeseries" }
+tpt-eng-geo-asset = { version = "0.1.0", path = "crates/tpt-eng-geo-asset" }
+tpt-eng-geo-topology = { version = "0.1.0", path = "crates/tpt-eng-geo-topology" }
+tpt-eng-network-matrix = { version = "0.1.0", path = "crates/tpt-eng-network-matrix" }
+tpt-eng-controls = { version = "0.1.0", path = "crates/tpt-eng-controls" }
+tpt-eng-structural = { version = "0.1.0", path = "crates/tpt-eng-structural" }
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "warn"
+# No crate here is allowed to introduce `unsafe`; the math substrate we wrap is
+# already audited, and these primitives need no unsafe escape hatch.
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = "warn"
+missing_errors_doc = "warn"
+missing_panics_doc = "warn"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
+overflow-checks = true

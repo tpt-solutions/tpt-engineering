@@ -1,0 +1,16 @@
+[package]
+name = "tpt-eng-geo-topology"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Directional infrastructure graphs (pipes/wires/ducts)."
+readme = "README.md"
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+tpt-eng-geo-asset = { workspace = true }
+
+[lints]
+workspace = true

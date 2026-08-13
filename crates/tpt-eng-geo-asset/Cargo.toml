@@ -1,0 +1,16 @@
+[package]
+name = "tpt-eng-geo-asset"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Geographic asset registry: coordinates to logical device/node."
+readme = "README.md"
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+tpt-math-units = { workspace = true }
+
+[lints]
+workspace = true

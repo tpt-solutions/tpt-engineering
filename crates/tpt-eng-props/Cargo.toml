@@ -1,0 +1,34 @@
+[package]
+name = "tpt-eng-props"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Umbrella: re-exports water + air + fuels fluid properties."
+readme = "README.md"
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+tpt-eng-props-water = { version = "0.1.0", path = "../tpt-eng-props-water", default-features = false }
+tpt-eng-props-air = { version = "0.1.0", path = "../tpt-eng-props-air", default-features = false }
+tpt-eng-props-fuels = { version = "0.1.0", path = "../tpt-eng-props-fuels", default-features = false }
+tpt-math-units = { version = "0.1.0", path = "../../../tpt-math/crates/tpt-math-units", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+    "tpt-eng-props-water/std",
+    "tpt-eng-props-air/std",
+    "tpt-eng-props-fuels/std",
+    "tpt-math-units/std",
+]
+alloc = [
+    "tpt-eng-props-water/alloc",
+    "tpt-eng-props-air/alloc",
+    "tpt-eng-props-fuels/alloc",
+    "tpt-math-units/alloc",
+]
+
+[lints]
+workspace = true
