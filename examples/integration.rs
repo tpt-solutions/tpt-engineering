@@ -8,12 +8,12 @@
 
 use std::f32::consts::FRAC_1_SQRT_2;
 
-use tpt_eng_cad::{SolidFeature, Sphere, Part};
-use tpt_eng_geometry::{frame::Frame3, Point3};
+use tpt_eng_cad::{Part, SolidFeature, Sphere};
 use tpt_eng_gdt::{
     Datum, DatumReference, DatumReferenceFrame, GeometricCharacteristic, MaterialCondition,
     ToleranceFrame, ToleranceZone,
 };
+use tpt_eng_geometry::{frame::Frame3, Point3};
 use tpt_eng_mesh::Mesh;
 use tpt_eng_nurbs::{KnotVector, NurbsCurve};
 
@@ -22,7 +22,11 @@ fn main() {
     let kv = KnotVector::new(vec![0.0, 0.0, 0.0, 1.0, 1.0, 1.0]).unwrap();
     let arc = NurbsCurve::new(
         2,
-        vec![Point3::new(1.0, 0.0, 0.0), Point3::new(1.0, 1.0, 0.0), Point3::new(0.0, 1.0, 0.0)],
+        vec![
+            Point3::new(1.0, 0.0, 0.0),
+            Point3::new(1.0, 1.0, 0.0),
+            Point3::new(0.0, 1.0, 0.0),
+        ],
         vec![1.0, FRAC_1_SQRT_2, 1.0],
         kv,
     )
@@ -56,6 +60,9 @@ fn main() {
         ToleranceZone::Cylindrical { diameter: 0.1 },
     )
     .with_datum(DatumReference::new('A', MaterialCondition::Mmc));
-    println!("DRF primary origin in world: {:?}", drf.to_world(Point3::ZERO));
+    println!(
+        "DRF primary origin in world: {:?}",
+        drf.to_world(Point3::ZERO)
+    );
     println!("tolerance frame datum refs: {}", tf.datum_refs.len());
 }

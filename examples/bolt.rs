@@ -2,7 +2,7 @@
 //!
 //! Run with: `cargo run --example bolt -p tpt-eng-cad`
 
-use tpt_eng_cad::{SolidFeature, Sphere, Part};
+use tpt_eng_cad::{Part, SolidFeature, Sphere};
 use tpt_eng_geometry::Point3;
 
 fn main() {

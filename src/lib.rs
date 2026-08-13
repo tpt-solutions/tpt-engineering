@@ -473,11 +473,43 @@ fn tet_triangles(pos: &[Point3; 4], val: &[f32; 4]) -> Vec<[Point3; 3]> {
     triangles
 }
 
-/// Orient a triangle so its normal points outward from the solid, flipping the
-/// winding when the triangle centroid lies outside (`sdf(centroid) > 0`).
+/// Approximate the SDF gradient at `p` via central finite differences.
+///
+/// The gradient of a signed-distance field points in the direction of increasing
+/// distance, i.e. *outward* from the solid (where `sdf < 0`). It is well-defined
+/// on both convex and concave surfaces, so it orients mesh triangles correctly
+/// even for internal cavities produced by boolean subtraction.
+fn sdf_gradient<S: Solid + ?Sized>(solid: &S, p: Point3) -> Vector3 {
+    const H: f32 = 1e-3;
+    let gx = (solid.sdf(p + Vector3::new(H, 0.0, 0.0)) - solid.sdf(p - Vector3::new(H, 0.0, 0.0)))
+        / (2.0 * H);
+    let gy = (solid.sdf(p + Vector3::new(0.0, H, 0.0)) - solid.sdf(p - Vector3::new(0.0, H, 0.0)))
+        / (2.0 * H);
+    let gz = (solid.sdf(p + Vector3::new(0.0, 0.0, H)) - solid.sdf(p - Vector3::new(0.0, 0.0, H)))
+        / (2.0 * H);
+    Vector3::new(gx, gy, gz)
+}
+
+/// Orient a triangle so its normal points outward from the solid.
+///
+/// The triangle normal (from its current winding) is compared against the
+/// average SDF gradient at its vertices; if they oppose, the winding is flipped.
+/// Falls back to the centroid-sign heuristic only where the gradient is
+/// degenerate (near-zero, e.g. exactly at a sphere center).
 fn orient_outward<S: Solid + ?Sized>(solid: &S, triangle: [Point3; 3]) -> [Point3; 3] {
-    let centroid = (triangle[0] + triangle[1] + triangle[2]) / 3.0;
-    if solid.sdf(centroid) > 0.0 {
+    let n = (triangle[1] - triangle[0]).cross(triangle[2] - triangle[0]);
+    let grad = (sdf_gradient(solid, triangle[0])
+        + sdf_gradient(solid, triangle[1])
+        + sdf_gradient(solid, triangle[2]))
+        / 3.0;
+    if grad.length() < 1e-6 {
+        let centroid = (triangle[0] + triangle[1] + triangle[2]) / 3.0;
+        if solid.sdf(centroid) > 0.0 {
+            [triangle[0], triangle[2], triangle[1]]
+        } else {
+            triangle
+        }
+    } else if n.dot(grad) < 0.0 {
         [triangle[0], triangle[2], triangle[1]]
     } else {
         triangle
@@ -791,6 +823,62 @@ mod tests {
         assert_eq!(brep.vertex_count(), 3);
         assert_eq!(brep.edge_count(), 3);
         assert_eq!(brep.face_count(), 1);
+    }
+
+    #[test]
+    fn mesh_normals_point_outward() {
+        let s = Sphere {
+            center: Point3::ZERO,
+            radius: 1.0,
+        };
+        let mesh = marching_tetrahedra(&s, 16, &s.bbox());
+        // Every triangle's geometric normal must align with the outward radial
+        // direction (away from the sphere center).
+        for tri in mesh.indices.chunks_exact(3) {
+            let a = mesh.positions[tri[0] as usize];
+            let b = mesh.positions[tri[1] as usize];
+            let c = mesh.positions[tri[2] as usize];
+            let n = (b - a).cross(c - a);
+            if n.length() < 1e-9 {
+                continue; // skip coincidental zero-area triangles
+            }
+            let center = (a + b + c) / 3.0;
+            assert!(n.dot(center) > 0.0, "inward-facing triangle at {center:?}");
+        }
+    }
+
+    #[test]
+    fn cavity_surface_orients_into_void() {
+        // Big block with a spherical pocket subtracted: the cavity wall should
+        // be oriented so its normal points into the void (away from material).
+        let block = Box {
+            center: Point3::ZERO,
+            half_extents: Vector3::new(2.0, 2.0, 2.0),
+        };
+        let pocket = Sphere {
+            center: Point3::new(0.0, 0.0, 0.0),
+            radius: 1.0,
+        };
+        let part = Part::new("block", StdBox::new(block))
+            .add_feature(SolidFeature::Cut(StdBox::new(pocket)));
+        let mesh = part.mesh(24);
+        // For each triangle, the SDF gradient (outward from material) must agree
+        // with the triangle's geometric normal.
+        for tri in mesh.indices.chunks_exact(3) {
+            let a = mesh.positions[tri[0] as usize];
+            let b = mesh.positions[tri[1] as usize];
+            let c = mesh.positions[tri[2] as usize];
+            let n = (b - a).cross(c - a);
+            if n.length() < 1e-9 {
+                continue; // skip coincidental zero-area triangles
+            }
+            let center = (a + b + c) / 3.0;
+            let grad = sdf_gradient(part.resolved().as_ref(), center);
+            assert!(
+                n.dot(grad) > 0.0,
+                "misoriented triangle at cavity/face {center:?}"
+            );
+        }
     }
 
     #[test]
