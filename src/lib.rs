@@ -160,12 +160,13 @@ impl BsplineCurve {
 
     /// Derivative of the curve of the given `order` at parameter `u`.
     ///
-    /// Order `0` returns the zero vector. Higher orders are computed with
-    /// central finite differences (`h = 1e-4`); the result is a vector.
+    /// Order `0` returns the curve position (as a vector from the origin);
+    /// higher orders are computed with central finite differences
+    /// (`h = 1e-4`).
     pub fn derivative(&self, u: f32, order: usize) -> Vector3 {
         const H: f32 = 1e-4;
         match order {
-            0 => Vector3::ZERO,
+            0 => self.eval(u),
             1 => {
                 let f1 = self.eval(u - H);
                 let f2 = self.eval(u + H);
@@ -267,12 +268,12 @@ impl NurbsCurve {
 
     /// Derivative of the rational curve of the given `order` at `u`.
     ///
-    /// Order `0` returns the zero vector. Higher orders use central finite
-    /// differences (`h = 1e-4`).
+    /// Order `0` returns the curve position (as a vector from the origin);
+    /// higher orders use central finite differences (`h = 1e-4`).
     pub fn derivative(&self, u: f32, order: usize) -> Vector3 {
         const H: f32 = 1e-4;
         match order {
-            0 => Vector3::ZERO,
+            0 => self.eval(u),
             1 => {
                 let f1 = self.eval(u - H);
                 let f2 = self.eval(u + H);
@@ -454,6 +455,118 @@ impl NurbsSurface {
     }
 }
 
+/// A non-rational B-spline surface in 3D defined over a control-point grid
+/// `control_points[i][j]` (index `i` along `u`, `j` along `v`).
+#[derive(Debug, Clone)]
+pub struct BsplineSurface {
+    /// Degree in the `u` direction.
+    pub degree_u: usize,
+    /// Degree in the `v` direction.
+    pub degree_v: usize,
+    /// Control point grid `control_points[i][j]`.
+    pub control_points: Vec<Vec<Point3>>,
+    /// Knot vector in the `u` direction.
+    pub knots_u: KnotVector,
+    /// Knot vector in the `v` direction.
+    pub knots_v: KnotVector,
+}
+
+impl BsplineSurface {
+    /// Build a B-spline surface, validating the rectangular grid and valid knot
+    /// vectors in both directions.
+    pub fn new(
+        degree_u: usize,
+        degree_v: usize,
+        control_points: Vec<Vec<Point3>>,
+        knots_u: KnotVector,
+        knots_v: KnotVector,
+    ) -> Result<Self, String> {
+        if control_points.is_empty() || control_points[0].is_empty() {
+            return Err("control point grid must be non-empty".to_string());
+        }
+        let n_u = control_points.len();
+        let n_v = control_points[0].len();
+        for row in &control_points {
+            if row.len() != n_v {
+                return Err("control point grid must be rectangular".to_string());
+            }
+        }
+        if !knots_u.is_valid(degree_u, n_u) {
+            return Err(format!(
+                "invalid u knot vector: expected {} knots for degree {} and {} rows",
+                n_u + degree_u + 1,
+                degree_u,
+                n_u
+            ));
+        }
+        if !knots_v.is_valid(degree_v, n_v) {
+            return Err(format!(
+                "invalid v knot vector: expected {} knots for degree {} and {} columns",
+                n_v + degree_v + 1,
+                degree_v,
+                n_v
+            ));
+        }
+        Ok(BsplineSurface {
+            degree_u,
+            degree_v,
+            control_points,
+            knots_u,
+            knots_v,
+        })
+    }
+
+    /// Evaluate the surface at `(u, v)`, clamped to both domains.
+    pub fn eval(&self, u: f32, v: f32) -> Point3 {
+        let u = clamp_to_domain(u, self.knots_u.domain());
+        let v = clamp_to_domain(v, self.knots_v.domain());
+        let span_u = self.knots_u.find_span(u, self.degree_u);
+        let span_v = self.knots_v.find_span(v, self.degree_v);
+        let nu = basis_functions(span_u, u, self.degree_u, &self.knots_u.knots);
+        let nv = basis_functions(span_v, v, self.degree_v, &self.knots_v.knots);
+        let mut point = Point3::ZERO;
+        for (a, &bu) in nu.iter().enumerate() {
+            let i = span_u - self.degree_u + a;
+            for (b, &bv) in nv.iter().enumerate() {
+                let j = span_v - self.degree_v + b;
+                point += bu * bv * self.control_points[i][j];
+            }
+        }
+        point
+    }
+
+    /// Tessellate the surface into a triangle mesh (welded grid).
+    pub fn tessellate(&self, nu: usize, nv: usize) -> tpt_eng_mesh::Mesh {
+        let (u0, u1) = self.knots_u.domain();
+        let (v0, v1) = self.knots_v.domain();
+        let mut positions = Vec::with_capacity(nu * nv);
+        for i in 0..nu {
+            let u = if nu == 1 { u0 } else { u0 + (u1 - u0) * (i as f32 / (nu - 1) as f32) };
+            for j in 0..nv {
+                let v = if nv == 1 { v0 } else { v0 + (v1 - v0) * (j as f32 / (nv - 1) as f32) };
+                positions.push(self.eval(u, v));
+            }
+        }
+        let mut indices = Vec::new();
+        for i in 0..nu.saturating_sub(1) {
+            for j in 0..nv.saturating_sub(1) {
+                let a = (i * nv + j) as u32;
+                let b = (i * nv + (j + 1)) as u32;
+                let c = ((i + 1) * nv + j) as u32;
+                let d = ((i + 1) * nv + (j + 1)) as u32;
+                indices.push(a);
+                indices.push(c);
+                indices.push(b);
+                indices.push(b);
+                indices.push(c);
+                indices.push(d);
+            }
+        }
+        tpt_eng_mesh::Mesh::from_positions_indices(positions, indices)
+            .expect("grid tessellation produces a valid mesh")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -543,6 +656,21 @@ mod tests {
             "got {:?}",
             center
         );
+        let mesh = surface.tessellate(4, 4);
+        assert!(mesh.face_count() > 0);
+    }
+
+    #[test]
+    fn bspline_surface_center_and_tessellation() {
+        let ku = KnotVector::new(vec![0.0, 0.0, 1.0, 1.0]).unwrap();
+        let kv = KnotVector::new(vec![0.0, 0.0, 1.0, 1.0]).unwrap();
+        let cps = vec![
+            vec![p(0.0, 0.0, 0.0), p(0.0, 1.0, 0.0)],
+            vec![p(1.0, 0.0, 0.0), p(1.0, 1.0, 0.0)],
+        ];
+        let surface = BsplineSurface::new(1, 1, cps, ku, kv).unwrap();
+        let center = surface.eval(0.5, 0.5);
+        assert!((center - p(0.5, 0.5, 0.0)).length() < 1e-5, "got {:?}", center);
         let mesh = surface.tessellate(4, 4);
         assert!(mesh.face_count() > 0);
     }
