@@ -1,0 +1,19 @@
+[package]
+name = "tpt-eng-reliability"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Reliability and life analysis: fatigue, life prediction, failure rates, FMEA, probabilistic design."
+
+[dependencies]
+tpt-eng-math.workspace = true
+tpt-eng-uncertainty.workspace = true
+rand.workspace = true
+statrs.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+approx.workspace = true
