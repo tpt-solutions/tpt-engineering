@@ -303,9 +303,13 @@ impl Limits {
 
 /// Build symmetric size limits centered on `nominal`.
 ///
-/// Both holes and shafts are treated identically here: the limits are
-/// `(nominal - tolerance / 2, nominal + tolerance / 2)`. The `is_hole` flag is
-/// retained for call-site clarity and possible future asymmetric conventions.
+/// This is the simple, convention-agnostic case where holes and shafts share
+/// the same symmetric limits `(nominal - tolerance / 2, nominal + tolerance
+/// / 2)`. The `is_hole` flag is retained for call-site clarity only.
+///
+/// To distinguish holes from shafts using the ISO system of limits and fits
+/// (where holes and shafts get *different* fundamental deviations, e.g. `H7`
+/// vs `g6`), use [`iso_hole_limits`] and [`iso_shaft_limits`] instead.
 #[must_use]
 pub fn size_limits(nominal: f32, tolerance: f32, is_hole: bool) -> Limits {
     let _ = is_hole;
@@ -341,6 +345,116 @@ pub fn fit_type(hole: &Limits, shaft: &Limits) -> FitType {
 #[must_use]
 pub fn allowance(hole: &Limits, shaft: &Limits) -> f32 {
     clearance(hole, shaft)
+}
+
+/// # ISO hole/shaft tolerance classes
+///
+/// Helpers for the common ISO system of limits and fits. They compute size
+/// limits from an IT grade and a fundamental-deviation letter (e.g. `H7`, `g6`)
+/// so that holes and shafts get distinct limits. Values follow the standard
+/// ISO tolerance-unit formulas; they may differ slightly from the officially
+/// published *rounded* tables, so verify against the standard for production use.
+///
+/// Only the most common deviation letters are supported: shafts `a`..`h` and
+/// `js` (and the mirrored holes `A`..`H`, `JS`).
+///
+/// Standard ISO tolerance unit `i` (or `I` for sizes above 500 mm), in
+/// micrometres, for a nominal size `d_mm` (millimetres).
+#[must_use]
+pub fn iso_tolerance_unit_um(d_mm: f32) -> f32 {
+    let d = d_mm.abs().max(0.0);
+    if d <= 500.0 {
+        0.45 * d.powf(1.0 / 3.0) + 0.001 * d
+    } else {
+        0.004 * d + 2.1
+    }
+}
+
+/// ISO IT-grade tolerance value (millimetres) for a nominal size (mm).
+///
+/// Supports IT5..IT18 (the common engineering grades); returns `None` otherwise.
+#[must_use]
+pub fn iso_tolerance(grade: u8, nominal_mm: f32) -> Option<f32> {
+    let multiplier = match grade {
+        5 => 7.0,
+        6 => 10.0,
+        7 => 16.0,
+        8 => 25.0,
+        9 => 40.0,
+        10 => 64.0,
+        11 => 100.0,
+        12 => 160.0,
+        13 => 250.0,
+        14 => 400.0,
+        15 => 640.0,
+        16 => 1000.0,
+        17 => 1600.0,
+        18 => 2500.0,
+        _ => return None,
+    };
+    Some((multiplier * iso_tolerance_unit_um(nominal_mm)) / 1000.0)
+}
+
+/// Upper/lower shaft deviations `(es, ei)` in micrometres for a fundamental
+/// deviation letter and grade tolerance `t_um` (µm).
+///
+/// Covers `a`..`h` (deviation on the upper bound) and `js` (symmetric); returns
+/// `None` for unsupported letters (e.g. `k`, `m`, `n`, `p`, ...).
+fn shaft_deviations_um(deviation: &str, d_mm: f32, t_um: f32) -> Option<(f32, f32)> {
+    let d = d_mm.abs().max(0.0);
+    let es = match deviation {
+        "a" => -(265.0 + 1.3 * d),
+        "b" => -(140.0 + 0.85 * d),
+        "c" => -(63.0 + 0.8 * d),
+        "d" => -(16.0 * d.powf(0.44)),
+        "e" => -(11.0 * d.powf(0.41)),
+        "f" => -(5.5 * d.powf(0.41)),
+        "g" => -(2.5 * d.powf(0.34)),
+        "h" => 0.0,
+        "j" | "js" => t_um / 2.0,
+        _ => return None,
+    };
+    let (es, ei) = if deviation == "j" || deviation == "js" {
+        (t_um / 2.0, -t_um / 2.0)
+    } else {
+        (es, es - t_um)
+    };
+    Some((es, ei))
+}
+
+/// ISO shaft size limits (mm) for a nominal size, IT grade (5..18), and
+/// fundamental-deviation letter (`a`..`h`, `js`).
+pub fn iso_shaft_limits(nominal_mm: f32, grade: u8, deviation: &str) -> Result<Limits, String> {
+    let t = iso_tolerance(grade, nominal_mm)
+        .ok_or_else(|| format!("unsupported ISO grade IT{grade} (supported: IT5..IT18)"))?;
+    let (es, ei) = shaft_deviations_um(deviation, nominal_mm, t * 1000.0).ok_or_else(|| {
+        format!("unsupported shaft deviation '{deviation}' (supported: a..h, js)")
+    })?;
+    Ok(Limits {
+        upper: nominal_mm + es / 1000.0,
+        lower: nominal_mm + ei / 1000.0,
+    })
+}
+
+/// ISO hole size limits (mm) for a nominal size, IT grade (5..18), and
+/// fundamental-deviation letter (`A`..`H`, `JS`). Hole deviations mirror the
+/// corresponding shaft letter.
+pub fn iso_hole_limits(nominal_mm: f32, grade: u8, deviation: &str) -> Result<Limits, String> {
+    let t = iso_tolerance(grade, nominal_mm)
+        .ok_or_else(|| format!("unsupported ISO grade IT{grade} (supported: IT5..IT18)"))?;
+    let (es, _) = shaft_deviations_um(
+        deviation.to_ascii_lowercase().as_str(),
+        nominal_mm,
+        t * 1000.0,
+    )
+    .ok_or_else(|| format!("unsupported hole deviation '{deviation}' (supported: A..H, JS)"))?;
+    // Hole deviation mirrors the shaft: EI = -es, ES = EI + T.
+    let ei_hole = -es;
+    let es_hole = ei_hole + t * 1000.0;
+    Ok(Limits {
+        lower: nominal_mm + ei_hole / 1000.0,
+        upper: nominal_mm + es_hole / 1000.0,
+    })
 }
 
 /// A single contributor to a 1-D tolerance stack-up.
@@ -500,7 +614,11 @@ impl DatumReferenceFrame {
                 max_dev = dev;
             }
         }
-        let max_dev = if world_points.is_empty() { 0.0 } else { max_dev };
+        let max_dev = if world_points.is_empty() {
+            0.0
+        } else {
+            max_dev
+        };
         ConformanceReport {
             max_deviation: max_dev,
             passed: max_dev <= 0.0,
@@ -543,9 +661,10 @@ impl Stackup {
                 } else {
                     (m.tol_plus, m.tol_minus)
                 };
+                let (neg, pos) = (neg as f64, pos as f64);
                 let u = lcg_uniform(&mut state);
-                let dev = (-neg as f64) + u * (neg + pos) as f64;
-                total += m.sign as f64 * (m.nominal as f64 + dev);
+                let dev = -neg + u * (neg + pos);
+                total += m.sign * (m.nominal as f64 + dev);
             }
             sum += total;
             sum_sq += total * total;
@@ -765,5 +884,35 @@ mod tests {
         // ±3σ band should comfortably contain the analytic worst case of ±0.1.
         assert!(r.lower_3sigma > 9.7);
         assert!(r.upper_3sigma < 10.3);
+    }
+
+    #[test]
+    fn iso_tolerance_basics() {
+        let t7 = iso_tolerance(7, 50.0).unwrap();
+        assert!(t7 > 0.02 && t7 < 0.03, "T7@50mm ~0.025, got {t7}");
+        let t6 = iso_tolerance(6, 50.0).unwrap();
+        assert!(t6 > 0.015 && t6 < 0.018, "T6@50mm ~0.016, got {t6}");
+        assert!(iso_tolerance(4, 50.0).is_none());
+    }
+
+    #[test]
+    fn iso_hole_vs_shaft_distinct() {
+        let hole = iso_hole_limits(50.0, 7, "H").unwrap();
+        let shaft = iso_shaft_limits(50.0, 6, "g").unwrap();
+        // H7 hole: lower limit equals the nominal (EI = 0).
+        assert!((hole.lower - 50.0).abs() < 1e-6);
+        assert!(hole.upper > hole.lower);
+        // g6 shaft: both limits sit below the nominal (deviation below zero line).
+        assert!(shaft.upper < 50.0);
+        assert!(shaft.lower < shaft.upper);
+        // The two are clearly different designs (hole is positive-side, shaft negative-side).
+        assert!(hole.lower > shaft.upper);
+    }
+
+    #[test]
+    fn iso_unsupported_errors() {
+        assert!(iso_shaft_limits(50.0, 6, "k").is_err());
+        assert!(iso_shaft_limits(50.0, 4, "h").is_err());
+        assert!(iso_hole_limits(50.0, 6, "K").is_err());
     }
 }

@@ -2,11 +2,11 @@
 //!
 //! Run with: `cargo run --example datum_frame -p tpt-eng-gdt`
 
-use tpt_eng_geometry::{frame::Frame3, Point3};
 use tpt_eng_gdt::{
     Datum, DatumReference, DatumReferenceFrame, GeometricCharacteristic, MaterialCondition,
     ToleranceFrame, ToleranceZone,
 };
+use tpt_eng_geometry::{frame::Frame3, Point3};
 
 fn main() {
     let drf = DatumReferenceFrame::new(Datum::new('A', Frame3::IDENTITY));
@@ -20,6 +20,7 @@ fn main() {
     .with_datum(DatumReference::new('A', MaterialCondition::Mmc));
     println!(
         "tolerance characteristic: {:?}, datum refs: {}",
-        frame.characteristic, frame.datum_refs.len()
+        frame.characteristic,
+        frame.datum_refs.len()
     );
 }
