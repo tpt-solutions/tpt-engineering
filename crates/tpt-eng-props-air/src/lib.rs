@@ -52,6 +52,18 @@ fn ln(x: f64) -> f64 {
     x.ln()
 }
 
+/// Errors returned by psychrometric calculations.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Error {
+    /// A vapour partial pressure exceeds total pressure, or is non-finite.
+    VapourPressureExceedsTotal,
+    /// A temperature outside the supported psychrometric range was supplied
+    /// (e.g. ≤ 0 K), making the saturation correlation non-physical.
+    TemperatureOutOfRange,
+    /// A humidity ratio or fraction was supplied outside `[0, 1]`.
+    RatioOutOfRange,
+}
+
 /// Molecular-weight ratio of water vapour to dry air (≈ 18.01528 / 28.9644).
 const WATER_TO_DRYAIR: f64 = 0.621_945;
 
@@ -82,25 +94,58 @@ pub fn saturation_pressure_water(t: ThermodynamicTemperature) -> Pressure {
 /// Humidity ratio `W` (kg water / kg dry air) for partial vapour pressure
 /// `p_w` (Pa) at total pressure `p` (Pa):
 /// `W = 0.621945 · p_w / (p − p_w)`.
-pub fn humidity_ratio(p_w: Pressure, p: Pressure) -> f64 {
+///
+/// # Errors
+///
+/// Returns [`Error::VapourPressureExceedsTotal`] if `p_w ≥ p` (which would
+/// divide by zero or yield a negative ratio) or if either pressure is
+/// non-finite.
+pub fn humidity_ratio(p_w: Pressure, p: Pressure) -> Result<f64, Error> {
     let pw = p_w.get::<tpt_math_units::uom::si::pressure::pascal>();
     let pt = p.get::<tpt_math_units::uom::si::pressure::pascal>();
-    WATER_TO_DRYAIR * pw / (pt - pw)
+    if !pw.is_finite() || !pt.is_finite() {
+        return Err(Error::VapourPressureExceedsTotal);
+    }
+    if pw >= pt {
+        return Err(Error::VapourPressureExceedsTotal);
+    }
+    Ok(WATER_TO_DRYAIR * pw / (pt - pw))
 }
 
 /// Partial vapour pressure (Pa) implied by humidity ratio `w` at total
 /// pressure `p` (Pa). Inverse of [`humidity_ratio`].
-pub fn vapour_pressure_from_ratio(w: f64, p: Pressure) -> Pressure {
+///
+/// # Errors
+///
+/// Returns [`Error::RatioOutOfRange`] if `w` is negative or non-finite.
+pub fn vapour_pressure_from_ratio(w: f64, p: Pressure) -> Result<Pressure, Error> {
+    if !w.is_finite() || w < 0.0 {
+        return Err(Error::RatioOutOfRange);
+    }
     let pt = p.get::<tpt_math_units::uom::si::pressure::pascal>();
     let pw = w * pt / (WATER_TO_DRYAIR + w);
-    Pressure::new::<tpt_math_units::uom::si::pressure::pascal>(pw)
+    Ok(Pressure::new::<tpt_math_units::uom::si::pressure::pascal>(pw))
 }
 
 /// Relative humidity `φ ∈ [0, 1]` for vapour partial pressure `p_w` at
 /// temperature `t` (uses [`saturation_pressure_water`]).
-pub fn relative_humidity(p_w: Pressure, t: ThermodynamicTemperature) -> f64 {
+///
+/// # Errors
+///
+/// Returns [`Error::TemperatureOutOfRange`] if `t ≤ 0 K` (non-physical
+/// saturation correlation) or [`Error::VapourPressureExceedsTotal`] if
+/// `p_w` is non-finite.
+pub fn relative_humidity(p_w: Pressure, t: ThermodynamicTemperature) -> Result<f64, Error> {
+    let tk = t.get::<tpt_math_units::uom::si::thermodynamic_temperature::kelvin>();
+    if !tk.is_finite() || tk <= 0.0 {
+        return Err(Error::TemperatureOutOfRange);
+    }
+    let pw = p_w.get::<tpt_math_units::uom::si::pressure::pascal>();
+    if !pw.is_finite() {
+        return Err(Error::VapourPressureExceedsTotal);
+    }
     let psat = saturation_pressure_water(t).get::<tpt_math_units::uom::si::pressure::pascal>();
-    p_w.get::<tpt_math_units::uom::si::pressure::pascal>() / psat
+    Ok(pw / psat)
 }
 
 /// Moist-air specific enthalpy (kJ per kg dry air) for dry-bulb temperature
@@ -114,8 +159,16 @@ pub fn moist_air_enthalpy(t: ThermodynamicTemperature, w: f64) -> f64 {
 /// Dew-point temperature (kelvin) for vapour partial pressure `p_w`.
 ///
 /// Inverts [`saturation_pressure_water`] by bisection over 173–373 K.
-pub fn dew_point(p_w: Pressure) -> ThermodynamicTemperature {
+///
+/// # Errors
+///
+/// Returns [`Error::VapourPressureExceedsTotal`] if `p_w ≤ 0` or is
+/// non-finite, since no physical dew point exists.
+pub fn dew_point(p_w: Pressure) -> Result<ThermodynamicTemperature, Error> {
     let pw = p_w.get::<tpt_math_units::uom::si::pressure::pascal>();
+    if !pw.is_finite() || pw <= 0.0 {
+        return Err(Error::VapourPressureExceedsTotal);
+    }
     let (mut lo, mut hi) = (173.0_f64, 373.0_f64);
     for _ in 0..100 {
         let mid = 0.5 * (lo + hi);
@@ -129,9 +182,9 @@ pub fn dew_point(p_w: Pressure) -> ThermodynamicTemperature {
             hi = mid;
         }
     }
-    ThermodynamicTemperature::new::<tpt_math_units::uom::si::thermodynamic_temperature::kelvin>(
+    Ok(ThermodynamicTemperature::new::<tpt_math_units::uom::si::thermodynamic_temperature::kelvin>(
         0.5 * (lo + hi),
-    )
+    ))
 }
 
 #[cfg(test)]
@@ -163,18 +216,50 @@ mod tests {
     fn humidity_ratio_roundtrip() {
         let p = Pressure::new::<kilopascal>(101.325);
         let pw = Pressure::new::<kilopascal>(2.0);
-        let w = humidity_ratio(pw, p);
-        let pw2 = vapour_pressure_from_ratio(w, p);
+        let w = humidity_ratio(pw, p).unwrap();
+        let pw2 = vapour_pressure_from_ratio(w, p).unwrap();
         assert!(approx(pw2.get::<pascal>(), pw.get::<pascal>(), 1e-6));
     }
 
     #[test]
     fn dew_point_consistent() {
         let pw = Pressure::new::<kilopascal>(2.0);
-        let tdp = dew_point(pw);
+        let tdp = dew_point(pw).unwrap();
         let psat = saturation_pressure_water(tdp);
         assert!(approx(psat.get::<pascal>(), pw.get::<pascal>(), 1.0));
         // 2 kPa vapour ≈ dew point around 17 °C.
         assert!(tdp.get::<kelvin>() > 273.0 && tdp.get::<kelvin>() < 295.0);
+    }
+
+    #[test]
+    fn guards_reject_non_physical_inputs() {
+        let p = Pressure::new::<kilopascal>(101.325);
+        // Vapour pressure at/above total pressure is impossible.
+        assert_eq!(
+            humidity_ratio(Pressure::new::<kilopascal>(101.325), p),
+            Err(Error::VapourPressureExceedsTotal)
+        );
+        assert_eq!(
+            humidity_ratio(Pressure::new::<kilopascal>(150.0), p),
+            Err(Error::VapourPressureExceedsTotal)
+        );
+        // Negative humidity ratio rejected.
+        assert_eq!(
+            vapour_pressure_from_ratio(-1.0, p),
+            Err(Error::RatioOutOfRange)
+        );
+        // Non-physical temperature (≤ 0 K) rejected.
+        assert_eq!(
+            relative_humidity(
+                Pressure::new::<kilopascal>(1.0),
+                ThermodynamicTemperature::new::<kelvin>(0.0)
+            ),
+            Err(Error::TemperatureOutOfRange)
+        );
+        // Non-physical dew-point input (≤ 0 Pa) rejected.
+        assert_eq!(
+            dew_point(Pressure::new::<pascal>(0.0)),
+            Err(Error::VapourPressureExceedsTotal)
+        );
     }
 }

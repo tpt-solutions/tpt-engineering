@@ -35,6 +35,7 @@ environment).
 | `tpt-eng-network-matrix` | geo | | Incidence/admittance matrix generation |
 | `tpt-eng-controls` | controls | | PID / state-space / transfer-function |
 | `tpt-eng-structural` | structural | | Loads, beam/frame analysis, code checks |
+| `tpt-eng-examples` | integration | | Cross-crate scenario composing all of the above |
 
 ## Building
 
@@ -45,6 +46,37 @@ cargo test --workspace
 
 The `tpt-eng-props-*` family is `no_std`; it builds for bare-metal targets
 with the default features disabled.
+
+## Quickstart
+
+Add the crates you need (they re-export `tpt-math`'s `uom`-typed units):
+
+```sh
+cargo add tpt-eng-props tpt-eng-controls tpt-eng-structural
+```
+
+```rust
+use tpt_eng_controls::{Pid, PidGains};
+
+let mut pid = Pid::new(PidGains::new(2.0, 1.0, 0.0)).with_output_limit(1.0);
+pid.set_setpoint(10.0);
+let mut y = 0.0;
+for _ in 0..1000 {
+    let u = pid.update(y, 0.01);
+    y += 0.01 * u; // first-order plant, τ = 1 s
+}
+assert!((y - 10.0).abs() < 0.5);
+```
+
+For a full, cross-crate worked example (topology → network matrix → controls →
+time-series conditioning → structural check), see
+[`tpt-eng-examples`](crates/tpt-eng-examples).
+
+## Developer tooling
+
+`cargo xtask` provides one-stop hygiene and scaffolding (`check`, `test`,
+`doctest`, `doc`, `no-std-matrix`, `new-crate`). A root [`justfile`](justfile)
+mirrors these for non-Cargo users.
 
 ## License
 

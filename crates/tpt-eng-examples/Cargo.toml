@@ -1,0 +1,29 @@
+[package]
+name = "tpt-eng-examples"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Cross-crate integration scenarios composing the tpt-eng-* engineering primitives"
+readme = "README.md"
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+tpt-eng-geo-topology = { workspace = true }
+tpt-eng-network-matrix = { workspace = true }
+tpt-eng-controls = { workspace = true }
+tpt-eng-props-fuels = { workspace = true }
+tpt-eng-timeseries-core = { workspace = true }
+tpt-eng-timeseries-align = { workspace = true }
+tpt-eng-timeseries-gap = { workspace = true }
+tpt-eng-structural = { workspace = true }
+tpt-math-units = { workspace = true }
+
+[features]
+default = ["std"]
+std = ["tpt-math-units/std"]
+alloc = ["tpt-math-units/alloc"]
+
+[lints]
+workspace = true

@@ -32,6 +32,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "tpt-eng-examples"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-controls",
+ "tpt-eng-geo-topology",
+ "tpt-eng-network-matrix",
+ "tpt-eng-props-fuels",
+ "tpt-eng-structural",
+ "tpt-eng-timeseries-align",
+ "tpt-eng-timeseries-core",
+ "tpt-eng-timeseries-gap",
+ "tpt-math-units",
+]
+
+[[package]]
 name = "tpt-eng-geo-asset"
 version = "0.1.0"
 dependencies = [
@@ -91,7 +106,6 @@ dependencies = [
 name = "tpt-eng-structural"
 version = "0.1.0"
 dependencies = [
- "tpt-math-linalg",
  "tpt-math-units",
 ]
 
@@ -172,3 +186,7 @@ dependencies = [
  "num-traits",
  "typenum",
 ]
+
+[[package]]
+name = "xtask"
+version = "0.1.0"

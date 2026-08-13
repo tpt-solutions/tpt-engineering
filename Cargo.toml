@@ -14,6 +14,8 @@ members = [
     "crates/tpt-eng-network-matrix",
     "crates/tpt-eng-controls",
     "crates/tpt-eng-structural",
+    "crates/tpt-eng-examples",
+    "xtask",
 ]
 exclude = []
 
@@ -46,6 +48,7 @@ tpt-eng-geo-topology = { version = "0.1.0", path = "crates/tpt-eng-geo-topology"
 tpt-eng-network-matrix = { version = "0.1.0", path = "crates/tpt-eng-network-matrix" }
 tpt-eng-controls = { version = "0.1.0", path = "crates/tpt-eng-controls" }
 tpt-eng-structural = { version = "0.1.0", path = "crates/tpt-eng-structural" }
+tpt-eng-examples = { version = "0.1.0", path = "crates/tpt-eng-examples" }
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "warn"

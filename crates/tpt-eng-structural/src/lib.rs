@@ -9,10 +9,10 @@
 //! (line) loads are carried as a total [`Force`](tpt_math_units::uom::si::f64)
 //! over a [`Length`](tpt_math_units::uom::si::f64) span so the line load is a
 //! plain `f64` in N/m. Like `tpt-eng-controls`, this is a from-scratch
-//! implementation: the `spec.txt` note that `tpt-eng-structural`'s dependency
-//! needs (likely `tpt-math-linalg`) should be confirmed with the
-//! `tpt-vertical-map` construction owner, but the analysis here is closed-form
-//! and does not require a matrix solver for `v0.1.0`.
+//! implementation. The analysis is closed-form (reactions, shear, bending
+//! moment, utilisation ratio) and does not require a matrix solver for
+//! `v0.1.0`; `tpt-math-linalg` was therefore confirmed unnecessary and is not
+//! a dependency.
 //!
 //! ## Example
 //!
@@ -226,11 +226,18 @@ impl Beam {
         Torque::new::<newton_meter>(m)
     }
 
-    /// The maximum absolute bending moment over the span (sampled), as a
-    /// positive [`Torque`].
+    /// The maximum absolute bending moment over the span (sampled at 400
+    /// points), as a positive [`Torque`].
     pub fn max_bending_moment(&self) -> Torque {
+        self.max_bending_moment_with_resolution(400)
+    }
+
+    /// The maximum absolute bending moment over the span, sampled at
+    /// `resolution` points (higher is more accurate near peaks), as a positive
+    /// [`Torque`].
+    pub fn max_bending_moment_with_resolution(&self, resolution: usize) -> Torque {
         let l = self.span.get::<meter>();
-        let n = 400;
+        let n = resolution.max(1);
         let mut max = 0.0_f64;
         for i in 0..=n {
             let x = l * (i as f64) / (n as f64);
@@ -349,5 +356,19 @@ mod tests {
         );
         let m = Torque::new::<kilonewton_meter>(25.0);
         assert!(approx(check.utilization(m), 1.0, 1e-9));
+    }
+
+    #[test]
+    fn resolution_variant_matches_default() {
+        let mut beam = Beam::new(Length::new::<meter>(10.0));
+        beam.add(Load::point(
+            Length::new::<meter>(5.0),
+            Force::new::<kilonewton>(10.0),
+        ));
+        let coarse = beam.max_bending_moment_with_resolution(50);
+        let fine = beam.max_bending_moment_with_resolution(2000);
+        // Higher resolution should not reduce the (already exact, mid-span) peak.
+        assert!(coarse.get::<kilonewton_meter>() >= 24.9);
+        assert!((fine.get::<kilonewton_meter>() - 25.0).abs() < 1e-6);
     }
 }

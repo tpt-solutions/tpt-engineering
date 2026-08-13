@@ -34,14 +34,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo test --workspace
+      - run: cargo test --workspace --all-features
 
-  # NOTE: intentionally NOT `cargo build --workspace --target thumbv6m-none-eabi`.
-  # Per ADR 0001 (tpt-rust-map/docs/adr/0001-no-std-via-features-not-forks.md), a
-  # blind --workspace no_std build breaks the moment any std-only crate joins
-  # this repo. Once the first std-only crate lands, replace the crate list
-  # below with `xtask no-std-matrix` (reads the `no_std = true` entries for
-  # this repo from ../tpt-rust-map/registry.toml) instead of hand-maintaining it.
+  # Doc tests + docs build for every crate (including the integration examples).
+  docs:
+    runs-on: ubuntu-latest
+    env:
+      RUSTDOCFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --doc --workspace --all-features
+      - run: cargo doc --workspace --no-deps --all-features
+
+  # Per ADR 0001 (tpt-rust-map/docs/adr/0001-no-std-via-features-not-forks.md),
+  # a blind `cargo build --workspace --target thumbv6m-none-eabi` breaks the
+  # moment any std-only crate joins this repo. `xtask no-std-matrix` builds
+  # only the crates flagged `no_std = true` in ../tpt-rust-map/registry.toml,
+  # reading that list from the single source of truth in `xtask/src/main.rs`.
   no_std:
     runs-on: ubuntu-latest
     steps:
@@ -49,10 +59,31 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: thumbv6m-none-eabi
+      - run: cargo xtask no-std-matrix
+
+  # Bare-metal target for the no_std props family: also verify they build for
+  # wasm32 (the toolchain already lists this target), proving portability of
+  # the embedded telemetry primitives.
+  wasm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
       - run: |
-          # REPLACE with explicit -p <crate> flags for this repo's no_std = true
-          # crates once any crate is added.
-          echo "no crates yet — nothing to build"
+          for c in tpt-eng-props-water tpt-eng-props-air tpt-eng-props-fuels tpt-eng-props; do
+            cargo build -p "$c" --no-default-features --target wasm32-unknown-unknown
+          done
+
+  # Independent RUSTSEC advisory scan (complements cargo-deny's advisory gate).
+  cargo-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rustsec/audit-check@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   cargo-deny:
     runs-on: ubuntu-latest

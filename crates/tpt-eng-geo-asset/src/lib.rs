@@ -105,22 +105,28 @@ impl AssetRegistry {
 
     /// The asset nearest `target` by great-circle distance, if any.
     ///
-    /// # Panics
-    ///
-    /// Panics if a registered coordinate is non-finite (NaN), which makes the
-    /// great-circle ordering ill-defined.
+    /// Assets whose coordinates are non-finite (NaN/inf) are ignored rather
+    /// than causing a panic, so a single malformed registry entry cannot crash
+    /// a call built from untrusted asset data.
     pub fn nearest(&self, target: GeoCoord) -> Option<&Asset> {
-        self.list.iter().min_by(|a, b| {
-            haversine(a.coord, target)
-                .partial_cmp(&haversine(b.coord, target))
-                .unwrap()
-        })
+        self.list
+            .iter()
+            .filter(|a| a.coord.lat.is_finite() && a.coord.lon.is_finite())
+            .min_by(|a, b| {
+                haversine(a.coord, target)
+                    .partial_cmp(&haversine(b.coord, target))
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
     }
 
     /// Assets within `radius_m` metres of `target` (inclusive).
+    ///
+    /// Assets whose coordinates are non-finite (NaN/inf) are ignored, matching
+    /// the behaviour of [`AssetRegistry::nearest`].
     pub fn within_radius(&self, target: GeoCoord, radius_m: f64) -> Vec<&Asset> {
         self.list
             .iter()
+            .filter(|a| a.coord.lat.is_finite() && a.coord.lon.is_finite())
             .filter(|a| haversine(a.coord, target) <= radius_m)
             .collect()
     }
@@ -192,5 +198,18 @@ mod tests {
             "n2",
         ));
         assert_eq!(r.within_radius(GeoCoord::new(0.0, 0.0), 200_000.0).len(), 1);
+    }
+
+    #[test]
+    fn non_finite_coords_ignored_in_radius() {
+        let mut r = AssetRegistry::new();
+        r.register(Asset::new(
+            "A",
+            AssetKind::Sensor,
+            GeoCoord::new(f64::NAN, 0.0),
+            "n1",
+        ));
+        // The malformed entry must not match as a zero-distance (NaN) hit.
+        assert_eq!(r.within_radius(GeoCoord::new(0.0, 0.0), 1.0).len(), 0);
     }
 }

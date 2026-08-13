@@ -56,7 +56,9 @@ fn node_index_map(topology: &Topology) -> (Vec<String>, HashMap<String, usize>) 
 
 /// The reduced incidence matrix `A` (nodes × edges): `−1` at a branch tail,
 /// `+1` at its head, `0` elsewhere. Edge columns follow
-/// [`Topology::edges`] order; node rows follow sorted node ids.
+/// [`Topology::edges`] order; node rows follow sorted node ids. Edges whose
+/// endpoint nodes are absent from the topology are skipped (so a malformed
+/// topology cannot trigger an out-of-bounds index).
 pub fn incidence_matrix(topology: &Topology) -> DMatrix<f64> {
     let (_, idx) = node_index_map(topology);
     let n = idx.len();
@@ -64,17 +66,19 @@ pub fn incidence_matrix(topology: &Topology) -> DMatrix<f64> {
     let m = edges.len();
     let mut data = vec![0.0; n * m]; // column-major: (i, j) at i + j*n
     for (j, e) in edges.iter().enumerate() {
-        if let (Some(&a), Some(&b)) = (idx.get(&e.from), idx.get(&e.to)) {
-            data[a + j * n] += -1.0;
-            data[b + j * n] += 1.0;
-        }
+        let (Some(&a), Some(&b)) = (idx.get(&e.from), idx.get(&e.to)) else {
+            continue;
+        };
+        data[a + j * n] += -1.0;
+        data[b + j * n] += 1.0;
     }
     DMatrix::from_vec(n, m, data)
 }
 
 /// The nodal admittance (Laplacian) matrix `Y` for unit-or-capacity branch
 /// admittances. For a branch `e` from `a` to `b` with admittance `y`:
-/// `Y[a][a] += y`, `Y[b][b] += y`, `Y[a][b] -= y`, `Y[b][a] -= y`.
+/// `Y[a][a] += y`, `Y[b][b] += y`, `Y[a][b] -= y`, `Y[b][a] -= y`. Edges with
+/// missing endpoint nodes are skipped (defensive against malformed input).
 pub fn admittance_matrix(topology: &Topology) -> DMatrix<f64> {
     let (_, idx) = node_index_map(topology);
     let n = idx.len();
@@ -83,8 +87,9 @@ pub fn admittance_matrix(topology: &Topology) -> DMatrix<f64> {
         data[i + j * n] += v;
     };
     for e in topology.edges() {
-        let a = idx[&e.from];
-        let b = idx[&e.to];
+        let (Some(&a), Some(&b)) = (idx.get(&e.from), idx.get(&e.to)) else {
+            continue;
+        };
         let y = e.capacity;
         put(&mut data, n, a, a, y);
         put(&mut data, n, b, b, y);

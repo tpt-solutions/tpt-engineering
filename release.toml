@@ -1,0 +1,12 @@
+[workspace]
+# All crates share the workspace version; `cargo release` bumps them together.
+consolidate-commits = true
+allow-branch = ["main"]
+dependent-version = "upgrade"
+features = ["all"]
+
+[package]
+# Internal workspace; not published to crates.io until the registry flips to
+# `git` status (see todo.md Phase 5e).
+publish = false
+release = false

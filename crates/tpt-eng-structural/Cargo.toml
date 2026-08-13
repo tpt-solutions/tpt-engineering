@@ -10,7 +10,6 @@ repository.workspace = true
 homepage.workspace = true
 
 [dependencies]
-tpt-math-linalg = { workspace = true }
 tpt-math-units = { workspace = true }
 
 [lints]

@@ -3,7 +3,8 @@
 
 [advisories]
 version = 2
-yanked = "warn"
+# Yanked crates must never be used; fail rather than warn.
+yanked = "deny"
 ignore = []
 
 [licenses]
@@ -32,5 +33,9 @@ multiple-versions = "warn"
 wildcards = "allow"
 
 [sources]
-unknown-registry = "warn"
-unknown-git = "warn"
+# Only crates.io and the known sibling path dependencies (../tpt-math) are
+# permitted. Anything from an unknown registry or git source now fails CI.
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
