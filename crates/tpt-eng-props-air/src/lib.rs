@@ -26,6 +26,8 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(not(feature = "std"))]
+use tpt_math_numeric::Float;
+#[cfg(not(feature = "std"))]
 use tpt_math_numeric::libm;
 use tpt_math_units::uom::si::f64::{Pressure, ThermodynamicTemperature};
 
@@ -37,7 +39,7 @@ fn exp(x: f64) -> f64 {
 #[cfg(not(feature = "std"))]
 #[inline]
 fn ln(x: f64) -> f64 {
-    libm::ln(x)
+    libm::log(x)
 }
 #[cfg(feature = "std")]
 #[inline]
@@ -97,8 +99,7 @@ pub fn vapour_pressure_from_ratio(w: f64, p: Pressure) -> Pressure {
 /// Relative humidity `φ ∈ [0, 1]` for vapour partial pressure `p_w` at
 /// temperature `t` (uses [`saturation_pressure_water`]).
 pub fn relative_humidity(p_w: Pressure, t: ThermodynamicTemperature) -> f64 {
-    let psat = saturation_pressure_water(t)
-        .get::<tpt_math_units::uom::si::pressure::pascal>();
+    let psat = saturation_pressure_water(t).get::<tpt_math_units::uom::si::pressure::pascal>();
     p_w.get::<tpt_math_units::uom::si::pressure::pascal>() / psat
 }
 
@@ -169,7 +170,6 @@ mod tests {
 
     #[test]
     fn dew_point_consistent() {
-        let p = Pressure::new::<kilopascal>(101.325);
         let pw = Pressure::new::<kilopascal>(2.0);
         let tdp = dew_point(pw);
         let psat = saturation_pressure_water(tdp);

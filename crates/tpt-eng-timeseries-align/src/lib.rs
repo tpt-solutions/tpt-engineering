@@ -80,6 +80,10 @@ pub fn uniform_grid(start: f64, end: f64, n: usize) -> Vec<f64> {
 }
 
 /// Re-wrap an aligned vector back into a [`Series`] on the given `grid`.
+///
+/// # Panics
+///
+/// Panics if `grid.len() != values.len()`.
 pub fn series_from_grid(grid: &[f64], values: Vec<f64>) -> Series<f64> {
     assert_eq!(grid.len(), values.len());
     Series::from_samples(
@@ -95,7 +99,11 @@ mod tests {
     use tpt_eng_timeseries_core::Sample;
 
     fn s(items: &[(f64, f64)]) -> Series<f64> {
-        Series::from_samples(items.iter().map(|&(t, v)| Sample::new(Timestamp::from_seconds(t), v)))
+        Series::from_samples(
+            items
+                .iter()
+                .map(|&(t, v)| Sample::new(Timestamp::from_seconds(t), v)),
+        )
     }
 
     #[test]
@@ -115,7 +123,13 @@ mod tests {
     fn multi_rate_streams_onto_common_grid() {
         // Slow stream at 0/2/4 s, fast stream at 0/1/2/3/4 s.
         let slow = s(&[(0.0, 0.0), (2.0, 20.0), (4.0, 40.0)]);
-        let fast = s(&[(0.0, 0.0), (1.0, 11.0), (2.0, 22.0), (3.0, 33.0), (4.0, 44.0)]);
+        let fast = s(&[
+            (0.0, 0.0),
+            (1.0, 11.0),
+            (2.0, 22.0),
+            (3.0, 33.0),
+            (4.0, 44.0),
+        ]);
         let grid = uniform_grid(0.0, 4.0, 5); // 0,1,2,3,4
         let out = align_streams(&[slow, fast], &grid);
         // Slow aligned: 0,10,20,30,40 (linear between its samples).

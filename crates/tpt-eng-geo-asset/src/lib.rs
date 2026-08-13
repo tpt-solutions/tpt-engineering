@@ -104,14 +104,17 @@ impl AssetRegistry {
     }
 
     /// The asset nearest `target` by great-circle distance, if any.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a registered coordinate is non-finite (NaN), which makes the
+    /// great-circle ordering ill-defined.
     pub fn nearest(&self, target: GeoCoord) -> Option<&Asset> {
-        self.list
-            .iter()
-            .min_by(|a, b| {
-                haversine(a.coord, target)
-                    .partial_cmp(&haversine(b.coord, target))
-                    .unwrap()
-            })
+        self.list.iter().min_by(|a, b| {
+            haversine(a.coord, target)
+                .partial_cmp(&haversine(b.coord, target))
+                .unwrap()
+        })
     }
 
     /// Assets within `radius_m` metres of `target` (inclusive).
@@ -131,8 +134,7 @@ pub fn haversine(a: GeoCoord, b: GeoCoord) -> f64 {
     let lat2 = b.lat.to_radians();
     let dlat = (b.lat - a.lat).to_radians();
     let dlon = (b.lon - a.lon).to_radians();
-    let h = (dlat / 2.0).sin().powi(2)
-        + lat1.cos() * lat2.cos() * (dlon / 2.0).sin().powi(2);
+    let h = (dlat / 2.0).sin().powi(2) + lat1.cos() * lat2.cos() * (dlon / 2.0).sin().powi(2);
     2.0 * EARTH_RADIUS_M * h.sqrt().asin()
 }
 
@@ -150,8 +152,18 @@ mod tests {
     #[test]
     fn registry_lookup_and_nearest() {
         let mut r = AssetRegistry::new();
-        r.register(Asset::new("A", AssetKind::Sensor, GeoCoord::new(0.0, 0.0), "n1"));
-        r.register(Asset::new("B", AssetKind::Meter, GeoCoord::new(1.0, 1.0), "n2"));
+        r.register(Asset::new(
+            "A",
+            AssetKind::Sensor,
+            GeoCoord::new(0.0, 0.0),
+            "n1",
+        ));
+        r.register(Asset::new(
+            "B",
+            AssetKind::Meter,
+            GeoCoord::new(1.0, 1.0),
+            "n2",
+        ));
         assert_eq!(r.get("A").unwrap().logical_node, "n1");
         let near = r.nearest(GeoCoord::new(0.1, 0.1)).unwrap();
         assert_eq!(near.id, "A");
@@ -167,8 +179,18 @@ mod tests {
     #[test]
     fn within_radius_filters() {
         let mut r = AssetRegistry::new();
-        r.register(Asset::new("A", AssetKind::Sensor, GeoCoord::new(0.0, 0.0), "n1"));
-        r.register(Asset::new("B", AssetKind::Sensor, GeoCoord::new(10.0, 10.0), "n2"));
+        r.register(Asset::new(
+            "A",
+            AssetKind::Sensor,
+            GeoCoord::new(0.0, 0.0),
+            "n1",
+        ));
+        r.register(Asset::new(
+            "B",
+            AssetKind::Sensor,
+            GeoCoord::new(10.0, 10.0),
+            "n2",
+        ));
         assert_eq!(r.within_radius(GeoCoord::new(0.0, 0.0), 200_000.0).len(), 1);
     }
 }

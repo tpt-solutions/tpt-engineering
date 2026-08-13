@@ -127,10 +127,12 @@ pub fn interpolate_at(series: &Series<f64>, t: f64, strategy: Strategy) -> f64 {
 /// filling dropouts per `strategy`. Useful for turning an irregular, gappy
 /// stream into a clean deterministic signal.
 pub fn fill_gaps(series: &Series<f64>, grid: &[f64], strategy: Strategy) -> Series<f64> {
-    Series::from_samples(
-        grid.iter()
-            .map(|&t| Sample::new(Timestamp::from_seconds(t), interpolate_at(series, t, strategy))),
-    )
+    Series::from_samples(grid.iter().map(|&t| {
+        Sample::new(
+            Timestamp::from_seconds(t),
+            interpolate_at(series, t, strategy),
+        )
+    }))
 }
 
 #[cfg(test)]
@@ -139,7 +141,11 @@ mod tests {
     use tpt_eng_timeseries_core::Sample;
 
     fn s(items: &[(f64, f64)]) -> Series<f64> {
-        Series::from_samples(items.iter().map(|&(t, v)| Sample::new(Timestamp::from_seconds(t), v)))
+        Series::from_samples(
+            items
+                .iter()
+                .map(|&(t, v)| Sample::new(Timestamp::from_seconds(t), v)),
+        )
     }
 
     #[test]

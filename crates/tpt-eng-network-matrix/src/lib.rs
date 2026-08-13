@@ -42,13 +42,14 @@ use tpt_eng_geo_topology::Topology;
 use tpt_math_linalg::tpt_math_linalg_dense::DMatrix;
 
 /// Build a deterministic node-id → row-index map (sorted for stability).
-fn node_index_map(topology: &Topology) -> (Vec<String>, HashMap<&str, usize>) {
+fn node_index_map(topology: &Topology) -> (Vec<String>, HashMap<String, usize>) {
     let mut ids: Vec<String> = topology.nodes().iter().cloned().collect();
     ids.sort();
     let map = ids
         .iter()
+        .cloned()
         .enumerate()
-        .map(|(i, s)| (s.as_str(), i))
+        .map(|(i, s)| (s, i))
         .collect();
     (ids, map)
 }
@@ -63,7 +64,7 @@ pub fn incidence_matrix(topology: &Topology) -> DMatrix<f64> {
     let m = edges.len();
     let mut data = vec![0.0; n * m]; // column-major: (i, j) at i + j*n
     for (j, e) in edges.iter().enumerate() {
-        if let (Some(&a), Some(&b)) = (idx.get(e.from.as_str()), idx.get(e.to.as_str())) {
+        if let (Some(&a), Some(&b)) = (idx.get(&e.from), idx.get(&e.to)) {
             data[a + j * n] += -1.0;
             data[b + j * n] += 1.0;
         }
@@ -82,8 +83,8 @@ pub fn admittance_matrix(topology: &Topology) -> DMatrix<f64> {
         data[i + j * n] += v;
     };
     for e in topology.edges() {
-        let a = idx[e.from.as_str()];
-        let b = idx[e.to.as_str()];
+        let a = idx[&e.from];
+        let b = idx[&e.to];
         let y = e.capacity;
         put(&mut data, n, a, a, y);
         put(&mut data, n, b, b, y);

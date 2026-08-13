@@ -54,7 +54,9 @@ pub struct Series<T> {
 
 impl<T> Default for Series<T> {
     fn default() -> Self {
-        Series { samples: Vec::new() }
+        Series {
+            samples: Vec::new(),
+        }
     }
 }
 
@@ -117,9 +119,7 @@ impl<T> Series<T> {
 
     /// Whether timestamps are strictly non-decreasing.
     pub fn is_sorted(&self) -> bool {
-        self.samples
-            .windows(2)
-            .all(|w| w[0].t <= w[1].t)
+        self.samples.windows(2).all(|w| w[0].t <= w[1].t)
     }
 }
 

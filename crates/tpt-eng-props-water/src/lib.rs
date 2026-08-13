@@ -38,12 +38,14 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(not(feature = "std"))]
+use tpt_math_numeric::Float;
+#[cfg(not(feature = "std"))]
 use tpt_math_numeric::libm;
 use tpt_math_units::uom::si::f64::{
     MassDensity, Pressure, SpecificHeatCapacity, SpecificVolume, ThermodynamicTemperature,
 };
 use tpt_math_units::uom::si::{
-    mass_density::kilogram_per_cubic_meter, pressure::megapascal, pressure::pascal,
+    mass_density::kilogram_per_cubic_meter, pressure::pascal,
     specific_heat_capacity::kilojoule_per_kilogram_kelvin,
     specific_volume::cubic_meter_per_kilogram, thermodynamic_temperature::kelvin,
 };
@@ -54,7 +56,7 @@ use tpt_math_units::uom::si::{
 #[cfg(not(feature = "std"))]
 #[inline]
 fn powf(x: f64, y: f64) -> f64 {
-    libm::powf(x, y)
+    libm::pow(x, y)
 }
 #[cfg(not(feature = "std"))]
 #[inline]
@@ -64,7 +66,7 @@ fn sqrt(x: f64) -> f64 {
 #[cfg(not(feature = "std"))]
 #[inline]
 fn ln(x: f64) -> f64 {
-    libm::ln(x)
+    libm::log(x)
 }
 #[cfg(feature = "std")]
 #[inline]
@@ -200,16 +202,16 @@ const REGION2_RESID: [(i32, i32, f64); 43] = [
 
 /// Region 4 (saturation) coefficients.
 const REGION4: [f64; 10] = [
-    1167.052_145_276_7,
-    -724_213.167_032_06,
-    -17.073_846_940_092,
-    12_020.824_702_47,
-    -3_232_555.032_233_3,
-    14.915_108_613_530,
-    -4823.265_736_159_1,
-    405_113.405_420_57,
-    -0.238_555_575_678_49,
-    650.175_348_447_98,
+    1167.0521452767,
+    -724213.16703206,
+    -17.073846940092,
+    12020.82470247,
+    -3232555.0322333,
+    14.915108613530,
+    -4823.2657361591,
+    405113.40542057,
+    -0.23855557567849,
+    650.17534844798,
 ];
 
 /// Errors returned by property calculations.
@@ -318,6 +320,13 @@ fn saturation_pressure_at_kelvin(tk: f64) -> f64 {
 ///
 /// Returns [`Error::Region3Unsupported`] for states above the B23 boundary
 /// pressure that fall in the near-critical Region 3.
+///
+/// # Errors
+///
+/// Returns [`Error::TemperatureOutOfRange`] if `temperature < 273.15 K`,
+/// [`Error::NegativePressure`] if `pressure` is negative, and
+/// [`Error::Region3Unsupported`] for states above the B23 boundary pressure
+/// that fall in the near-critical Region 3.
 pub fn state(
     temperature: ThermodynamicTemperature,
     pressure: Pressure,
@@ -489,11 +498,7 @@ mod tests {
             0.001_002_151_68,
             1e-9
         ));
-        assert!(approx(
-            s.enthalpy,
-            115.331_273,
-            1e-6
-        ));
+        assert!(approx(s.enthalpy, 115.331_273, 1e-6));
         assert!(approx(
             s.entropy.get::<kilojoule_per_kilogram_kelvin>(),
             0.392_294_792,
@@ -530,11 +535,7 @@ mod tests {
             39.491_386_6,
             1e-4
         ));
-        assert!(approx(
-            s.enthalpy,
-            2549.911_45,
-            1e-2
-        ));
+        assert!(approx(s.enthalpy, 2549.91145, 1e-2));
         assert!(approx(
             s.entropy.get::<kilojoule_per_kilogram_kelvin>(),
             8.522_389_67,
@@ -546,7 +547,7 @@ mod tests {
     fn saturation_pressure_300k() {
         // p_sat(300 K) ≈ 0.00353659 MPa.
         let p = saturation_pressure(ThermodynamicTemperature::new::<kelvin>(300.0));
-        assert!(approx(p.get::<megapascal>(), 0.003_536_59, 1e-6));
+        assert!(approx(p.get::<megapascal>(), 0.00353659, 1e-6));
     }
 
     #[test]

@@ -25,6 +25,18 @@ use tpt_math_units::uom::si::f64::MassDensity;
 /// Mass fraction of O₂ in dry air (used for stoichiometric air–fuel ratio).
 const O2_IN_AIR: f64 = 0.232;
 
+/// Clamp `x` to the unit interval `[0, 1]` (no_std-safe).
+#[allow(clippy::manual_clamp)]
+fn clamp01(x: f64) -> f64 {
+    if x < 0.0 {
+        0.0
+    } else if x > 1.0 {
+        1.0
+    } else {
+        x
+    }
+}
+
 /// A fuel with literature-typical properties.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Fuel {
@@ -144,7 +156,7 @@ pub struct BlendedFuel {
 impl BlendedFuel {
     /// Build a natural-gas/hydrogen blend. `h2_fraction` is clamped to [0, 1].
     pub fn new(h2_fraction: f64) -> Self {
-        let f = h2_fraction.clamp(0.0, 1.0);
+        let f = clamp01(h2_fraction);
         let one_m = 1.0 - f;
         let molar_mass = one_m * 16.0 + f * 2.0;
         let carbon = one_m * 1.0;
@@ -190,7 +202,11 @@ mod tests {
     #[test]
     fn methane_afr() {
         // CH₄ stoich AFR ≈ 17.2.
-        assert!(approx(Fuel::Methane.stoichiometric_air_fuel_ratio(), 17.2, 0.3));
+        assert!(approx(
+            Fuel::Methane.stoichiometric_air_fuel_ratio(),
+            17.2,
+            0.3
+        ));
     }
 
     #[test]
@@ -204,7 +220,11 @@ mod tests {
     #[test]
     fn diesel_afr() {
         // C₁₂H₂₃ stoich AFR ≈ 14.6.
-        assert!(approx(Fuel::Diesel.stoichiometric_air_fuel_ratio(), 14.6, 0.3));
+        assert!(approx(
+            Fuel::Diesel.stoichiometric_air_fuel_ratio(),
+            14.6,
+            0.3
+        ));
     }
 
     #[test]
