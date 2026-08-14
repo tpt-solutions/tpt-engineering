@@ -1,0 +1,18 @@
+[package]
+name = "tpt-eng-nurbs"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+description = "Spline and NURBS modeling: B-splines, NURBS curves/surfaces, knot vectors, evaluation, derivatives, tessellation"
+readme = "README.md"
+keywords = ["nurbs", "bspline", "spline", "cad", "geometry"]
+categories = ["science", "mathematics", "graphics"]
+
+[dependencies]
+glam.workspace = true
+serde.workspace = true
+tpt-eng-geometry.workspace = true
+tpt-eng-mesh.workspace = true
