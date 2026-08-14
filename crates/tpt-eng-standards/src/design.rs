@@ -9,7 +9,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::combinations::{demand_map, LoadCombination};
+use crate::combinations::{LoadCombination, demand_map};
 use crate::factors::FactorSet;
 use crate::limit_states::LimitState;
 use crate::load::LoadCase;

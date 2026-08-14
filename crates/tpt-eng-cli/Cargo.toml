@@ -15,4 +15,3 @@ serde_json = { workspace = true }
 tpt-eng-io = { workspace = true }
 tpt-eng-report = { workspace = true }
 tpt-eng-plot = { workspace = true }
-tpt-eng = { workspace = true }

@@ -9,7 +9,10 @@ pub fn render(report: &Report) -> String {
     body.push_str(&format!("<h1>{}</h1>\n", escape(&report.title)));
 
     if let Some(subtitle) = &report.subtitle {
-        body.push_str(&format!("<p class=\"subtitle\"><em>{}</em></p>\n", escape(subtitle)));
+        body.push_str(&format!(
+            "<p class=\"subtitle\"><em>{}</em></p>\n",
+            escape(subtitle)
+        ));
     }
 
     let mut meta: Vec<String> = Vec::new();

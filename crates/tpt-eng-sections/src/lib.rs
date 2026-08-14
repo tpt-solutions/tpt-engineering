@@ -59,7 +59,7 @@ pub use shapes::{Angle, Channel, Circle, ISection, Rectangle, Tube};
 /// The most commonly used items, in one `use`.
 pub mod prelude {
     pub use crate::{
-        compose::{centroid, plastic_x, plastic_y, second_moments, torsion, Rect},
+        compose::{Rect, centroid, plastic_x, plastic_y, second_moments, torsion},
         polygon::CustomPolygon,
         properties::SectionProperties,
         section::Section,

@@ -13,7 +13,7 @@ use tpt_eng_gdt::{
     Datum, DatumReference, DatumReferenceFrame, GeometricCharacteristic, MaterialCondition,
     ToleranceFrame, ToleranceZone,
 };
-use tpt_eng_geometry::{frame::Frame3, Point3};
+use tpt_eng_geometry::{Point3, frame::Frame3};
 use tpt_eng_mesh::Mesh;
 use tpt_eng_nurbs::{KnotVector, NurbsCurve};
 

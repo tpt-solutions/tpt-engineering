@@ -1,14 +1,13 @@
 //! Cross-crate integration test: a tolerance stack-up (tpt-eng-tolerance)
 //! drives a safety limit check (tpt-eng-safety) and a reliability estimate
-//! (tpt-eng-reliability), with quantities expressed via tpt-eng-quantity.
+//! (tpt-eng-reliability), with quantities expressed via tpt-eng-safety's
+//! own `Quantity` type.
 
-use rand::rngs::StdRng;
 use rand::SeedableRng;
-use tpt_eng_quantity::{Dimension, Quantity};
+use rand::rngs::StdRng;
 use tpt_eng_reliability::prob_failure_below;
-use tpt_eng_safety::{evaluate_limit, CheckStatus};
-use tpt_eng_standards::LimitSense;
-use tpt_eng_tolerance::{monte_carlo, worst_case, DimTol};
+use tpt_eng_safety::{CheckStatus, Dimension, Limit, LimitSense, Quantity, evaluate_limit};
+use tpt_eng_tolerance::{DimTol, monte_carlo, worst_case};
 
 #[test]
 fn stackup_drives_safety_and_reliability() {
@@ -32,13 +31,13 @@ fn stackup_drives_safety_and_reliability() {
     );
 
     // Safety (tpt-eng-safety): design thickness must be at least 29.7 mm.
-    let limit = tpt_eng_standards::Limit {
-        value: Quantity::new(29.7, Dimension::LENGTH),
+    let limit = Limit {
+        value: Quantity::new(29.7, Dimension::Length),
         sense: LimitSense::Above,
     };
     let report = evaluate_limit(
         "stack clearance",
-        Quantity::new(mc.mean, Dimension::LENGTH),
+        Quantity::new(mc.mean, Dimension::Length),
         &limit,
         Some(1.0),
     )

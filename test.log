@@ -1,0 +1,596 @@
+﻿cargo :    Compiling tpt-eng-cli v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-cli)
+At line:4 char:36
++ ... d C:\Programming\tpt-engineering; cargo test --workspace 2>&1 | Out-F ...
++                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling tp...es\tpt-eng-cli):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.44s
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_cad-b85ff318de9ba81e.exe)
+
+running 8 tests
+test tests::brep_from_single_triangle ... ok
+test tests::difference_removes_region ... ok
+test tests::sphere_sdf_and_bbox ... ok
+test tests::union_overlap ... ok
+test tests::mesh_normals_point_outward ... ok
+test tests::part_with_cut_feature ... ok
+test tests::cavity_surface_orients_into_void ... ok
+test tests::marching_tetrahedra_sphere ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src\main.rs (target\debug\deps\tpt_eng_cli-54a162a991dab262.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\integration.rs (target\debug\deps\integration-7466b7a07ea6cd93.exe)
+
+running 10 tests
+test test_calc_beam ... ok
+test test_materials_inspect ... ok
+test test_sections_inspect ... ok
+test test_sections_ibeam ... ok
+test test_units_convert ... ok
+test test_units_convert_temperature ... ok
+test test_units_incompatible ... ok
+test test_validate_json ... ok
+test test_validate_unknown_type_fails ... ok
+test test_report_generates_all_formats ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.06s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_controls-a64825afbcfd3af2.exe)
+
+running 5 tests
+test tests::pid_drives_first_order_plant ... ok
+test tests::pid_output_clamped ... ok
+test tests::transfer_function_dc_gain ... ok
+test tests::transfer_function_first_order_step ... ok
+test tests::state_space_first_order_matches_analytic ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_examples-9a8bab1c1b7c5309.exe)
+
+running 1 test
+test thermal_loop::tests::scenario_converges_and_repairs_telemetry ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_gdt-75ddf9cfe5ab7ea9.exe)
+
+running 17 tests
+test tests::characteristic_categories ... ok
+test tests::conformance_passes_and_fails ... ok
+test tests::datum_frame_composition ... ok
+test tests::datum_frame_identity_roundtrip ... ok
+test tests::fit_classification_clearance ... ok
+test tests::fit_classification_interference ... ok
+test tests::iso_hole_vs_shaft_distinct ... ok
+test tests::iso_tolerance_basics ... ok
+test tests::iso_unsupported_errors ... ok
+test tests::limits_accessors ... ok
+test tests::stackup_rss ... ok
+test tests::stackup_signed_members ... ok
+test tests::stackup_worst_case ... ok
+test tests::tolerance_frame_builder ... ok
+test tests::zone_magnitude ... ok
+test tests::zone_deviation_cylindrical ... ok
+test tests::monte_carlo_is_centered_and_bounded ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_geo_asset-f3421e28dd2b513a.exe)
+
+running 5 tests
+test tests::coord_clamps_and_wraps ... ok
+test tests::haversine_known ... ok
+test tests::non_finite_coords_ignored_in_radius ... ok
+test tests::registry_lookup_and_nearest ... ok
+test tests::within_radius_filters ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_geo_topology-93348a72e22c617f.exe)
+
+running 4 tests
+test tests::degree_counts ... ok
+test tests::downstream_chain ... ok
+test tests::reachability ... ok
+test tests::upstream_chain ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_geometry-334d5315d75e2a7d.exe)
+
+running 26 tests
+test curve::tests::bezier_endpoints ... ok
+test curve::tests::circle_radius ... ok
+test curve::tests::line_eval_and_tangent ... ok
+test frame::tests::compose_frames ... ok
+test frame::tests::rotation_maps_axes ... ok
+test frame::tests::roundtrip_point ... ok
+test intersection::tests::line_plane_hit ... ok
+test intersection::tests::line_sphere_two_hits ... ok
+test intersection::tests::plane_plane_line ... ok
+test intersection::tests::ray_triangle_hit ... ok
+test point::tests::barycentric_of_vertex ... ok
+test point::tests::centroid_of_three ... ok
+test point::tests::midpoint_is_average ... ok
+test projection::tests::project_to_line ... ok
+test projection::tests::project_to_plane ... ok
+test query::tests::aabb_bounds ... ok
+test query::tests::area_right_triangle ... ok
+test surface::tests::cylinder_radius ... ok
+test surface::tests::plane_eval ... ok
+test surface::tests::sphere_normal_points_outward ... ok
+test transform::tests::inverse_undoes ... ok
+test transform::tests::rotation_maps_x_to_y ... ok
+test transform::tests::translation_moves_point_not_vector ... ok
+test vector::tests::angle_right ... ok
+test vector::tests::orthonormal_basis_is_orthogonal ... ok
+test vector::tests::signed_angle_positive_ccw ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_io-5b9a1262097c6a37.exe)
+
+running 10 tests
+test json::tests::test_write_json_compact ... ok
+test json::tests::test_read_write_json ... ok
+test csv::tests::test_read_write_csv ... ok
+test csv::tests::test_read_write_csv_with_headers ... ok
+test stl::tests::test_stl_roundtrip_binary ... ok
+test obj::tests::test_obj_roundtrip_with_normals ... ok
+test obj::tests::test_obj_roundtrip ... ok
+test stl::tests::test_stl_roundtrip_ascii ... ok
+test tests::test_json_roundtrip ... ok
+test tests::test_csv_roundtrip ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_materials-30e884e0f5a2f509.exe)
+
+running 12 tests
+test category::tests::parse_aliases ... ok
+test category::tests::round_trips_through_display_and_parse ... ok
+test library::tests::query_helpers ... ok
+test library::tests::validate_flags_missing_source_and_bad_license ... ok
+test library::tests::validate_passes_compliant_library ... ok
+test library::tests::json_round_trip ... ok
+test material::tests::build_and_query ... ok
+test library::tests::csv_round_trip ... ok
+test property::tests::anisotropic_value ... ok
+test property::tests::empty_inputs_return_none ... ok
+test property::tests::scalar_value ... ok
+test property::tests::temperature_interpolation ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_mesh-9b08aa6182557788.exe)
+
+running 6 tests
+test tests::cube_has_twelve_faces_and_eight_vertices_after_weld ... ok
+test tests::equilateral_aspect_ratio_is_one ... ok
+test tests::obj_round_trips_vertex_and_face_count ... ok
+test tests::subdivide_single_triangle ... ok
+test tests::stl_binary_round_trips ... ok
+test tests::weld_reduces_duplicate_vertices ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_network_matrix-a9fd64958993725a.exe)
+
+running 2 tests
+test tests::admittance_laplacian ... ok
+test tests::incidence_shape_and_signs ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_nurbs-c14239ad306f6e69.exe)
+
+running 7 tests
+test tests::knot_validation ... ok
+test tests::bspline_surface_center_and_tessellation ... ok
+test tests::linear_bspline_segment ... ok
+test tests::linear_nurbs_segment ... ok
+test tests::planar_surface_center_and_tessellation ... ok
+test tests::quadratic_bspline_curve ... ok
+test tests::quarter_circle_nurbs ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_plot-4c4078e2bd68a502.exe)
+
+running 3 tests
+test tests::test_section_drawing_png_svg ... ok
+test tests::test_result_chart_png_svg ... ok
+test tests::test_xy_plot_png_svg ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_props-b81c2ba65e9acc03.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_props_air-634c2473712372a2.exe)
+
+running 5 tests
+test tests::dew_point_consistent ... ok
+test tests::guards_reject_non_physical_inputs ... ok
+test tests::sat_pressure_100c ... ok
+test tests::humidity_ratio_roundtrip ... ok
+test tests::sat_pressure_25c ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_props_fuels-d9882eeaa7964180.exe)
+
+running 5 tests
+test tests::blend_bounds ... ok
+test tests::co2_monotonic_with_hydrogen ... ok
+test tests::diesel_afr ... ok
+test tests::hydrogen_afr_higher_than_methane ... ok
+test tests::methane_afr ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_props_water-937acbf37a9a19ca.exe)
+
+running 6 tests
+test tests::region1_reference_300k_3mpa ... ok
+test tests::region1_reference_500k_3mpa_cp ... ok
+test tests::region2_reference_300k_0_0035mpa ... ok
+test tests::region3_rejected ... ok
+test tests::saturation_pressure_300k ... ok
+test tests::saturation_temperature_roundtrip ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_reliability-650111ecce5db359.exe)
+
+running 10 tests
+test fatigue::tests::basquin_roundtrip ... ok
+test fatigue::tests::miners_rule_sums ... ok
+test fmea::tests::rpn_and_ranking ... ok
+test life::tests::exponential_mean_and_reliability ... ok
+test life::tests::weibull_b10_life ... ok
+test life::tests::weibull_reliability_monotone ... ok
+test probabilistic::tests::normal_cdf_symmetry ... ok
+test probabilistic::tests::prob_failure_below_mean ... ok
+test probabilistic::tests::reliability_strength_above_stress ... ok
+test probabilistic::tests::z_quantile_roundtrip ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_report-adea38dfc46921c2.exe)
+
+running 5 tests
+test tests::test_html_contains_sections ... ok
+test tests::test_markdown_contains_sections ... ok
+test tests::test_validation_fail ... ok
+test tests::test_json_roundtrip ... ok
+test tests::test_write_files ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_safety-12827b7543036957.exe)
+
+running 4 tests
+test tests::basic_ratios ... ok
+test tests::dimension_mismatch_errors ... ok
+test tests::with_class_uses_recommended_sf ... ok
+test tests::pass_warn_fail ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\cross_crate.rs (target\debug\deps\cross_crate-851688f071102ae9.exe)
+
+running 1 test
+test stackup_drives_safety_and_reliability ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_sections-a35f6b3c8a5328f8.exe)
+
+running 14 tests
+test compose::tests::composite_centroid_of_l_shape ... ok
+test compose::tests::single_rect_matches_analytic ... ok
+test polygon::tests::square_area_centroid_and_moments ... ok
+test polygon::tests::square_section_modulus ... ok
+test polygon::tests::validate_accepts_well_formed_polygon ... ok
+test properties::tests::polar_moment_is_sum ... ok
+test shapes::tests::angle_area_and_symmetry ... ok
+test shapes::tests::channel_centroid_offsets_to_flange_side ... ok
+test shapes::tests::circle_properties ... ok
+test shapes::tests::i_section_matches_hand_formula ... ok
+test shapes::tests::rectangle_properties ... ok
+test polygon::tests::square_plastic_modulus_grid ... ok
+test shapes::tests::tube_properties ... ok
+test polygon::tests::circle_torsion_grid ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.53s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_standards-589508e09b8bb0e5.exe)
+
+running 10 tests
+test combinations::tests::evaluate_combination ... ok
+test combinations::tests::demand_map_helpers ... ok
+test combinations::tests::missing_case_errors_when_checked ... ok
+test design::tests::design_basis_runs_all_combinations ... ok
+test design::tests::evaluate_single_check ... ok
+test factors::tests::factor_set_json_round_trip ... ok
+test factors::tests::factor_set_lookup ... ok
+test limit_states::tests::utilization_and_pass ... ok
+test limit_states::tests::zero_capacity_is_infinite_utilization ... ok
+test load::tests::load_case_json_round_trip ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_structural-64395e1243ccb242.exe)
+
+running 5 tests
+test tests::shear_sign_and_value ... ok
+test tests::utilization_ratio ... ok
+test tests::central_point_load_reactions_and_moment ... ok
+test tests::udl_max_moment ... ok
+test tests::resolution_variant_matches_default ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_timeseries-7c2c27907cc53150.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_timeseries_align-97795e2b660cca84.exe)
+
+running 4 tests
+test tests::clamp_outside_interval ... ok
+test tests::empty_series_yields_zeros ... ok
+test tests::linear_interp_midpoint ... ok
+test tests::multi_rate_streams_onto_common_grid ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_timeseries_core-bff8b59b240d36f4.exe)
+
+running 2 tests
+test tests::ordering_and_duration ... ok
+test tests::unsorted_detected ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_timeseries_gap-9142aa22624452a0.exe)
+
+running 5 tests
+test tests::fill_gaps_produces_grid ... ok
+test tests::gap_detection ... ok
+test tests::linear_fill_across_gap ... ok
+test tests::no_gap_when_within_max ... ok
+test tests::stale_logic ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_tolerance-037e5a515b91b773.exe)
+
+running 6 tests
+test tests::contributor_ranking ... ok
+test tests::rss_is_tighter_than_worst_case ... ok
+test tests::worst_case_bounds ... ok
+test tests::yield_within_wide_spec ... ok
+test tests::monte_carlo_mean_near_nominal ... ok
+test tests::sensitivity_uniform_correlations ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running unittests src\main.rs (target\debug\deps\xtask-dbcb3a3fb00a4399.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_cad
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_controls
+
+running 1 test
+test crates\tpt-eng-controls\src\lib.rs - (line 17) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+all doctests ran in 1.27s; merged doctests compilation took 0.73s
+   Doc-tests tpt_eng_examples
+
+running 1 test
+test crates\tpt-eng-examples\src\lib.rs - (line 15) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+all doctests ran in 1.13s; merged doctests compilation took 0.58s
+   Doc-tests tpt_eng_gdt
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_geo_asset
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_geo_topology
+
+running 1 test
+test crates\tpt-eng-geo-topology\src\lib.rs - (line 13) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+all doctests ran in 1.07s; merged doctests compilation took 0.53s
+   Doc-tests tpt_eng_geometry
+
+running 1 test
+test crates\tpt-eng-geometry\src\lib.rs - (line 21) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+all doctests ran in 0.99s; merged doctests compilation took 0.48s
+   Doc-tests tpt_eng_io
+
+running 1 test
+test crates\tpt-eng-io\src\lib.rs - (line 16) - compile ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.96s; merged doctests compilation took 0.48s
+   Doc-tests tpt_eng_materials
+
+running 1 test
+test crates\tpt-eng-materials\src\lib.rs - (line 36) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+all doctests ran in 1.04s; merged doctests compilation took 0.48s
+   Doc-tests tpt_eng_mesh
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_network_matrix
+
+running 1 test
+test crates\tpt-eng-network-matrix\src\lib.rs - (line 18) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+all doctests ran in 1.00s; merged doctests compilation took 0.44s
+   Doc-tests tpt_eng_nurbs
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_plot
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_props
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_props_air
+
+running 1 test
+test crates\tpt-eng-props-air\src\lib.rs - (line 16) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+all doctests ran in 1.06s; merged doctests compilation took 0.51s
+   Doc-tests tpt_eng_props_fuels
+
+running 1 test
+test crates\tpt-eng-props-fuels\src\lib.rs - (line 12) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+all doctests ran in 0.89s; merged doctests compilation took 0.37s
+   Doc-tests tpt_eng_props_water
+
+running 1 test
+test crates\tpt-eng-props-water\src\lib.rs - (line 22) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+all doctests ran in 0.98s; merged doctests compilation took 0.41s
+   Doc-tests tpt_eng_reliability
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_report
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_safety
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_sections
+
+running 1 test
+test crates\tpt-eng-sections\src\lib.rs - (line 34) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+all doctests ran in 0.92s; merged doctests compilation took 0.39s
+   Doc-tests tpt_eng_standards
+
+running 1 test
+test crates\tpt-eng-standards\src\lib.rs - (line 35) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+all doctests ran in 0.94s; merged doctests compilation took 0.40s
+   Doc-tests tpt_eng_structural
+
+running 1 test
+test crates\tpt-eng-structural\src\lib.rs - (line 19) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+all doctests ran in 0.99s; merged doctests compilation took 0.44s
+   Doc-tests tpt_eng_timeseries
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_timeseries_align
+
+running 1 test
+test crates\tpt-eng-timeseries-align\src\lib.rs - (line 13) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+all doctests ran in 0.91s; merged doctests compilation took 0.38s
+   Doc-tests tpt_eng_timeseries_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_timeseries_gap
+
+running 1 test
+test crates\tpt-eng-timeseries-gap\src\lib.rs - (line 14) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+all doctests ran in 0.88s; merged doctests compilation took 0.36s
+   Doc-tests tpt_eng_tolerance
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

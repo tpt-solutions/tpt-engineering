@@ -4,19 +4,15 @@
 //! trail) exporters, and validation helpers used to annotate results with a pass/warn/fail status.
 
 pub mod error;
-pub mod model;
-pub mod validate;
-pub mod markdown;
 pub mod html;
 pub mod json;
+pub mod markdown;
+pub mod model;
+pub mod validate;
 
 pub use error::{Error, Result};
-pub use model::{
-    NamedValue, Report, ResultEntry, Section, Table, ValidationStatus,
-};
-pub use validate::{
-    validate_max, validate_min, validate_range,
-};
+pub use model::{NamedValue, Report, ResultEntry, Section, Table, ValidationStatus};
+pub use validate::{validate_max, validate_min, validate_range};
 
 use std::path::Path;
 
@@ -69,8 +65,20 @@ mod tests {
                 NamedValue::new("Load", 10.0).with_unit("kN"),
             ])
             .results(vec![
-                ResultEntry::with_limits("Max moment", 12.5, Some("kNm".to_string()), Some(0.0), Some(15.0)),
-                ResultEntry::with_limits("Max deflection", 18.0, Some("mm".to_string()), Some(0.0), Some(20.0)),
+                ResultEntry::with_limits(
+                    "Max moment",
+                    12.5,
+                    Some("kNm".to_string()),
+                    Some(0.0),
+                    Some(15.0),
+                ),
+                ResultEntry::with_limits(
+                    "Max deflection",
+                    18.0,
+                    Some("mm".to_string()),
+                    Some(0.0),
+                    Some(20.0),
+                ),
             ])
             .heading("Notes")
             .paragraph("All checks within permissible limits.")

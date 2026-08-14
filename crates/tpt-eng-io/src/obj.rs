@@ -202,11 +202,7 @@ impl From<Obj> for ObjMesh {
 
 impl From<ObjMesh> for Obj {
     fn from(mesh: ObjMesh) -> Self {
-        let material_libs = mesh
-            .material_lib
-            .into_iter()
-            .map(obj::Mtl::new)
-            .collect();
+        let material_libs = mesh.material_lib.into_iter().map(obj::Mtl::new).collect();
 
         let mut object = obj::Object::new(mesh.name.unwrap_or_else(|| "default".to_string()));
         let mut group = obj::Group::new("default".to_string());

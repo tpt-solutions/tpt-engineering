@@ -288,7 +288,12 @@ fn point_in_polygon(px: f64, py: f64, verts: &[(f64, f64)]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tpt_eng_math::helpers::is_approx_equal;
+
+    fn is_approx_equal(a: f64, b: f64) -> bool {
+        let abs_diff = (a - b).abs();
+        let largest = a.abs().max(b.abs());
+        abs_diff <= 1e-12 || abs_diff <= 1e-9 * largest
+    }
 
     fn square() -> CustomPolygon {
         CustomPolygon::new(vec![(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)])

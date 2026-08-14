@@ -1,10 +1,10 @@
 //! Bar charts of named results (e.g. calculation outputs).
 
+use crate::Drawing;
 use crate::error::Result;
 use crate::plot_err;
-use crate::Drawing;
-use plotters::prelude::*;
 use plotters::element::Rectangle;
+use plotters::prelude::*;
 use std::path::Path;
 
 /// A bar chart of named results.

@@ -78,15 +78,13 @@ The `prelude` module re-exports the most commonly used items.
 
 ## Related crates
 
-- [`tpt-eng-linalg`](../tpt-eng-linalg) — linear algebra utilities.
-- [`tpt-eng-optimize`](../tpt-eng-optimize) — engineering optimization.
 - [`tpt-eng-materials`](../tpt-eng-materials) — material property modeling.
 - [`tpt-eng-standards`](../tpt-eng-standards) — standards modeling as data.
 
 ## Status
 
-Initial `0.1.0` release. Depends on `tpt-eng-core` / `tpt-eng-math` from the
-sibling `tpt-eng1` repository. Unit and geometry integrations are deferred.
+Initial `0.1.0` release. No dependencies beyond the standard library; unit
+and geometry integrations are deferred.
 
 ## Changelog
 

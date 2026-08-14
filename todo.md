@@ -272,3 +272,124 @@ settings) beyond a normal code change.
       `main`; a newly published RUSTSEC advisory for an already-merged
       dependency wouldn't be caught until the next push).
 - [ ] GitHub Pages / hosted rustdoc publishing workflow.
+
+## Phase 7 — Coherence, Consolidation & Documentation Pass (2026-08-15)
+
+Full plan: `C:\Users\phill\.claude\plans\review-all-the-crates-serene-quiche.md`.
+Triggered by a full-workspace review (29 `tpt-eng-*` crates + `xtask`) that
+found real functional overlaps between crates (not just naming coincidences),
+plus large documentation/metadata gaps and small coherence issues (lint
+opt-in, dependency-declaration style, stale cross-references). User chose
+**full consolidation** over "document only."
+
+### 7.0 Baseline
+- [ ] `cargo build --workspace` clean (pre-change baseline)
+- [ ] `cargo test --workspace` clean (pre-change baseline)
+
+### 7.1a. Tolerance stack-up consolidation
+- [ ] Extend `tpt-eng-tolerance::DimTol` to support asymmetric
+      (`tol_plus`/`tol_minus`) tolerances so it covers everything
+      `tpt-eng-gdt`'s `StackupMember` does today
+- [ ] `tpt-eng-gdt`: remove duplicate `StackupMember`/`Stackup`/
+      `MonteCarloResult`/`lcg_next`/`lcg_uniform`; depend on
+      `tpt-eng-tolerance` (workspace dep) and re-export its stack-up types
+      from the gdt crate root
+- [ ] Update/remove `tpt-eng-gdt` tests referencing the removed types
+- [ ] Keep `tpt-eng-gdt`'s `ToleranceZone`/`DatumReferenceFrame::check_conformance`
+      untouched (separate concern from 1-D stack-up)
+
+### 7.1b. Utilization/pass-fail consolidation onto `tpt-eng-safety`
+- [ ] `tpt-eng-standards::limit_states::DemandCapacity::utilization()` and
+      `design::CheckResult::new()` delegate to `tpt_eng_safety::utilization`
+      (add `tpt-eng-safety` workspace dep to `tpt-eng-standards`)
+- [ ] `tpt-eng-structural::SectionCheck::utilization()` delegates to
+      `tpt_eng_safety::utilization` (add `tpt-eng-safety` workspace dep to
+      `tpt-eng-structural`)
+- [ ] Re-verify existing test assertions in `limit_states.rs`, `design.rs`,
+      and `tpt-eng-structural`'s `utilization_ratio` test after delegation
+      (esp. the `capacity == 0.0 → infinity` edge case)
+- [ ] `tpt-eng-safety::quantity::Quantity`/`Dimension`: keep public shape,
+      back internally with real `tpt_math_units` (uom) values; add
+      `tpt-math-units` as a real (non-dev) dependency
+
+### 7.1c. STL/OBJ I/O consolidation
+- [ ] Extend `tpt-eng-mesh`'s in-house OBJ codec (`to_obj`/`from_obj`) to
+      carry texture coordinates and per-corner normal indices, matching
+      `tpt-eng-io`'s current `ObjMesh`/`ObjFace` fidelity
+- [ ] `tpt-eng-io`: drop `stl_io`/`obj` third-party deps; depend on
+      `tpt-eng-mesh`; rewrite `src/stl.rs`/`src/obj.rs` to operate directly
+      on `tpt_eng_mesh::Mesh`, dropping the local `StlMesh`/`ObjMesh` wrappers
+- [ ] Update `tpt-eng-io`'s lib.rs doc example + inline tests
+- [ ] Update `tpt-eng-cli::cmd_validate` STL/OBJ branches for the new
+      `tpt_eng_mesh::Mesh` accessors
+
+### 7.1d. CLI de-duplication
+- [ ] `tpt-eng-cli`: add workspace deps on `tpt-eng-materials`,
+      `tpt-eng-sections`, `tpt-eng-structural`
+- [ ] Replace `src/materials.rs` hardcoded table with a small embedded
+      `tpt_eng_materials::MaterialLibrary` (seeded with the same reference
+      values + `DataSource` provenance so `validate()` passes)
+- [ ] Replace `src/sections.rs` ad hoc formulas with direct
+      `tpt_eng_sections::{Rectangle, Circle, ISection}` construction +
+      `Section` trait calls
+- [ ] Rewire `cmd_calc_beam` to use `tpt_eng_structural::{Beam, Load}` +
+      `tpt_eng_sections::Section::second_moments()`, wrapping/unwrapping
+      bare-`f64` CLI inputs via `tpt_math_units` at the boundary; keep the
+      CLI's own closed-form UDL-deflection formula (out of scope for
+      `tpt-eng-structural` v0.1.0)
+- [ ] Update `tpt-eng-cli/tests/integration.rs` for any output-text
+      assertions that shift
+
+### 7.1e. `tpt-eng-sections` ↔ `tpt-eng-geometry` boundary
+- [ ] Rewrite the stale "geometry integration deferred until that crate
+      exists" language in `tpt-eng-sections/src/lib.rs` and README to state
+      the 2D/3D split is a deliberate, permanent domain separation (no
+      dependency edge added)
+
+### 7.2. Lint & dependency-declaration fixes
+- [ ] Add `[lints]\nworkspace = true` to the 12 crates missing it: `cad`,
+      `gdt`, `geometry`, `mesh`, `nurbs`, `io`, `plot`, `report`, `cli`,
+      `reliability`, `safety`, `tolerance`
+- [ ] `cargo clippy --workspace --all-targets` after opt-in; fix newly
+      surfaced warnings (expect `missing_errors_doc`/`missing_panics_doc`
+      gaps, esp. in `cad`, `mesh`, `cli`)
+- [ ] Fix `tpt-eng-props`/`-air`/`-fuels`/`-water`'s hardcoded relative-path
+      `tpt-math-units`/`tpt-math-numeric` deps to use
+      `{ workspace = true, default-features = false, features = [...] }`;
+      verify per-crate build with each feature combination the crate
+      currently exercises
+
+### 7.3. Cargo.toml metadata
+- [ ] Add `description` (where missing: `cli`, `io`, `plot`, `report`),
+      `keywords` (≤5), and `categories` (valid crates.io slugs) to the ~21
+      crates currently missing them, in the style of the 8 crates that
+      already have this metadata
+
+### 7.4. READMEs
+- [ ] Write fresh README for the 7 crates with none: `io`, `mesh`, `plot`,
+      `reliability`, `report`, `safety`, `tolerance`
+- [ ] Fix stale "Related crates" links (`tpt-eng-linalg`/`tpt-eng-optimize`
+      don't exist) in `materials`, `sections`, `standards` READMEs
+- [ ] Fix stale project name "tpt-eng3" → "tpt-engineering" in `cad`, `gdt`,
+      `geometry`, `nurbs` READMEs and `tpt-eng-cad/examples/integration.rs`
+- [ ] Update READMEs for crates whose public API changed in 7.1
+      (`gdt`, `safety`, `standards`, `structural`, `io`, `cli`)
+
+### 7.5. CHANGELOGs
+- [ ] Add `CHANGELOG.md` (`[0.1.0] - 2026`, "Added" bullets) to the 26
+      crates lacking one, reflecting the final consolidated state
+- [ ] Correct the 3 existing CHANGELOGs' (`materials`, `sections`,
+      `standards`) dates from "2024" to "2026"
+
+### 7.6. Verification
+- [ ] `cargo build --workspace` clean
+- [ ] `cargo test --workspace` clean (esp. gdt stack-up tests, `safety`'s
+      `tests/cross_crate.rs`, `standards`'s `limit_states.rs`/`design.rs`
+      tests, `structural`'s `utilization_ratio` test, `io`'s STL/OBJ tests
+      (full rewrite), `cli/tests/integration.rs`)
+- [ ] `cargo clippy --workspace --all-targets --all-features` clean
+- [ ] `cargo doc --workspace --no-deps` clean
+- [ ] `cargo tree --workspace` diffed against the 7.0 baseline — only the
+      intended new edges exist (`gdt→tolerance`, `standards→safety`,
+      `structural→safety`, `io→mesh`, `cli→materials/sections/structural`),
+      no cycles

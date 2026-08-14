@@ -8,9 +8,9 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
-use tpt_eng_core::Metadata;
 
 use crate::load::LoadCase;
+use crate::metadata::Metadata;
 
 /// One factor applied to one load case within a combination.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

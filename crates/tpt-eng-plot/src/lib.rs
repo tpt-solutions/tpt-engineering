@@ -8,16 +8,16 @@
 //!
 //! Each plot can be exported to PNG or SVG via [`Drawing::save_png`] / [`Drawing::save_svg`].
 
+pub mod chart;
 pub mod error;
 pub mod font;
-pub mod xy;
-pub mod chart;
 pub mod section;
+pub mod xy;
 
-pub use error::{Error, Result};
-pub use xy::{XyPlot, XySeries};
 pub use chart::ResultChart;
+pub use error::{Error, Result};
 pub use section::{SectionDrawing, SectionShape};
+pub use xy::{XyPlot, XySeries};
 
 use plotters::prelude::DrawingBackend;
 use std::path::Path;
@@ -29,7 +29,8 @@ pub trait Drawing {
 
     /// Export to a PNG file.
     fn save_png<P: AsRef<Path>>(&self, path: P) -> Result<()> {
-        let root = plotters::backend::BitMapBackend::new(path.as_ref(), (self.width(), self.height()));
+        let root =
+            plotters::backend::BitMapBackend::new(path.as_ref(), (self.width(), self.height()));
         self.draw(root)
     }
 
@@ -136,4 +137,3 @@ mod tests {
         let _ = std::fs::remove_file(&svg);
     }
 }
-

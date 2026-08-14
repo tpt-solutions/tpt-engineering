@@ -32,17 +32,17 @@
 //! # }
 //! ```
 
+pub mod csv;
 pub mod error;
 pub mod json;
-pub mod csv;
-pub mod stl;
 pub mod obj;
+pub mod stl;
 
+pub use csv::{CsvRecord, read_csv, write_csv};
 pub use error::{Error, Result};
 pub use json::{read_json, write_json};
-pub use csv::{read_csv, write_csv, CsvRecord};
-pub use stl::{read_stl, write_stl, StlMesh, StlTriangle, StlVertex};
-pub use obj::{read_obj, write_obj, ObjMesh, ObjFace, ObjVertex, ObjNormal, ObjTexCoord};
+pub use obj::{ObjFace, ObjMesh, ObjNormal, ObjTexCoord, ObjVertex, read_obj, write_obj};
+pub use stl::{StlMesh, StlTriangle, StlVertex, read_stl, write_stl};
 
 /// Trait for types that can be read from a file.
 pub trait ReadFromFile: Sized {
@@ -57,7 +57,9 @@ pub trait WriteToFile {
 }
 
 /// Trait for engineering data that can be serialized to/from multiple formats.
-pub trait EngineeringData: ReadFromFile + WriteToFile + serde::Serialize + serde::de::DeserializeOwned {
+pub trait EngineeringData:
+    ReadFromFile + WriteToFile + serde::Serialize + serde::de::DeserializeOwned
+{
     /// Get the default file extension for this data type.
     fn default_extension() -> &'static str;
 }

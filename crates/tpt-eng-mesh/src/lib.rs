@@ -18,7 +18,7 @@
 
 use std::collections::HashMap;
 
-use tpt_eng_geometry::{point, query, vector, Point3, Vector3, EPSILON};
+use tpt_eng_geometry::{EPSILON, Point3, Vector3, point, query, vector};
 
 /// An indexed triangle mesh.
 ///

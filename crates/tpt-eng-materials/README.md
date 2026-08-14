@@ -28,7 +28,7 @@ are supported:
 ## Data policy
 
 **Only original, user-provided, or openly licensed data is accepted.** Every
-material must record a source (`tpt_eng_core::DataSource`), and
+material must record a source (`provenance::DataSource`), and
 `MaterialLibrary::validate` enforces that rule: a material with no recorded
 source, or a disallowed `license` attribute, fails validation. No proprietary
 material tables are bundled or scraped.

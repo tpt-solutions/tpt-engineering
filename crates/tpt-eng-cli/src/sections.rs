@@ -10,12 +10,7 @@ pub enum Section {
     /// Solid circle of diameter `d`.
     Circle { d: f64 },
     /// Symmetric I-beam: total depth `d`, flange width `bf`, flange thickness `tf`, web thickness `tw`.
-    IBeam {
-        d: f64,
-        bf: f64,
-        tf: f64,
-        tw: f64,
-    },
+    IBeam { d: f64, bf: f64, tf: f64, tw: f64 },
 }
 
 impl Section {

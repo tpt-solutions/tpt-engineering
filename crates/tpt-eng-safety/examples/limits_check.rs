@@ -1,9 +1,7 @@
 //! Example: evaluate a design stress against an allowable limit using the
 //! recommended safety factor for a general static application.
 
-use tpt_eng_quantity::Quantity;
-use tpt_eng_safety::evaluate_with_class;
-use tpt_eng_standards::ApplicationClass;
+use tpt_eng_safety::{ApplicationClass, Quantity, evaluate_with_class};
 
 fn main() {
     let report = evaluate_with_class(

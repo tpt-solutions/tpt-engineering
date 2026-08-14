@@ -88,7 +88,10 @@ fn render_named_values(values: &[NamedValue]) -> String {
         let value = format!("{}", v.value);
         let unit = v.unit.as_deref().unwrap_or("");
         let description = v.description.as_deref().unwrap_or("");
-        out.push_str(&format!("| {} | {} | {unit} | {description} |\n", v.name, value));
+        out.push_str(&format!(
+            "| {} | {} | {unit} | {description} |\n",
+            v.name, value
+        ));
     }
     out
 }

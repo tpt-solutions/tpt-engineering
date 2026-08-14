@@ -5,7 +5,7 @@
 //! de Boor algorithm. No external NURBS dependency is used; the spline
 //! mathematics are implemented here directly.
 
-use tpt_eng_geometry::{Point3, Vector3, EPSILON};
+use tpt_eng_geometry::{EPSILON, Point3, Vector3};
 
 /// A knot vector: a non-decreasing sequence of parameter values used to define
 /// the piecewise polynomial structure of a spline.

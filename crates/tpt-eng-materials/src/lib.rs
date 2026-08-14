@@ -15,7 +15,7 @@
 //! ## Data policy
 //!
 //! **Only original, user-provided, or openly licensed data is accepted.** Every
-//! material must record a source ([`tpt_eng_core::DataSource`]), and
+//! material must record a source ([`provenance::DataSource`]), and
 //! [`library::MaterialLibrary::validate`] enforces that rule: a material with no
 //! recorded source, or a disallowed `license` attribute, fails validation. No
 //! proprietary material tables are bundled or scraped.
@@ -59,20 +59,23 @@ pub mod error;
 pub mod library;
 pub mod material;
 pub mod property;
+pub mod provenance;
 
 pub use category::MaterialCategory;
 pub use error::{MaterialError, Result};
-pub use library::{MaterialLibrary, ALLOWED_LICENSES};
+pub use library::{ALLOWED_LICENSES, MaterialLibrary};
 pub use material::Material;
 pub use property::{Property, TempPoint};
+pub use provenance::{DataSource, Metadata};
 
 /// The most commonly used items, in one `use`.
 pub mod prelude {
     pub use crate::{
         category::MaterialCategory,
         error::{MaterialError, Result},
-        library::{MaterialLibrary, ALLOWED_LICENSES},
+        library::{ALLOWED_LICENSES, MaterialLibrary},
         material::Material,
         property::{Property, TempPoint},
+        provenance::{DataSource, Metadata},
     };
 }

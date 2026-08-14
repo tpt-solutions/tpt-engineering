@@ -53,7 +53,7 @@ pub fn weibull_mean(eta: f64, beta: f64) -> Result<f64, ReliabilityError> {
             "eta and beta must be positive".into(),
         ));
     }
-    Ok(eta * statrs::function::gamma::gamma(1.0 + 1.0 / beta))
+    Ok(eta * tpt_math_stats::gamma(1.0 + 1.0 / beta))
 }
 
 /// B-life: time by which a fraction `b` (in percent, e.g. 10 for B10) of the

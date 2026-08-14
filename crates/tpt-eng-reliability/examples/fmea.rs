@@ -1,6 +1,6 @@
 //! Example: rank FMEA items and report a Weibull life metric.
 
-use tpt_eng_reliability::{rank_by_rpn, weibull_b_life, weibull_reliability, FmeaItem};
+use tpt_eng_reliability::{FmeaItem, rank_by_rpn, weibull_b_life, weibull_reliability};
 
 fn main() {
     let items = vec![

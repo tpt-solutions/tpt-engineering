@@ -1,6 +1,6 @@
 //! Command-line interface for the TPT engineering ecosystem.
 
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 
@@ -11,7 +11,7 @@ mod sections;
 mod units;
 
 use materials::{describe as describe_material, find as find_material};
-use sections::{describe as describe_section, Section};
+use sections::{Section, describe as describe_section};
 use units::convert as convert_units;
 
 #[derive(Parser)]
@@ -187,7 +187,11 @@ fn cmd_validate(path: &PathBuf) -> Result<()> {
         }
         "csv" => {
             let records = tpt_eng_io::read_csv(path)?;
-            println!("OK: {} is valid CSV ({} records)", path.display(), records.len());
+            println!(
+                "OK: {} is valid CSV ({} records)",
+                path.display(),
+                records.len()
+            );
         }
         "stl" => {
             let mesh = tpt_eng_io::read_stl(path)?;
@@ -222,8 +226,20 @@ fn cmd_report(args: ReportArgs) -> Result<()> {
             NamedValue::new("Load", 10.0).with_unit("kN"),
         ])
         .results(vec![
-            ResultEntry::with_limits("Max moment", 12.5, Some("kNm".into()), Some(0.0), Some(15.0)),
-            ResultEntry::with_limits("Max deflection", 18.0, Some("mm".into()), Some(0.0), Some(20.0)),
+            ResultEntry::with_limits(
+                "Max moment",
+                12.5,
+                Some("kNm".into()),
+                Some(0.0),
+                Some(15.0),
+            ),
+            ResultEntry::with_limits(
+                "Max deflection",
+                18.0,
+                Some("mm".into()),
+                Some(0.0),
+                Some(20.0),
+            ),
         ])
         .heading("Conclusion")
         .paragraph("All checked quantities are within permissible limits.");
@@ -323,8 +339,8 @@ fn cmd_calc_beam(
     report_out: Option<PathBuf>,
     plot_out: Option<PathBuf>,
 ) -> Result<()> {
-    let m = find_material(material_name)
-        .ok_or_else(|| anyhow!("unknown material: {material_name}"))?;
+    let m =
+        find_material(material_name).ok_or_else(|| anyhow!("unknown material: {material_name}"))?;
     let section = shape_from_cmd(&section_cmd);
 
     let e = m.youngs_modulus;
@@ -363,7 +379,13 @@ fn cmd_calc_beam(
                 ResultEntry::with_limits("Reaction A", reaction, Some("N".into()), None, None),
                 ResultEntry::with_limits("Reaction B", reaction, Some("N".into()), None, None),
                 ResultEntry::with_limits("Max moment", max_moment, Some("N·m".into()), None, None),
-                ResultEntry::with_limits("Max deflection", deflection_mm, Some("mm".into()), Some(0.0), Some(25.0)),
+                ResultEntry::with_limits(
+                    "Max deflection",
+                    deflection_mm,
+                    Some("mm".into()),
+                    Some(0.0),
+                    Some(25.0),
+                ),
             ]);
         write_report(&r, &path)?;
     }
@@ -375,8 +397,7 @@ fn cmd_calc_beam(
             .map(|k| {
                 let x = span * (k as f64) / (n as f64);
                 // deflection shape v(x) = w x (L^3 - 2 L x^2 + x^3) / (24 E I)
-                let v = load * x * (span.powi(3) - 2.0 * span * x * x + x.powi(3))
-                    / (24.0 * e * i);
+                let v = load * x * (span.powi(3) - 2.0 * span * x * x + x.powi(3)) / (24.0 * e * i);
                 let v_mm = units::convert(v, "m", "mm").unwrap_or(v);
                 (x, v_mm)
             })

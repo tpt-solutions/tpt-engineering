@@ -4,10 +4,10 @@
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
-use tpt_eng_core::{DataSource, Metadata};
 
 use crate::category::MaterialCategory;
 use crate::property::Property;
+use crate::provenance::{DataSource, Metadata};
 
 /// A material: identity, category, descriptive metadata, a set of named
 /// properties, and provenance/source tracking.

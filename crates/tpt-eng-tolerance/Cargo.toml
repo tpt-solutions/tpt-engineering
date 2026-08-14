@@ -9,12 +9,10 @@ authors.workspace = true
 description = "Tolerance analysis: worst-case, RSS, and Monte Carlo stack-up, sensitivity, and ranking."
 
 [dependencies]
-tpt-eng-math.workspace = true
-tpt-eng-uncertainty.workspace = true
+tpt-math-stats.workspace = true
 rand.workspace = true
 rand_distr.workspace = true
-statrs.workspace = true
-thiserror.workspace = true
+serde.workspace = true
 
 [dev-dependencies]
 approx.workspace = true

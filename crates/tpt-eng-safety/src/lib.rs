@@ -1,11 +1,14 @@
 //! Safety margins and limit-state evaluation.
 //!
-//! Builds on [`tpt_eng_quantity`] and [`tpt_eng_standards`] to evaluate
-//! design quantities against allowable limits, computing utilization, margins,
-//! and safety factors, and producing a structured pass/fail report.
+//! Evaluates design quantities against allowable limits, computing
+//! utilization, margins, and safety factors, and producing a structured
+//! pass/fail report.
 
-use tpt_eng_quantity::{Quantity, QuantityError};
-use tpt_eng_standards::{ApplicationClass, Limit};
+pub mod limit;
+pub mod quantity;
+
+pub use limit::{ApplicationClass, Limit, LimitSense, max_limit, min_limit};
+pub use quantity::{Dimension, Quantity, QuantityError};
 
 /// Outcome of a single limit-state check.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -78,7 +81,7 @@ pub fn evaluate_limit(
     let applied = design.value;
 
     let (util, marg, sf) = match limit.sense {
-        tpt_eng_standards::LimitSense::Below => {
+        LimitSense::Below => {
             // design must stay <= allowable
             (
                 utilization(applied, allowable),
@@ -86,7 +89,7 @@ pub fn evaluate_limit(
                 safety_factor(allowable, applied),
             )
         }
-        tpt_eng_standards::LimitSense::Above => {
+        LimitSense::Above => {
             // design must stay >= allowable
             (
                 utilization(allowable, applied),
@@ -105,8 +108,8 @@ pub fn evaluate_limit(
     };
 
     let sense_word = match limit.sense {
-        tpt_eng_standards::LimitSense::Below => "must not exceed",
-        tpt_eng_standards::LimitSense::Above => "must be at least",
+        LimitSense::Below => "must not exceed",
+        LimitSense::Above => "must be at least",
     };
     let message = format!(
         "{name}: applied {applied:.4} {sense_word} {allowable:.4}; SF={sf:.3} (required {req:.3}) -> {status:?}"
@@ -133,7 +136,7 @@ pub fn evaluate_with_class(
     allowable: Quantity,
     class: ApplicationClass,
 ) -> Result<CheckReport, QuantityError> {
-    let limit = tpt_eng_standards::max_limit(allowable);
+    let limit = max_limit(allowable);
     evaluate_limit(
         name,
         design,
@@ -146,7 +149,6 @@ pub fn evaluate_with_class(
 mod tests {
     use super::*;
     use approx::assert_relative_eq;
-    use tpt_eng_quantity::Quantity;
 
     #[test]
     fn basic_ratios() {
@@ -158,7 +160,7 @@ mod tests {
     #[test]
     fn pass_warn_fail() {
         let allow = Quantity::pascals(100.0);
-        let below = tpt_eng_standards::max_limit(allow);
+        let below = max_limit(allow);
 
         let pass = evaluate_limit("stress", Quantity::pascals(50.0), &below, Some(1.5)).unwrap();
         assert_eq!(pass.status, CheckStatus::Pass);
@@ -190,7 +192,7 @@ mod tests {
     fn dimension_mismatch_errors() {
         // Mixing pascals with meters should error.
         let allow = Quantity::meters(1.0);
-        let below = tpt_eng_standards::max_limit(allow);
+        let below = max_limit(allow);
         let res = evaluate_limit("x", Quantity::pascals(0.5), &below, Some(1.0));
         assert!(res.is_err());
     }

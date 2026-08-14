@@ -13,8 +13,6 @@ description = "Cross-section properties (area, centroid, second moment of area, 
 readme = "README.md"
 
 [dependencies]
-tpt-eng-core = { workspace = true }
-tpt-eng-math = { workspace = true }
 
 [lints]
 workspace = true

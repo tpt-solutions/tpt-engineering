@@ -7,7 +7,7 @@ use std::str::FromStr;
 /// Broad classification of an engineering material.
 ///
 /// Categories are `serde`-serialized in kebab-case (e.g. `"stainless-steel"`),
-/// matching the `SourceKind` convention in `tpt-eng-core`.
+/// matching the `SourceKind` convention in [`crate::provenance`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum MaterialCategory {

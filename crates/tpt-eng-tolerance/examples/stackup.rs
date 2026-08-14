@@ -1,9 +1,9 @@
 //! Example: compare worst-case, RSS, and Monte-Carlo stack-up of two
 //! dimensions whose nominal values nearly cancel.
 
-use rand::rngs::StdRng;
 use rand::SeedableRng;
-use tpt_eng_tolerance::{monte_carlo, rss, worst_case, DimTol};
+use rand::rngs::StdRng;
+use tpt_eng_tolerance::{DimTol, monte_carlo, rss, worst_case};
 
 fn main() {
     let dims = vec![

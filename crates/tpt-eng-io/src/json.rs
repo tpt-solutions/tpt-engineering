@@ -1,7 +1,7 @@
 //! JSON read/write functionality.
 
 use crate::error::Result;
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{Serialize, de::DeserializeOwned};
 use std::path::Path;
 
 /// Read a JSON file and deserialize it into type T.

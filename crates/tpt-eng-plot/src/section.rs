@@ -1,8 +1,8 @@
 //! 2D cross-section / geometry drawings.
 
+use crate::Drawing;
 use crate::error::Result;
 use crate::plot_err;
-use crate::Drawing;
 use plotters::prelude::*;
 use std::path::Path;
 
@@ -35,13 +35,7 @@ impl SectionShape {
             SectionShape::Rectangle { width, height } => {
                 let hw = width / 2.0;
                 let hh = height / 2.0;
-                vec![
-                    (-hw, -hh),
-                    (hw, -hh),
-                    (hw, hh),
-                    (-hw, hh),
-                    (-hw, -hh),
-                ]
+                vec![(-hw, -hh), (hw, -hh), (hw, hh), (-hw, hh), (-hw, -hh)]
             }
             SectionShape::Circle { radius } => {
                 let n = 64;
@@ -127,7 +121,10 @@ impl SectionDrawing {
         }
         let pad_x = (x_max - x_min).max(1.0) * 0.1;
         let pad_y = (y_max - y_min).max(1.0) * 0.1;
-        ((x_min - pad_x, x_max + pad_x), (y_min - pad_y, y_max + pad_y))
+        (
+            (x_min - pad_x, x_max + pad_x),
+            (y_min - pad_y, y_max + pad_y),
+        )
     }
 }
 

@@ -2,13 +2,15 @@
 //! evaluate a property at a temperature.
 //! Run with `cargo run --example load_material_library`.
 
-use tpt_eng_materials::{Material, MaterialCategory, MaterialLibrary, Property, TempPoint};
+use tpt_eng_materials::{
+    DataSource, Material, MaterialCategory, MaterialLibrary, Property, TempPoint,
+};
 
 fn main() {
     let mut lib = MaterialLibrary::new();
     lib.add(
         Material::new("steel-s355", "S355", MaterialCategory::Metal)
-            .with_source(tpt_eng_core::DataSource::standard("EN 10025"))
+            .with_source(DataSource::standard("EN 10025"))
             .with_property(
                 "youngs-modulus",
                 Property::Scalar {

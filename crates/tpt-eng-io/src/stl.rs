@@ -5,9 +5,9 @@
 //! top of the [`stl_io`] crate.
 
 use crate::error::{Error, Result};
-use stl_io::{self, IndexedMesh, IndexedTriangle, Normal, Triangle, Vertex};
 use std::io::Write;
 use std::path::Path;
+use stl_io::{self, IndexedMesh, IndexedTriangle, Normal, Triangle, Vertex};
 
 /// A vertex in an STL mesh.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -137,11 +137,7 @@ impl From<StlMesh> for IndexedMesh {
             vertices.push(Vertex::from(triangle.vertices[2]));
 
             faces.push(IndexedTriangle {
-                normal: Normal::new([
-                    triangle.normal.x,
-                    triangle.normal.y,
-                    triangle.normal.z,
-                ]),
+                normal: Normal::new([triangle.normal.x, triangle.normal.y, triangle.normal.z]),
                 vertices: [v0_idx, v1_idx, v2_idx],
             });
         }

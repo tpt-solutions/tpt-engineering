@@ -13,7 +13,6 @@ description = "Material property modeling with source tracking, temperature depe
 readme = "README.md"
 
 [dependencies]
-tpt-eng-core = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 csv = { workspace = true }

@@ -1,0 +1,16 @@
+﻿cargo :    Compiling proc-macro2 v1.0.107
+At line:4 char:36
++ ... ngineering; cargo test -p tpt-eng-tolerance -p tpt-eng-gdt 2>&1 | Out ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling proc-macro2 v1.0.107:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling tpt-math-numeric v0.1.0 (C:\Programming\tpt-math\crates\tpt-math-numeric)
+   Compiling rand_distr v0.4.3
+   Compiling approx v0.5.1
+   Compiling tpt-math-prob-core v0.1.0 (C:\Programming\tpt-math\crates\tpt-math-prob-core)
+   Compiling syn v3.0.3
+   Compiling tpt-math-stats v0.1.0 (C:\Programming\tpt-math\crates\tpt-math-stats)

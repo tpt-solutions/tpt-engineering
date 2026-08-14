@@ -1,9 +1,9 @@
 //! Multi-series XY plotting.
 
+use crate::Drawing;
 use crate::error::Result;
 use crate::font::annotate_axes;
 use crate::plot_err;
-use crate::Drawing;
 use plotters::prelude::*;
 use std::path::Path;
 

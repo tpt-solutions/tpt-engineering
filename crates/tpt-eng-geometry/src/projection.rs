@@ -1,6 +1,6 @@
 //! Projections: closest points of a point onto a line or a plane.
 
-use crate::{curve::Line3, surface::Plane3, Point3, Vector3};
+use crate::{Point3, Vector3, curve::Line3, surface::Plane3};
 
 /// Closest point on a line to `p`, together with the signed distance and parameter `t` along the
 /// line.

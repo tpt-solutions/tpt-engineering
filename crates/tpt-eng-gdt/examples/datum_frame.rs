@@ -6,7 +6,7 @@ use tpt_eng_gdt::{
     Datum, DatumReference, DatumReferenceFrame, GeometricCharacteristic, MaterialCondition,
     ToleranceFrame, ToleranceZone,
 };
-use tpt_eng_geometry::{frame::Frame3, Point3};
+use tpt_eng_geometry::{Point3, frame::Frame3};
 
 fn main() {
     let drf = DatumReferenceFrame::new(Datum::new('A', Frame3::IDENTITY));

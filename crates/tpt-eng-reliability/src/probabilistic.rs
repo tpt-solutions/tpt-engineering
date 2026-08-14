@@ -1,6 +1,6 @@
 //! Probabilistic design helpers (normal-integration reliability).
 
-use statrs::distribution::{ContinuousCDF, Normal};
+use tpt_math_stats::{ContinuousCDF, Normal};
 
 use crate::ReliabilityError;
 

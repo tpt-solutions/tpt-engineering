@@ -13,7 +13,6 @@ description = "Engineering standards modeling as structured, parameterized data:
 readme = "README.md"
 
 [dependencies]
-tpt-eng-core = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 

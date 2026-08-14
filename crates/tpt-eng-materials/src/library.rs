@@ -124,7 +124,7 @@ impl MaterialLibrary {
             if let Some(i) = source_i {
                 if let Some(s) = rec.get(i) {
                     if !s.is_empty() {
-                        m = m.with_source(tpt_eng_core::DataSource::file(s.to_string()));
+                        m = m.with_source(crate::provenance::DataSource::file(s.to_string()));
                     }
                 }
             }
@@ -251,7 +251,7 @@ mod tests {
         let mut lib = MaterialLibrary::new();
         lib.add(
             Material::new("steel-s355", "S355", MaterialCategory::Metal)
-                .with_source(tpt_eng_core::DataSource::standard("EN 10025"))
+                .with_source(crate::provenance::DataSource::standard("EN 10025"))
                 .with_property(
                     "youngs-modulus",
                     Property::Scalar {
@@ -262,7 +262,7 @@ mod tests {
         );
         lib.add(
             Material::new("aluminium-6061", "AA6061", MaterialCategory::Metal)
-                .with_source(tpt_eng_core::DataSource::standard("AMS 4027"))
+                .with_source(crate::provenance::DataSource::standard("AMS 4027"))
                 .with_property(
                     "youngs-modulus",
                     Property::Scalar {
@@ -309,7 +309,7 @@ mod tests {
         let mut lib = MaterialLibrary::new();
         lib.add(Material::new("x", "X", MaterialCategory::Other)); // no source
         let mut bad = Material::new("y", "Y", MaterialCategory::Other)
-            .with_source(tpt_eng_core::DataSource::file("vendor.pdf"));
+            .with_source(crate::provenance::DataSource::file("vendor.pdf"));
         bad.metadata
             .attributes
             .insert("license".into(), "proprietary".into());

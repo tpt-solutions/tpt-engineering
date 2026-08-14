@@ -5,7 +5,8 @@
 //! here — never magnitudes, which are supplied per analysis.
 
 use serde::{Deserialize, Serialize};
-use tpt_eng_core::Metadata;
+
+use crate::metadata::Metadata;
 
 /// The engineering category of a load action.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

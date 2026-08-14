@@ -14,15 +14,32 @@ members = [
     "crates/tpt-eng-network-matrix",
     "crates/tpt-eng-controls",
     "crates/tpt-eng-structural",
+    "crates/tpt-eng-materials",
+    "crates/tpt-eng-sections",
+    "crates/tpt-eng-standards",
+    "crates/tpt-eng-geometry",
+    "crates/tpt-eng-mesh",
+    "crates/tpt-eng-nurbs",
+    "crates/tpt-eng-gdt",
+    "crates/tpt-eng-cad",
+    "crates/tpt-eng-tolerance",
+    "crates/tpt-eng-reliability",
+    "crates/tpt-eng-safety",
+    "crates/tpt-eng-io",
+    "crates/tpt-eng-report",
+    "crates/tpt-eng-plot",
+    "crates/tpt-eng-cli",
     "crates/tpt-eng-examples",
     "xtask",
 ]
 exclude = []
 
 [workspace.package]
+version = "0.1.0"
 description = "tpt-engineering — applied engineering primitives for the TPT Solutions physical-systems verticals"
 authors = ["TPT Solutions"]
 edition = "2024"
+rust-version = "1.85"
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/tpt-solutions/tpt-engineering"
 repository = "https://github.com/tpt-solutions/tpt-engineering"
@@ -33,6 +50,7 @@ repository = "https://github.com/tpt-solutions/tpt-engineering"
 tpt-math-units = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-units" }
 tpt-math-numeric = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-numeric" }
 tpt-math-linalg = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-linalg" }
+tpt-math-stats = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-stats" }
 
 # In-repo crate dependencies (referenced by `workspace = true`).
 tpt-eng-props-water = { version = "0.1.0", path = "crates/tpt-eng-props-water" }
@@ -48,7 +66,37 @@ tpt-eng-geo-topology = { version = "0.1.0", path = "crates/tpt-eng-geo-topology"
 tpt-eng-network-matrix = { version = "0.1.0", path = "crates/tpt-eng-network-matrix" }
 tpt-eng-controls = { version = "0.1.0", path = "crates/tpt-eng-controls" }
 tpt-eng-structural = { version = "0.1.0", path = "crates/tpt-eng-structural" }
+tpt-eng-materials = { version = "0.1.0", path = "crates/tpt-eng-materials" }
+tpt-eng-sections = { version = "0.1.0", path = "crates/tpt-eng-sections" }
+tpt-eng-standards = { version = "0.1.0", path = "crates/tpt-eng-standards" }
+tpt-eng-geometry = { version = "0.1.0", path = "crates/tpt-eng-geometry" }
+tpt-eng-mesh = { version = "0.1.0", path = "crates/tpt-eng-mesh" }
+tpt-eng-nurbs = { version = "0.1.0", path = "crates/tpt-eng-nurbs" }
+tpt-eng-gdt = { version = "0.1.0", path = "crates/tpt-eng-gdt" }
+tpt-eng-cad = { version = "0.1.0", path = "crates/tpt-eng-cad" }
+tpt-eng-tolerance = { version = "0.1.0", path = "crates/tpt-eng-tolerance" }
+tpt-eng-reliability = { version = "0.1.0", path = "crates/tpt-eng-reliability" }
+tpt-eng-safety = { version = "0.1.0", path = "crates/tpt-eng-safety" }
+tpt-eng-io = { version = "0.1.0", path = "crates/tpt-eng-io" }
+tpt-eng-report = { version = "0.1.0", path = "crates/tpt-eng-report" }
+tpt-eng-plot = { version = "0.1.0", path = "crates/tpt-eng-plot" }
+tpt-eng-cli = { version = "0.1.0", path = "crates/tpt-eng-cli" }
 tpt-eng-examples = { version = "0.1.0", path = "crates/tpt-eng-examples" }
+
+# External dependencies shared by the newly merged crates.
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+csv = "1"
+thiserror = "2"
+glam = { version = "0.27", features = ["serde"] }
+rand = "0.8"
+rand_distr = "0.4"
+approx = "0.5"
+stl_io = "0.8"
+obj = "0.10"
+plotters = { version = "0.3", default-features = false, features = ["svg_backend", "bitmap_backend", "bitmap_encoder", "line_series", "point_series"] }
+clap = { version = "4.5", features = ["derive", "cargo"] }
+anyhow = "1.0"
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "warn"

@@ -1,9 +1,9 @@
 //! Geometric intersections.
 
 use crate::{
+    Point3, Vector3,
     curve::{Curve3, Line3},
     surface::Plane3,
-    Point3, Vector3,
 };
 
 /// Closest points between two lines (which may be skew). Returns the two points and their
