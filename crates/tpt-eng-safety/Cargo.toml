@@ -1,0 +1,20 @@
+[package]
+name = "tpt-eng-safety"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Safety margins and limit-state evaluation: utilization, margins, pass/fail, safety factors."
+
+[dependencies]
+tpt-eng-quantity.workspace = true
+tpt-eng-standards.workspace = true
+tpt-eng-reliability.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+approx.workspace = true
+rand.workspace = true
+tpt-eng-tolerance.workspace = true
