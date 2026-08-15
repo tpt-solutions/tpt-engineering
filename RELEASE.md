@@ -13,12 +13,14 @@ Tool used for the dry run: `cargo publish --dry-run` (cargo 1.97.1)
   are all published at `0.1.0`, matching the workspace `version = "0.1.0"`
   requirement. Every `tpt-eng-*` crate depends on these, so this must be true
   before anything here can publish (it is).
-- [ ] **crates.io token** exported: `set CARGO_REGISTRY_TOKEN=<token>` (or
-      `~/.cargo/credentials` configured).
-- [ ] **Clean tree (recommended)** — commit the current working-tree changes
-      (`Cargo.toml`, `README.md`, `Cargo.lock`, `crates/tpt-eng-cli/*`) first,
-      then publish without `--allow-dirty`. If you publish with uncommitted
-      changes, add `--allow-dirty` to every `cargo publish` command below.
+- [x] **crates.io token** exported: `set CARGO_REGISTRY_TOKEN=<token>` (or
+      `~/.cargo/credentials` configured). — verified: `~/.cargo/credentials.toml`
+      has a `[registry] token` entry and authenticated for Batch 1.
+- [x] **Clean tree (recommended)** — Batch 1 published **without**
+      `--allow-dirty` (the only working-tree change was an untracked root file,
+      which is outside every crate's package directory). If a later batch has
+      uncommitted changes inside a crate directory, either commit them or add
+      `--allow-dirty` to that `cargo publish` command.
 - [ ] **Version** — all crates are at `0.1.0`. This plan publishes `0.1.0` of
       each. Do not bump versions mid-release.
 - [ ] **`xtask` is excluded** — it is a workspace dev tool, not a publishable
@@ -81,52 +83,80 @@ you get the same safety net the dry run provided. Watch for the
 
 Legend: `[ ]` = not yet released · `[x]` = released to crates.io.
 
-### Batch 1 — Foundation (no `tpt-eng` deps; only `tpt-math-*`)
-- [ ] `tpt-eng-geometry`
-- [ ] `tpt-eng-materials`
-- [ ] `tpt-eng-sections`
-- [ ] `tpt-eng-plot`
-- [ ] `tpt-eng-report`
-- [ ] `tpt-eng-geo-asset`  (→ tpt-math-units)
+### Batch 1 — Foundation (no `tpt-eng` deps; only `tpt-math-*`) — RELEASED 2026-08-15
+- [x] `tpt-eng-geometry`
+- [x] `tpt-eng-materials`
+- [x] `tpt-eng-sections`
+- [x] `tpt-eng-plot`
+- [x] `tpt-eng-report`
+- [x] `tpt-eng-geo-asset`  (→ tpt-math-units)
 
-### Batch 2 — Foundation continued (only `tpt-math-*` deps)
-- [ ] `tpt-eng-controls`       (→ tpt-math-linalg)
-- [ ] `tpt-eng-reliability`     (→ tpt-math-stats)
-- [ ] `tpt-eng-tolerance`       (→ tpt-math-stats)
-- [ ] `tpt-eng-props-water`     (→ tpt-math-units, tpt-math-numeric)
-- [ ] `tpt-eng-props-air`       (→ tpt-math-units, tpt-math-numeric)
-- [ ] `tpt-eng-props-fuels`     (→ tpt-math-units, tpt-math-numeric)
+> Note: crates.io limits **new** crate publishes to a burst of 5, then one per
+> ~10 minutes. The 6th crate in this batch (`tpt-eng-geo-asset`) hit
+> `429 Too Many Requests` and succeeded on retry after the window reset. Expect
+> the same throttle in Batches 2–5: on 429, wait until the time given in the
+> error and re-run the same `cargo publish` command.
 
-### Batch 3 — Level 1 (depend on Batches 1–2)
-- [ ] `tpt-eng-timeseries-core` (→ tpt-math-numeric)
-- [ ] `tpt-eng-mesh`            (→ geometry)
-- [ ] `tpt-eng-geo-topology`    (→ geo-asset)
-- [ ] `tpt-eng-gdt`             (→ geometry, tolerance)
-- [ ] `tpt-eng-network-matrix`  (→ geo-topology, tpt-math-linalg)
-- [ ] `tpt-eng-safety`          (→ reliability, tolerance, tpt-math-units)
+### Batch 2 — Foundation continued (only `tpt-math-*` deps) — RELEASED 2026-08-15
+- [x] `tpt-eng-controls`       (→ tpt-math-linalg)
+- [x] `tpt-eng-reliability`     (→ tpt-math-stats)
+- [x] `tpt-eng-tolerance`       (→ tpt-math-stats)
+- [x] `tpt-eng-props-water`     (→ tpt-math-units, tpt-math-numeric)
+- [x] `tpt-eng-props-air`       (→ tpt-math-units, tpt-math-numeric)
+- [x] `tpt-eng-props-fuels`     (→ tpt-math-units, tpt-math-numeric)
 
-### Batch 4 — Level 2 (depend on Batches 1–3)
-- [ ] `tpt-eng-structural`      (→ safety, tpt-math-units)
-- [ ] `tpt-eng-nurbs`           (→ geometry, mesh)
-- [ ] `tpt-eng-timeseries-align`(→ timeseries-core)
-- [ ] `tpt-eng-timeseries-gap`  (→ timeseries-core)
-- [ ] `tpt-eng-io`              (→ mesh, geometry)
-- [ ] `tpt-eng-cad`             (→ geometry, mesh, nurbs, gdt)
+> As predicted, the 6th crate (`tpt-eng-props-fuels`) hit the new-crate
+> `429` throttle and was published on retry after the ~5-minute window reset.
 
-### Batch 5 — Top level (depend on everything above)
-- [ ] `tpt-eng-standards`       (→ safety)
-- [ ] `tpt-eng-props`           (→ props-water, props-air, props-fuels)
-- [ ] `tpt-eng-timeseries`      (→ timeseries-core, align, gap)
-- [ ] `tpt-eng-cli`             (→ io, report, plot, materials, sections, structural, controls, tolerance, props-{water,air,fuels})
-- [ ] `tpt-eng-examples`        (→ geo-topology, network-matrix, controls, props-fuels, timeseries-{core,align,gap}, structural, sections, materials, tolerance, gdt, geometry, report)
+### Batch 3 — Level 1 (depend on Batches 1–2) — RELEASED 2026-08-15
+- [x] `tpt-eng-timeseries-core` (→ tpt-math-numeric)
+- [x] `tpt-eng-mesh`            (→ geometry)
+- [x] `tpt-eng-geo-topology`    (→ geo-asset)
+- [x] `tpt-eng-gdt`             (→ geometry, tolerance)
+- [x] `tpt-eng-network-matrix`  (→ geo-topology, tpt-math-linalg)
+- [x] `tpt-eng-safety`          (→ reliability, tolerance, tpt-math-units)
+
+> The 5th and 6th crates (`network-matrix`, `safety`) hit the new-crate `429`
+> throttle and were published on retry. Note: because the burst allowance is
+> shared across the account, the throttle now kicks in around the 5th crate of
+> a batch and the wait can be ~7–10 min.
+
+### Batch 4 — Level 2 (depend on Batches 1–3) — RELEASED 2026-08-15
+- [x] `tpt-eng-structural`      (→ safety, tpt-math-units)
+- [x] `tpt-eng-nurbs`           (→ geometry, mesh)
+- [x] `tpt-eng-timeseries-align`(→ timeseries-core)
+- [x] `tpt-eng-timeseries-gap`  (→ timeseries-core)
+- [x] `tpt-eng-io`              (→ mesh, geometry)
+- [x] `tpt-eng-cad`             (→ geometry, mesh, nurbs, gdt)
+
+> Published in dependency order (`nurbs` before `cad`). The 6th crate
+> (`tpt-eng-cad`) hit the new-crate `429` throttle and was published on retry
+> (this time only ~26 s wait — the account burst had partially refilled).
+
+### Batch 5 — Top level (depend on everything above) — RELEASED 2026-08-15
+- [x] `tpt-eng-standards`       (→ safety)
+- [x] `tpt-eng-props`           (→ props-water, props-air, props-fuels)
+- [x] `tpt-eng-timeseries`      (→ timeseries-core, align, gap)
+- [x] `tpt-eng-cli`             (→ io, report, plot, materials, sections, structural, controls, tolerance, props-{water,air,fuels})
+- [x] `tpt-eng-examples`        (→ geo-topology, network-matrix, controls, props-fuels, timeseries-{core,align,gap}, structural, sections, materials, tolerance, gdt, geometry, report)
+
+> Final batch. Only `tpt-eng-standards` fit in the account's new-crate burst;
+> `props`, `timeseries`, `cli`, and `examples` all hit the `429` throttle and
+> were published one-by-one on retry (waits ~4–10 min each as the burst
+> refilled). All five live at `0.1.0`.
 
 ---
 
 ## 5. Post-release checklist
 
-- [ ] All 29 `tpt-eng-*` crates show as published `0.1.0` on crates.io.
-- [ ] `cargo add tpt-eng-<name>` resolves for a fresh consumer (confirms the
+- [x] All 29 `tpt-eng-*` crates show as published `0.1.0` on crates.io.
+      (Verified per-crate via the crates.io API at the end of each batch; all
+      `0.1.0`, none yanked.)
+- [x] `cargo add tpt-eng-<name>` resolves for a fresh consumer (confirms the
       dependency graph is satisfiable end-to-end).
+      (Verified: a throwaway crate `cargo add tpt-eng-cli tpt-eng-examples` +
+      `cargo update` resolved the full transitive `tpt-eng-*` graph from
+      crates.io with exit 0.)
 - [ ] Flip `status = "planned"` → `"git"` for the crates in the sibling
       `tpt-rust-map/registry.toml` (external repo — maintainer action).
 - [ ] Cut the `v0.1.0` git tag once CI is green on `main` (release-owner action).
