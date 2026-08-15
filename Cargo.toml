@@ -45,12 +45,11 @@ homepage = "https://github.com/tpt-solutions/tpt-engineering"
 repository = "https://github.com/tpt-solutions/tpt-engineering"
 
 [workspace.dependencies]
-# Cross-repo dependencies (tpt-math substrate), following tpt-science's
-# proven path-dependency pattern.
-tpt-math-units = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-units" }
-tpt-math-numeric = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-numeric" }
-tpt-math-linalg = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-linalg" }
-tpt-math-stats = { version = "0.1.0", path = "../tpt-math/crates/tpt-math-stats" }
+# Cross-repo dependencies (tpt-math substrate), published on crates.io.
+tpt-math-units = "0.1.0"
+tpt-math-numeric = "0.1.0"
+tpt-math-linalg = "0.1.0"
+tpt-math-stats = "0.1.0"
 
 # In-repo crate dependencies (referenced by `workspace = true`).
 tpt-eng-props-water = { version = "0.1.0", path = "crates/tpt-eng-props-water" }

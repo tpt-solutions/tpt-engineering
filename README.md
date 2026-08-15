@@ -65,21 +65,16 @@ environment).
 
 ## Building
 
-This workspace depends on the sibling [`tpt-math`](https://github.com/tpt-solutions/tpt-math)
-repo via relative `path` dependencies (`../tpt-math/crates/tpt-math-*`).
-`tpt-math` must sit **next to** this repo (same parent directory) so the
-`path = "../tpt-math/..."` entries in the workspace `Cargo.toml` resolve:
+This workspace depends on the [`tpt-math`](https://github.com/tpt-solutions/tpt-math)
+substrate (`tpt-math-units`, `tpt-math-numeric`, `tpt-math-linalg`, `tpt-math-stats`),
+resolved as regular versioned dependencies from crates.io — no sibling checkout needed:
 
 ```sh
-git clone https://github.com/tpt-solutions/tpt-math.git ../tpt-math
 git clone https://github.com/tpt-solutions/tpt-engineering.git
 cd tpt-engineering
 cargo build --workspace
 cargo test --workspace
 ```
-
-Without the sibling `tpt-math` checkout the workspace will not resolve its
-`path` dependencies and `cargo build` will fail at the manifest step.
 
 - **Edition:** `2024`.
 - **MSRV:** none pinned (no `rust-version` in `[workspace.package]`). Build with a

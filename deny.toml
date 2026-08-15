@@ -34,8 +34,8 @@ multiple-versions = "warn"
 wildcards = "allow"
 
 [sources]
-# Only crates.io and the known sibling path dependencies (../tpt-math) are
-# permitted. Anything from an unknown registry or git source now fails CI.
+# Only crates.io is permitted. Anything from an unknown registry or git
+# source now fails CI.
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]

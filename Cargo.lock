@@ -946,6 +946,8 @@ dependencies = [
 [[package]]
 name = "tpt-math-linalg"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d843d795e0d6111aabebdcd29fce7f69960722acbc161046a6c51e598bedb90f"
 dependencies = [
  "tpt-math-linalg-dense",
  "tpt-math-numeric",
@@ -955,6 +957,8 @@ dependencies = [
 [[package]]
 name = "tpt-math-linalg-dense"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb72b3e4034255fc86448357b4b2fbce62225525ef41c9ec72a54e9aae6c2c4f"
 dependencies = [
  "tpt-math-numeric",
 ]
@@ -962,6 +966,8 @@ dependencies = [
 [[package]]
 name = "tpt-math-numeric"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3cf48d7c841b2a882d06426b67f732a79e0b248d103ff8c1f6d2fdf1ab3df87b"
 dependencies = [
  "libm",
  "num-traits",
@@ -970,6 +976,8 @@ dependencies = [
 [[package]]
 name = "tpt-math-prob-core"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "317421ad9717f735237987801cab468c3dbb7f48b182f2ef637b79dfc2bd5776"
 dependencies = [
  "tpt-math-numeric",
 ]
@@ -977,6 +985,8 @@ dependencies = [
 [[package]]
 name = "tpt-math-stats"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc5bd4a81ade5b428c808b4ee6093b2ff3b2c0ad74e88735e0cf3bd72bb81828"
 dependencies = [
  "tpt-math-prob-core",
 ]
@@ -984,6 +994,8 @@ dependencies = [
 [[package]]
 name = "tpt-math-units"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05b2d0f02bbe8c0dadfa03790f47d4b579a021bc810afce0e8788fda0ea9b6e7"
 dependencies = [
  "num-traits",
  "uom",
