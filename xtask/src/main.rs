@@ -26,11 +26,17 @@ use std::process::Command;
 
 /// `no_std`-capable crates, mirroring the CI `no_std` job and the
 /// `no_std = true` entries for this repo in `tpt-rust-map/registry.toml`.
+///
+/// NOTE: `tpt-eng-props` (the umbrella re-export) is intentionally excluded.
+/// It depends on `tpt-math-units`, which unconditionally pulls `uom` and
+/// `num-traits`. Building it `--no-default-features` still activates the leaf
+/// crates' default `std` features via feature unification, enabling
+/// `num-traits/std`, which is unavailable on `thumbv6m-none-eabi`. Only the
+/// leaf fluid-property crates below build cleanly no_std.
 const NO_STD_CRATES: &[&str] = &[
     "tpt-eng-props-water",
     "tpt-eng-props-air",
     "tpt-eng-props-fuels",
-    "tpt-eng-props",
 ];
 
 const NO_STD_TARGET: &str = "thumbv6m-none-eabi";
