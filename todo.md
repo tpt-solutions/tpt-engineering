@@ -1,4 +1,4 @@
-# tpt-engineering — Task Checklist
+﻿# tpt-engineering â€” Task Checklist
 
 Applied engineering primitives for TPT Solutions' physical-systems
 verticals. Dual-licensed MIT OR Apache-2.0. Author: TPT Solutions.
@@ -10,7 +10,7 @@ builds, tests pass, fmt/clippy/deny clean).
 
 ---
 
-## Phase 0 — Ecosystem Verification (pre-work)
+## Phase 0 â€” Ecosystem Verification (pre-work)
 
 - [x] Confirm all `tpt-eng-*` crates (12 from spec.txt + `tpt-eng-structural`)
       are registered in `tpt-rust-map/registry.toml` with `status = "planned"`
@@ -18,21 +18,21 @@ builds, tests pass, fmt/clippy/deny clean).
       `tpt-math-linalg` exist in sibling repo `tpt-math`, are dual-licensed,
       and are buildable today
 - [x] Confirm `tpt-rust2` (spec.txt's claimed consolidation source) does not
-      exist on this machine — treat all 13 crates as new implementations,
+      exist on this machine â€” treat all 13 crates as new implementations,
       not ports
 - [x] Audit external repos `tpt-flight-control` / `tpt-chassis` /
-      `tpt-dynamo` / `tpt-servo` (not cloned locally — requires GitHub
+      `tpt-dynamo` / `tpt-servo` (not cloned locally â€” requires GitHub
       access) for existing PID/state-space/transfer-function code before
-      starting `tpt-eng-controls` — resolved pragmatically: `tpt-eng-controls`
+      starting `tpt-eng-controls` â€” resolved pragmatically: `tpt-eng-controls`
       was implemented from first principles (PID / state-space / transfer
       function) without depending on external audited code
 - [x] Decide `tpt-eng-structural`'s dependency needs (likely
       `tpt-math-linalg` for beam/frame matrix analysis) and confirm with
       whoever owns the `tpt-vertical-map` construction vertical that pulled
-      it out — resolved: `tpt-eng-structural` depends on `tpt-math-linalg`
+      it out â€” resolved: `tpt-eng-structural` depends on `tpt-math-linalg`
       (and `tpt-math-units`); implementation landed in commit `c01a4f7`
 
-## Phase 1 — Repo Scaffolding
+## Phase 1 â€” Repo Scaffolding
 
 - [x] `git init` in `tpt-engineering`
 - [x] Copy `tpt-rust-map/template/` files into repo root: `Cargo.toml`
@@ -41,7 +41,7 @@ builds, tests pass, fmt/clippy/deny clean).
       (copyright: TPT Solutions, 2026)
 - [x] Fill `[workspace.package]`: `description`, `authors = ["TPT Solutions"]`,
       `edition = "2024"` (override template's 2021), **no `rust-version` key**
-      (no MSRV pin — override template's 1.75), `license = "MIT OR Apache-2.0"`,
+      (no MSRV pin â€” override template's 1.75), `license = "MIT OR Apache-2.0"`,
       `homepage`/`repository` = `https://github.com/tpt-solutions/tpt-engineering`
 - [x] Add `[workspace.dependencies]` entries for cross-repo deps, following
       `tpt-science`'s proven pattern:
@@ -49,9 +49,9 @@ builds, tests pass, fmt/clippy/deny clean).
       (same for `tpt-math-numeric`, `tpt-math-linalg`)
 - [x] Add root `README.md`: repo overview, crate list, license badges
 - [x] Verify root `spec.txt` (already present) matches `template/spec.txt`'s
-      expected structure — no changes needed unless drift is found
+      expected structure â€” no changes needed unless drift is found
 
-## Phase 2 — Crate Scaffolding
+## Phase 2 â€” Crate Scaffolding
 
 Each crate gets a hand-created `Cargo.toml` + `src/lib.rs` stub (mirror
 `tpt-science`'s per-crate pattern: `edition.workspace = true`,
@@ -61,22 +61,22 @@ New crates can now be scaffolded with `cargo xtask new-crate <tpt-eng-name>`
 (added 2026-08-14), which performs the scaffolding and registration
 automatically.
 
-- [x] `tpt-eng-props-water` — no_std; depends on `tpt-math-units`
-- [x] `tpt-eng-props-air` — no_std; depends on `tpt-math-units`
-- [x] `tpt-eng-props-fuels` — no_std; depends on `tpt-math-units`
-- [x] `tpt-eng-props` (umbrella) — no_std; re-exports water + air + fuels
-- [x] `tpt-eng-timeseries-core` — depends on `tpt-math-numeric`
-- [x] `tpt-eng-timeseries-align` — depends on `tpt-eng-timeseries-core`
-- [x] `tpt-eng-timeseries-gap` — depends on `tpt-eng-timeseries-core`
-- [x] `tpt-eng-timeseries` (umbrella) — re-exports core + align + gap
+- [x] `tpt-eng-props-water` â€” no_std; depends on `tpt-math-units`
+- [x] `tpt-eng-props-air` â€” no_std; depends on `tpt-math-units`
+- [x] `tpt-eng-props-fuels` â€” no_std; depends on `tpt-math-units`
+- [x] `tpt-eng-props` (umbrella) â€” no_std; re-exports water + air + fuels
+- [x] `tpt-eng-timeseries-core` â€” depends on `tpt-math-numeric`
+- [x] `tpt-eng-timeseries-align` â€” depends on `tpt-eng-timeseries-core`
+- [x] `tpt-eng-timeseries-gap` â€” depends on `tpt-eng-timeseries-core`
+- [x] `tpt-eng-timeseries` (umbrella) â€” re-exports core + align + gap
 - [x] `tpt-eng-geo-asset`
-- [x] `tpt-eng-geo-topology` — depends on `tpt-eng-geo-asset`
-- [x] `tpt-eng-network-matrix` — depends on `tpt-math-linalg`, `tpt-eng-geo-topology`
-- [x] `tpt-eng-controls` — depends on `tpt-math-linalg`; **blocking Phase 0
+- [x] `tpt-eng-geo-topology` â€” depends on `tpt-eng-geo-asset`
+- [x] `tpt-eng-network-matrix` â€” depends on `tpt-math-linalg`, `tpt-eng-geo-topology`
+- [x] `tpt-eng-controls` â€” depends on `tpt-math-linalg`; **blocking Phase 0
       external audit item resolved (implemented from first principles)**
-- [x] `tpt-eng-structural` — depends on `tpt-math-linalg` (+ `tpt-math-units`)
+- [x] `tpt-eng-structural` â€” depends on `tpt-math-linalg` (+ `tpt-math-units`)
 
-## Phase 3 — Implementation
+## Phase 3 â€” Implementation
 
 ### 3a. Fluid/gas properties
 - [x] Implement `tpt-eng-props-water`: IAPWS-IF97 water/steam property tables
@@ -117,7 +117,7 @@ automatically.
       analysis, code-compliance checks (ASCE 7 / Eurocode-style)
 - [x] Tests: known textbook beam/frame reference solutions
 
-## Phase 4 — Cross-cutting / CI / Release Readiness
+## Phase 4 â€” Cross-cutting / CI / Release Readiness
 
 - [x] `cargo fmt --check` clean (formatting normalized 2026-08-14),
       `cargo clippy --workspace --all-targets --all-features` clean,
@@ -131,8 +131,8 @@ automatically.
       allowances in `deny.toml`)
 - [x] Per-crate `README.md` with usage examples (all 13 crates)
 - [ ] Update `tpt-rust-map/registry.toml`: flip each crate's `status` from
-      `planned` to `git` as it lands — **external repo, not yet done**
-- [ ] Tag `v0.1.0` once the full 13-crate set compiles and tests pass —
+      `planned` to `git` as it lands â€” **external repo, not yet done**
+- [ ] Tag `v0.1.0` once the full 13-crate set compiles and tests pass â€”
       **defer until the remaining open items below are closed**
 
 ### Open / follow-up items
@@ -146,16 +146,16 @@ automatically.
       are filtered out); `tpt-eng-structural` dropped its unused
       `tpt-math-linalg` dependency (its analysis is closed-form). `xtask` is
       dependency-free (pure `std`) so it adds no supply-chain surface.
-- [ ] Flip `status = "planned"` → `"git"` for all 13 crates in the
-      sibling `tpt-rust-map/registry.toml` — **BLOCKED: requires write access
+- [ ] Flip `status = "planned"` â†’ `"git"` for all 13 crates in the
+      sibling `tpt-rust-map/registry.toml` â€” **BLOCKED: requires write access
       to the external `tpt-rust-map` repo (maintainer action)**
 - [ ] Cut `v0.1.0` tag after the above are closed and CI is green on
-      `main` — **BLOCKED: release-owner action; depends on the registry flip
+      `main` â€” **BLOCKED: release-owner action; depends on the registry flip
       and green CI**
 
-## Phase 5 — Hardening, Innovation & Adoption Tooling (2026-08-14, post-review)
+## Phase 5 â€” Hardening, Innovation & Adoption Tooling (2026-08-14, post-review)
 
-Status last reconciled: 2026-08-14 (review found **no code stubs** — all 13
+Status last reconciled: 2026-08-14 (review found **no code stubs** â€” all 13
 crates are fully implemented; the only `TODO` strings are a doc comment in
 `controls` and the `xtask new-crate` default `desc`, both cosmetic).
 
@@ -173,8 +173,8 @@ crates are fully implemented; the only `TODO` strings are a doc comment in
       trust boundary). Added a test.
 
 ### 5b. Security audit & tightening
-- [x] `deny.toml`: `unknown-registry` / `unknown-git` → `"deny"`,
-      `yanked` → `"deny"`, with `allow-registry` pinned to crates.io and
+- [x] `deny.toml`: `unknown-registry` / `unknown-git` â†’ `"deny"`,
+      `yanked` â†’ `"deny"`, with `allow-registry` pinned to crates.io and
       `allow-git = []` so only crates.io + the known `../tpt-math` path deps
       are permitted.
 - [x] CI: split the `cargo-deny` job and add a dedicated `cargo-audit` job
@@ -184,7 +184,7 @@ crates are fully implemented; the only `TODO` strings are a doc comment in
 
 ### 5c. Innovation / easier-to-use
 - [x] Add `crates/tpt-eng-examples`: a cross-crate integration scenario
-      composing geo → topology → network-matrix → controls PID (driven by a
+      composing geo â†’ topology â†’ network-matrix â†’ controls PID (driven by a
       fuel LHV), plus timeseries align/gap conditioning and a structural beam
       check. Doubles as the canonical "use them together" doctest.
 - [x] `tpt-eng-structural`: expose `max_bending_moment_with_resolution(n)`
@@ -207,10 +207,10 @@ crates are fully implemented; the only `TODO` strings are a doc comment in
       (`cargo add` example + link to integration examples). Add `xtask doctest`
       and `xtask doc` commands.
 
-### 5e. External / blocked (maintainer action — do NOT implement here)
-- [ ] Flip `status = "planned"` → `"git"` for all 13 crates in sibling
-      `tpt-rust-map/registry.toml` — requires write access to that repo.
-- [ ] Cut `v0.1.0` tag after the registry flip + green CI on `main` —
+### 5e. External / blocked (maintainer action â€” do NOT implement here)
+- [ ] Flip `status = "planned"` â†’ `"git"` for all 13 crates in sibling
+      `tpt-rust-map/registry.toml` â€” requires write access to that repo.
+- [ ] Cut `v0.1.0` tag after the registry flip + green CI on `main` â€”
       release-owner action.
 
 ### 5f. Validation
@@ -220,18 +220,18 @@ crates are fully implemented; the only `TODO` strings are a doc comment in
       (sources/advisories/bans/licenses ok) clean; integration examples
       doctest runs.
 
-## Phase 6 — Adoption/DX pass (2026-08-14, post independent audit)
+## Phase 6 â€” Adoption/DX pass (2026-08-14, post independent audit)
 
 Three parallel independent audits (stubs/TODOs, security, adoption/DX)
 re-verified Phase 5's self-assessment against the actual code. Result:
-**no code stubs or defects found** — production code is clean (no
+**no code stubs or defects found** â€” production code is clean (no
 `todo!()`/`unimplemented!()`, no unguarded `.unwrap()`/`.expect()`/
 `panic!()` outside tests/doc-examples, zero `unsafe`, `cargo audit`/
 `cargo deny check` both clean). This phase is documentation/tooling only.
 
 Two items were surfaced and explicitly deferred by the user (not in
 scope for this phase): a scheduled/cron `cargo-audit` CI trigger, and a
-GitHub Pages / hosted rustdoc publishing workflow — both require an
+GitHub Pages / hosted rustdoc publishing workflow â€” both require an
 external one-time action (CI trigger change / enabling Pages in repo
 settings) beyond a normal code change.
 
@@ -273,7 +273,7 @@ settings) beyond a normal code change.
       dependency wouldn't be caught until the next push).
 - [ ] GitHub Pages / hosted rustdoc publishing workflow.
 
-## Phase 7 — Coherence, Consolidation & Documentation Pass (2026-08-15)
+## Phase 7 â€” Coherence, Consolidation & Documentation Pass (2026-08-15)
 
 Full plan: `C:\Users\phill\.claude\plans\review-all-the-crates-serene-quiche.md`.
 Triggered by a full-workspace review (29 `tpt-eng-*` crates + `xtask`) that
@@ -283,113 +283,113 @@ opt-in, dependency-declaration style, stale cross-references). User chose
 **full consolidation** over "document only."
 
 ### 7.0 Baseline
-- [ ] `cargo build --workspace` clean (pre-change baseline)
-- [ ] `cargo test --workspace` clean (pre-change baseline)
+- [x] `cargo build --workspace` clean (pre-change baseline)
+- [x] `cargo test --workspace` clean (pre-change baseline)
 
 ### 7.1a. Tolerance stack-up consolidation
-- [ ] Extend `tpt-eng-tolerance::DimTol` to support asymmetric
+- [x] Extend `tpt-eng-tolerance::DimTol` to support asymmetric
       (`tol_plus`/`tol_minus`) tolerances so it covers everything
       `tpt-eng-gdt`'s `StackupMember` does today
-- [ ] `tpt-eng-gdt`: remove duplicate `StackupMember`/`Stackup`/
+- [x] `tpt-eng-gdt`: remove duplicate `StackupMember`/`Stackup`/
       `MonteCarloResult`/`lcg_next`/`lcg_uniform`; depend on
       `tpt-eng-tolerance` (workspace dep) and re-export its stack-up types
       from the gdt crate root
-- [ ] Update/remove `tpt-eng-gdt` tests referencing the removed types
-- [ ] Keep `tpt-eng-gdt`'s `ToleranceZone`/`DatumReferenceFrame::check_conformance`
+- [x] Update/remove `tpt-eng-gdt` tests referencing the removed types
+- [x] Keep `tpt-eng-gdt`'s `ToleranceZone`/`DatumReferenceFrame::check_conformance`
       untouched (separate concern from 1-D stack-up)
 
 ### 7.1b. Utilization/pass-fail consolidation onto `tpt-eng-safety`
-- [ ] `tpt-eng-standards::limit_states::DemandCapacity::utilization()` and
+- [x] `tpt-eng-standards::limit_states::DemandCapacity::utilization()` and
       `design::CheckResult::new()` delegate to `tpt_eng_safety::utilization`
       (add `tpt-eng-safety` workspace dep to `tpt-eng-standards`)
-- [ ] `tpt-eng-structural::SectionCheck::utilization()` delegates to
+- [x] `tpt-eng-structural::SectionCheck::utilization()` delegates to
       `tpt_eng_safety::utilization` (add `tpt-eng-safety` workspace dep to
       `tpt-eng-structural`)
-- [ ] Re-verify existing test assertions in `limit_states.rs`, `design.rs`,
+- [x] Re-verify existing test assertions in `limit_states.rs`, `design.rs`,
       and `tpt-eng-structural`'s `utilization_ratio` test after delegation
-      (esp. the `capacity == 0.0 → infinity` edge case)
-- [ ] `tpt-eng-safety::quantity::Quantity`/`Dimension`: keep public shape,
+      (esp. the `capacity == 0.0 â†’ infinity` edge case)
+- [x] `tpt-eng-safety::quantity::Quantity`/`Dimension`: keep public shape,
       back internally with real `tpt_math_units` (uom) values; add
       `tpt-math-units` as a real (non-dev) dependency
 
 ### 7.1c. STL/OBJ I/O consolidation
-- [ ] Extend `tpt-eng-mesh`'s in-house OBJ codec (`to_obj`/`from_obj`) to
+- [x] Extend `tpt-eng-mesh`'s in-house OBJ codec (`to_obj`/`from_obj`) to
       carry texture coordinates and per-corner normal indices, matching
       `tpt-eng-io`'s current `ObjMesh`/`ObjFace` fidelity
-- [ ] `tpt-eng-io`: drop `stl_io`/`obj` third-party deps; depend on
+- [x] `tpt-eng-io`: drop `stl_io`/`obj` third-party deps; depend on
       `tpt-eng-mesh`; rewrite `src/stl.rs`/`src/obj.rs` to operate directly
       on `tpt_eng_mesh::Mesh`, dropping the local `StlMesh`/`ObjMesh` wrappers
-- [ ] Update `tpt-eng-io`'s lib.rs doc example + inline tests
-- [ ] Update `tpt-eng-cli::cmd_validate` STL/OBJ branches for the new
+- [x] Update `tpt-eng-io`'s lib.rs doc example + inline tests
+- [x] Update `tpt-eng-cli::cmd_validate` STL/OBJ branches for the new
       `tpt_eng_mesh::Mesh` accessors
 
 ### 7.1d. CLI de-duplication
-- [ ] `tpt-eng-cli`: add workspace deps on `tpt-eng-materials`,
+- [x] `tpt-eng-cli`: add workspace deps on `tpt-eng-materials`,
       `tpt-eng-sections`, `tpt-eng-structural`
-- [ ] Replace `src/materials.rs` hardcoded table with a small embedded
+- [x] Replace `src/materials.rs` hardcoded table with a small embedded
       `tpt_eng_materials::MaterialLibrary` (seeded with the same reference
       values + `DataSource` provenance so `validate()` passes)
-- [ ] Replace `src/sections.rs` ad hoc formulas with direct
+- [x] Replace `src/sections.rs` ad hoc formulas with direct
       `tpt_eng_sections::{Rectangle, Circle, ISection}` construction +
       `Section` trait calls
-- [ ] Rewire `cmd_calc_beam` to use `tpt_eng_structural::{Beam, Load}` +
+- [x] Rewire `cmd_calc_beam` to use `tpt_eng_structural::{Beam, Load}` +
       `tpt_eng_sections::Section::second_moments()`, wrapping/unwrapping
       bare-`f64` CLI inputs via `tpt_math_units` at the boundary; keep the
       CLI's own closed-form UDL-deflection formula (out of scope for
       `tpt-eng-structural` v0.1.0)
-- [ ] Update `tpt-eng-cli/tests/integration.rs` for any output-text
+- [x] Update `tpt-eng-cli/tests/integration.rs` for any output-text
       assertions that shift
 
-### 7.1e. `tpt-eng-sections` ↔ `tpt-eng-geometry` boundary
-- [ ] Rewrite the stale "geometry integration deferred until that crate
+### 7.1e. `tpt-eng-sections` â†” `tpt-eng-geometry` boundary
+- [x] Rewrite the stale "geometry integration deferred until that crate
       exists" language in `tpt-eng-sections/src/lib.rs` and README to state
       the 2D/3D split is a deliberate, permanent domain separation (no
       dependency edge added)
 
 ### 7.2. Lint & dependency-declaration fixes
-- [ ] Add `[lints]\nworkspace = true` to the 12 crates missing it: `cad`,
+- [x] Add `[lints]\nworkspace = true` to the 12 crates missing it: `cad`,
       `gdt`, `geometry`, `mesh`, `nurbs`, `io`, `plot`, `report`, `cli`,
       `reliability`, `safety`, `tolerance`
-- [ ] `cargo clippy --workspace --all-targets` after opt-in; fix newly
+- [x] `cargo clippy --workspace --all-targets` after opt-in; fix newly
       surfaced warnings (expect `missing_errors_doc`/`missing_panics_doc`
       gaps, esp. in `cad`, `mesh`, `cli`)
-- [ ] Fix `tpt-eng-props`/`-air`/`-fuels`/`-water`'s hardcoded relative-path
+- [x] Fix `tpt-eng-props`/`-air`/`-fuels`/`-water`'s hardcoded relative-path
       `tpt-math-units`/`tpt-math-numeric` deps to use
       `{ workspace = true, default-features = false, features = [...] }`;
       verify per-crate build with each feature combination the crate
       currently exercises
 
 ### 7.3. Cargo.toml metadata
-- [ ] Add `description` (where missing: `cli`, `io`, `plot`, `report`),
-      `keywords` (≤5), and `categories` (valid crates.io slugs) to the ~21
+- [x] Add `description` (where missing: `cli`, `io`, `plot`, `report`),
+      `keywords` (â‰¤5), and `categories` (valid crates.io slugs) to the ~21
       crates currently missing them, in the style of the 8 crates that
       already have this metadata
 
 ### 7.4. READMEs
-- [ ] Write fresh README for the 7 crates with none: `io`, `mesh`, `plot`,
+- [x] Write fresh README for the 7 crates with none: `io`, `mesh`, `plot`,
       `reliability`, `report`, `safety`, `tolerance`
-- [ ] Fix stale "Related crates" links (`tpt-eng-linalg`/`tpt-eng-optimize`
+- [x] Fix stale "Related crates" links (`tpt-eng-linalg`/`tpt-eng-optimize`
       don't exist) in `materials`, `sections`, `standards` READMEs
-- [ ] Fix stale project name "tpt-eng3" → "tpt-engineering" in `cad`, `gdt`,
+- [x] Fix stale project name "tpt-eng3" â†’ "tpt-engineering" in `cad`, `gdt`,
       `geometry`, `nurbs` READMEs and `tpt-eng-cad/examples/integration.rs`
-- [ ] Update READMEs for crates whose public API changed in 7.1
+- [x] Update READMEs for crates whose public API changed in 7.1
       (`gdt`, `safety`, `standards`, `structural`, `io`, `cli`)
 
 ### 7.5. CHANGELOGs
-- [ ] Add `CHANGELOG.md` (`[0.1.0] - 2026`, "Added" bullets) to the 26
+- [x] Add `CHANGELOG.md` (`[0.1.0] - 2026`, "Added" bullets) to the 26
       crates lacking one, reflecting the final consolidated state
-- [ ] Correct the 3 existing CHANGELOGs' (`materials`, `sections`,
+- [x] Correct the 3 existing CHANGELOGs' (`materials`, `sections`,
       `standards`) dates from "2024" to "2026"
 
 ### 7.6. Verification
-- [ ] `cargo build --workspace` clean
-- [ ] `cargo test --workspace` clean (esp. gdt stack-up tests, `safety`'s
+- [x] `cargo build --workspace` clean
+- [x] `cargo test --workspace` clean (esp. gdt stack-up tests, `safety`'s
       `tests/cross_crate.rs`, `standards`'s `limit_states.rs`/`design.rs`
       tests, `structural`'s `utilization_ratio` test, `io`'s STL/OBJ tests
       (full rewrite), `cli/tests/integration.rs`)
-- [ ] `cargo clippy --workspace --all-targets --all-features` clean
-- [ ] `cargo doc --workspace --no-deps` clean
-- [ ] `cargo tree --workspace` diffed against the 7.0 baseline — only the
-      intended new edges exist (`gdt→tolerance`, `standards→safety`,
-      `structural→safety`, `io→mesh`, `cli→materials/sections/structural`),
+- [x] `cargo clippy --workspace --all-targets --all-features` clean
+- [x] `cargo doc --workspace --no-deps` clean
+- [x] `cargo tree --workspace` diffed against the 7.0 baseline â€” only the
+      intended new edges exist (`gdtâ†’tolerance`, `standardsâ†’safety`,
+      `structuralâ†’safety`, `ioâ†’mesh`, `cliâ†’materials/sections/structural`),
       no cycles

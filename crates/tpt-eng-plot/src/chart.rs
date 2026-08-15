@@ -131,6 +131,11 @@ impl Drawing for ResultChart {
 }
 
 /// Write a [`ResultChart`] to a PNG file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the chart cannot be rendered or the PNG file
+/// cannot be created or written to.
 pub fn plot_result_chart_png<P: AsRef<Path>>(
     title: &str,
     items: Vec<(String, f64)>,
@@ -140,6 +145,11 @@ pub fn plot_result_chart_png<P: AsRef<Path>>(
 }
 
 /// Write a [`ResultChart`] to an SVG file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the chart cannot be rendered or the SVG file
+/// cannot be created or written to.
 pub fn plot_result_chart_svg<P: AsRef<Path>>(
     title: &str,
     items: Vec<(String, f64)>,

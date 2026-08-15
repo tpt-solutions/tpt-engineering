@@ -7,7 +7,14 @@ authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
 rust-version.workspace = true
+description = "Plotting and diagram generation (PNG/SVG) for the TPT ecosystem, built on `plotters`."
+readme = "README.md"
+keywords = ["engineering", "plot", "chart", "visualization", "svg"]
+categories = ["science", "visualization", "graphics"]
 
 [dependencies]
 plotters = { workspace = true }
 thiserror = { workspace = true }
+
+[lints]
+workspace = true

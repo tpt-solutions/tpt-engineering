@@ -7,8 +7,15 @@ authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
 rust-version.workspace = true
+description = "Calculation-report data model and exporters (Markdown/HTML/JSON) for the TPT ecosystem."
+readme = "README.md"
+keywords = ["engineering", "report", "markdown", "html", "export"]
+categories = ["science", "visualization", "data-structures"]
 
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
+
+[lints]
+workspace = true

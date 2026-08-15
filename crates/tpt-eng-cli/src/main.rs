@@ -299,7 +299,7 @@ fn cmd_materials(args: MaterialsArgs) -> Result<()> {
             println!("{}", describe_material(m));
         }
         None => {
-            for m in materials::MATERIALS {
+            for m in materials::list() {
                 println!("- {}", m.name);
             }
         }
@@ -343,11 +343,23 @@ fn cmd_calc_beam(
         find_material(material_name).ok_or_else(|| anyhow!("unknown material: {material_name}"))?;
     let section = shape_from_cmd(&section_cmd);
 
-    let e = m.youngs_modulus;
+    let e = m.value("youngs-modulus", 0.0).unwrap_or(0.0);
     let i = section.second_moment_x();
 
-    let reaction = load * span / 2.0;
-    let max_moment = load * span * span / 8.0;
+    // Reactions and max moment via tpt-eng-structural (wrapped at the uom boundary);
+    // the closed-form UDL deflection below stays in this crate.
+    use tpt_eng_structural::{Beam, Load};
+    use tpt_math_units::uom::si::f64::{Force, Length};
+    use tpt_math_units::uom::si::{force::newton, length::meter, torque::newton_meter};
+    let mut beam = Beam::new(Length::new::<meter>(span));
+    beam.add(Load::uniform(
+        Length::new::<meter>(0.0),
+        Length::new::<meter>(span),
+        Force::new::<newton>(load * span),
+    ));
+    let reaction = beam.reaction_a().get::<newton>();
+    let max_moment = beam.max_bending_moment().get::<newton_meter>();
+
     // Simply supported beam under UDL: delta_max = 5 w L^4 / (384 E I)  [metres]
     let deflection_m = 5.0 * load * span.powi(4) / (384.0 * e * i);
     let deflection_mm = units::convert(deflection_m, "m", "mm")?;

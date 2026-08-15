@@ -1,16 +1,55 @@
-﻿cargo :    Compiling proc-macro2 v1.0.107
+﻿cargo :    Compiling tpt-eng-gdt v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-gdt)
 At line:4 char:36
 + ... ngineering; cargo test -p tpt-eng-tolerance -p tpt-eng-gdt 2>&1 | Out ...
 +                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (   Compiling proc-macro2 v1.0.107:String) [], RemoteException
+    + CategoryInfo          : NotSpecified: (   Compiling tp...es\tpt-eng-gdt):String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
  
-   Compiling quote v1.0.47
-   Compiling serde_core v1.0.229
-   Compiling num-traits v0.2.19
-   Compiling tpt-math-numeric v0.1.0 (C:\Programming\tpt-math\crates\tpt-math-numeric)
-   Compiling rand_distr v0.4.3
-   Compiling approx v0.5.1
-   Compiling tpt-math-prob-core v0.1.0 (C:\Programming\tpt-math\crates\tpt-math-prob-core)
-   Compiling syn v3.0.3
-   Compiling tpt-math-stats v0.1.0 (C:\Programming\tpt-math\crates\tpt-math-stats)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.24s
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_gdt-62e7eb9ff83c9098.exe)
+
+running 17 tests
+test tests::conformance_passes_and_fails ... ok
+test tests::characteristic_categories ... ok
+test tests::datum_frame_composition ... ok
+test tests::fit_classification_clearance ... ok
+test tests::datum_frame_identity_roundtrip ... ok
+test tests::fit_classification_interference ... ok
+test tests::iso_hole_vs_shaft_distinct ... ok
+test tests::iso_tolerance_basics ... ok
+test tests::iso_unsupported_errors ... ok
+test tests::limits_accessors ... ok
+test tests::stackup_rss ... ok
+test tests::stackup_signed_members ... ok
+test tests::stackup_worst_case ... ok
+test tests::tolerance_frame_builder ... ok
+test tests::zone_deviation_cylindrical ... ok
+test tests::zone_magnitude ... ok
+test tests::monte_carlo_is_centered_and_bounded ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\tpt_eng_tolerance-68be95b0ab309040.exe)
+
+running 6 tests
+test tests::contributor_ranking ... ok
+test tests::rss_is_tighter_than_worst_case ... ok
+test tests::worst_case_bounds ... ok
+test tests::yield_within_wide_spec ... ok
+test tests::monte_carlo_mean_near_nominal ... ok
+test tests::sensitivity_uniform_correlations ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+   Doc-tests tpt_eng_gdt
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tpt_eng_tolerance
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

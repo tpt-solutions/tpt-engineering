@@ -9,10 +9,13 @@ rust-version.workspace = true
 description = "Geometric dimensioning and tolerancing: datums, tolerance frames, tolerance zones, fits, allowances, stack-up inputs"
 readme = "README.md"
 keywords = ["gdt", "tolerance", "datum", "engineering", "manufacturing"]
-categories = ["science", "manufacturing"]
+categories = ["science", "mathematics"]
 
 [dependencies]
 glam.workspace = true
 serde.workspace = true
 tpt-eng-geometry.workspace = true
 tpt-eng-tolerance.workspace = true
+
+[lints]
+workspace = true

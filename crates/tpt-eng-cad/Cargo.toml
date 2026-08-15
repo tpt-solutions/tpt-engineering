@@ -20,3 +20,6 @@ tpt-eng-nurbs.workspace = true
 
 [dev-dependencies]
 tpt-eng-gdt.workspace = true
+
+[lints]
+workspace = true

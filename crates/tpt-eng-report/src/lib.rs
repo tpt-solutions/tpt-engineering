@@ -27,23 +27,40 @@ pub fn to_html(report: &Report) -> String {
 }
 
 /// Render the report to a JSON calculation-trail string.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the report cannot be serialized to JSON.
 pub fn to_json(report: &Report) -> Result<String> {
     json::render(report)
 }
 
 /// Write the report as Markdown to a file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the file cannot be created or written to.
 pub fn write_markdown<P: AsRef<Path>>(report: &Report, path: P) -> Result<()> {
     std::fs::write(path, markdown::render(report))?;
     Ok(())
 }
 
 /// Write the report as HTML to a file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the file cannot be created or written to.
 pub fn write_html<P: AsRef<Path>>(report: &Report, path: P) -> Result<()> {
     std::fs::write(path, html::render(report))?;
     Ok(())
 }
 
 /// Write the report as a JSON calculation trail to a file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the report cannot be serialized or the file
+/// cannot be created or written to.
 pub fn write_json<P: AsRef<Path>>(report: &Report, path: P) -> Result<()> {
     let json = serde_json::to_string_pretty(report)?;
     std::fs::write(path, json)?;

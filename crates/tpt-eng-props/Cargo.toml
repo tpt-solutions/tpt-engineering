@@ -6,14 +6,21 @@ license.workspace = true
 authors.workspace = true
 description = "Umbrella: re-exports water + air + fuels fluid properties."
 readme = "README.md"
+keywords = ["engineering", "thermodynamics", "properties", "fluids", "steam"]
+categories = ["science", "algorithms", "no-std"]
 repository.workspace = true
 homepage.workspace = true
 
 [dependencies]
-tpt-eng-props-water = { version = "0.1.0", path = "../tpt-eng-props-water", default-features = false }
-tpt-eng-props-air = { version = "0.1.0", path = "../tpt-eng-props-air", default-features = false }
-tpt-eng-props-fuels = { version = "0.1.0", path = "../tpt-eng-props-fuels", default-features = false }
+# tpt-math-units is kept as an explicit path with `default-features = false`:
+# `workspace = true` + `default-features = false` is rejected by cargo (it cannot
+# override an inherited default-features), which would break this no_std-capable
+# crate. See Phase 7.2 / todo.md 7.2.
 tpt-math-units = { version = "0.1.0", path = "../../../tpt-math/crates/tpt-math-units", default-features = false }
+
+tpt-eng-props-water = { workspace = true }
+tpt-eng-props-air = { workspace = true }
+tpt-eng-props-fuels = { workspace = true }
 
 [features]
 default = ["std"]

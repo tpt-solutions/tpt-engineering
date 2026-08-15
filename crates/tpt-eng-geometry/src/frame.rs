@@ -2,7 +2,7 @@
 //!
 //! A [`Frame3`] is an orthonormal right-handed coordinate frame defined by an origin and a
 //! rotation. It maps local coordinates to world coordinates and back. This is the basis for
-//! datum reference frames in [`tpt_eng_gdt`].
+//! datum reference frames in `tpt-eng-gdt`.
 
 use crate::{Point3, Quat, Vector3};
 

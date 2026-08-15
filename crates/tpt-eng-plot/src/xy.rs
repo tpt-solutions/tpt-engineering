@@ -213,6 +213,11 @@ impl Drawing for XyPlot {
 }
 
 /// Convenience: build an [`XyPlot`] from a single series and write it to a PNG file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the plot cannot be rendered or the PNG file
+/// cannot be created or written to.
 pub fn plot_xy_png<P: AsRef<Path>>(
     title: &str,
     x_label: &str,
@@ -228,6 +233,11 @@ pub fn plot_xy_png<P: AsRef<Path>>(
 }
 
 /// Convenience: build an [`XyPlot`] from a single series and write it to an SVG file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the plot cannot be rendered or the SVG file
+/// cannot be created or written to.
 pub fn plot_xy_svg<P: AsRef<Path>>(
     title: &str,
     x_label: &str,

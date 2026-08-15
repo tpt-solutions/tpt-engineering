@@ -6,6 +6,8 @@ license.workspace = true
 authors.workspace = true
 description = "Umbrella: re-exports timeseries core + align + gap."
 readme = "README.md"
+keywords = ["engineering", "timeseries", "sensors", "alignment", "data"]
+categories = ["science", "data-structures", "algorithms"]
 repository.workspace = true
 homepage.workspace = true
 

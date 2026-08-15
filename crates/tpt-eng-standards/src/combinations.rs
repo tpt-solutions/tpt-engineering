@@ -69,6 +69,11 @@ impl LoadCombination {
 
     /// Evaluate, returning an error if any referenced case is missing from
     /// `demands`.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` with a message naming the combination and the offending
+    /// case id if a factor references a case that is absent from `demands`.
     pub fn evaluate_checked(&self, demands: &HashMap<String, f64>) -> Result<f64, String> {
         let mut total = 0.0;
         for f in &self.factors {

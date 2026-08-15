@@ -18,6 +18,8 @@ pub struct KnotVector {
 impl KnotVector {
     /// Build a knot vector, validating that the values are non-decreasing.
     ///
+    /// # Errors
+    ///
     /// Returns `Err` if any knot is strictly less than its predecessor.
     pub fn new(knots: Vec<f32>) -> Result<KnotVector, String> {
         for w in knots.windows(2) {
@@ -125,6 +127,12 @@ pub struct BsplineCurve {
 impl BsplineCurve {
     /// Build a B-spline curve, validating the knot vector against the control
     /// point count.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if `knots` is not a valid knot vector for `degree` and the
+    /// given control point count (it must hold exactly
+    /// `control_points.len() + degree + 1` non-decreasing knots).
     pub fn new(
         degree: usize,
         control_points: Vec<Point3>,
@@ -220,6 +228,12 @@ pub struct NurbsCurve {
 
 impl NurbsCurve {
     /// Build a NURBS curve, validating the weights length and knot vector.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if `weights` and `control_points` have different lengths,
+    /// or if `knots` is not a valid knot vector for `degree` and the given
+    /// control point count.
     pub fn new(
         degree: usize,
         control_points: Vec<Point3>,
@@ -333,6 +347,13 @@ pub struct NurbsSurface {
 impl NurbsSurface {
     /// Build a NURBS surface, validating the rectangular grid, matching weights,
     /// and valid knot vectors in both directions.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if the control point grid is empty or not rectangular, if
+    /// the weights grid does not have the same shape as the control point grid,
+    /// or if either knot vector is invalid for its degree and control point
+    /// count.
     pub fn new(
         degree_u: usize,
         degree_v: usize,
@@ -416,6 +437,12 @@ impl NurbsSurface {
     ///
     /// Samples an `nu x nv` grid of points and builds two triangles per grid
     /// quad, returning the welded grid as a [`tpt_eng_mesh::Mesh`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if the generated grid positions and indices are rejected by
+    /// [`tpt_eng_mesh::Mesh::from_positions_indices`], which would indicate a
+    /// broken internal invariant rather than bad input.
     pub fn tessellate(&self, nu: usize, nv: usize) -> tpt_eng_mesh::Mesh {
         let (u0, u1) = self.knots_u.domain();
         let (v0, v1) = self.knots_v.domain();
@@ -474,6 +501,11 @@ pub struct BsplineSurface {
 impl BsplineSurface {
     /// Build a B-spline surface, validating the rectangular grid and valid knot
     /// vectors in both directions.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if the control point grid is empty or not rectangular, or
+    /// if either knot vector is invalid for its degree and control point count.
     pub fn new(
         degree_u: usize,
         degree_v: usize,
@@ -536,6 +568,12 @@ impl BsplineSurface {
     }
 
     /// Tessellate the surface into a triangle mesh (welded grid).
+    ///
+    /// # Panics
+    ///
+    /// Panics if the generated grid positions and indices are rejected by
+    /// [`tpt_eng_mesh::Mesh::from_positions_indices`], which would indicate a
+    /// broken internal invariant rather than bad input.
     pub fn tessellate(&self, nu: usize, nv: usize) -> tpt_eng_mesh::Mesh {
         let (u0, u1) = self.knots_u.domain();
         let (v0, v1) = self.knots_v.domain();

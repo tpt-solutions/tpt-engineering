@@ -7,13 +7,19 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Safety margins and limit-state evaluation: utilization, margins, pass/fail, safety factors."
+keywords = ["safety", "engineering", "limit-state", "utilization", "margin"]
+categories = ["science", "algorithms"]
 
 [dependencies]
 tpt-eng-reliability.workspace = true
 thiserror.workspace = true
 serde.workspace = true
+tpt-math-units.workspace = true
 
 [dev-dependencies]
 approx.workspace = true
 rand.workspace = true
 tpt-eng-tolerance.workspace = true
+
+[lints]
+workspace = true

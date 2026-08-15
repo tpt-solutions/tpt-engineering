@@ -16,3 +16,6 @@ glam.workspace = true
 serde.workspace = true
 tpt-eng-geometry.workspace = true
 tpt-eng-mesh.workspace = true
+
+[lints]
+workspace = true

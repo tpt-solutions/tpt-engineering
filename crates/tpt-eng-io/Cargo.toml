@@ -7,14 +7,20 @@ authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
 rust-version.workspace = true
+description = "Engineering file I/O (STL and OBJ meshes) for the TPT ecosystem, built on `tpt-eng-mesh`."
+keywords = ["engineering", "stl", "obj", "mesh", "io"]
+categories = ["science", "graphics", "encoding"]
 
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
 csv = { workspace = true }
-stl_io = { workspace = true }
-obj = { workspace = true }
 thiserror = { workspace = true }
+tpt-eng-mesh = { workspace = true }
 
 [dev-dependencies]
 tempfile = "3.8"
+tpt-eng-geometry = { workspace = true }
+
+[lints]
+workspace = true

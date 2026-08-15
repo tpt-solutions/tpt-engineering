@@ -1,12 +1,18 @@
 # tpt-eng-gdt
 
 Geometric dimensioning and tolerancing (GD&T) data structures for the
-`tpt-eng3` workspace: datums, datum reference frames, tolerance zones,
+`tpt-engineering` workspace: datums, datum reference frames, tolerance zones,
 symbolic tolerance frames, fits/allowances, and tolerance stack-up inputs.
 
 This crate is a pure data model. It represents GD&T engineering concepts
 (generic terminology such as *datum*, *tolerance zone*, and *fit*) as types and
 does not prescribe any inspection method.
+
+> **Note:** the 1-D dimension stack-up analysis types (`StackupMember`,
+> `Stackup`, `MonteCarloResult`) are now re-exported from
+> [`tpt-eng-tolerance`](../tpt-eng-tolerance/) (consolidated there as the
+> canonical home of the stack-up analysis). GD&T zone / datum conformance
+> (`ToleranceZone` / `DatumReferenceFrame`) remains in this crate.
 
 ## Example
 

@@ -2,7 +2,7 @@
 
 Core 3D geometry primitives and operations for engineering applications.
 
-Part of the [`tpt-eng3`](https://github.com/tpt-solutions/tpt-eng3) workspace. Dual-licensed
+Part of the [`tpt-engineering`](https://github.com/tpt-solutions/tpt-engineering) workspace. Dual-licensed
 under MIT OR Apache-2.0.
 
 ## Features

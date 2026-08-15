@@ -1,4 +1,4 @@
-//! Integration: the full tpt-eng3 pipeline in one place.
+//! Integration: the full tpt-engineering pipeline in one place.
 //!
 //! - NURBS quarter circle -> tessellated polyline
 //! - CAD part (sphere with a spherical pocket) -> mesh -> binary STL

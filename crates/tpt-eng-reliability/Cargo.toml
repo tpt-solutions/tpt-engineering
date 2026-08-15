@@ -7,6 +7,8 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Reliability and life analysis: fatigue, life prediction, failure rates, FMEA, probabilistic design."
+keywords = ["engineering", "reliability", "maintenance", "weibull", "life-analysis"]
+categories = ["science", "mathematics"]
 
 [dependencies]
 rand.workspace = true
@@ -15,3 +17,6 @@ thiserror.workspace = true
 
 [dev-dependencies]
 approx.workspace = true
+
+[lints]
+workspace = true

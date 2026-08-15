@@ -1,7 +1,9 @@
 //! Engineering file I/O crate for the TPT ecosystem.
 //!
 //! Provides traits and implementations for reading/writing common engineering
-//! file formats including JSON, CSV, STL, and OBJ.
+//! file formats including JSON, CSV, STL, and OBJ. STL/OBJ files are exchanged
+//! as [`tpt_eng_mesh::Mesh`] values (this crate adds no duplicate geometry
+//! model of its own).
 //!
 //! # Traits
 //!
@@ -14,20 +16,13 @@
 //! Reading and writing an STL mesh:
 //!
 //! ```no_run
-//! use tpt_eng_io::{read_stl, write_stl, StlMesh, StlTriangle, StlVertex};
+//! use tpt_eng_io::{read_stl, write_stl};
+//! use tpt_eng_io::Mesh;
 //!
 //! # fn main() -> tpt_eng_io::Result<()> {
-//! let mesh = read_stl("part.stl")?;
+//! let mesh: Mesh = read_stl("part.stl")?;
 //! let _ = mesh.triangle_count();
-//! let out = StlMesh::from_triangles(vec![StlTriangle {
-//!     normal: StlVertex { x: 0.0, y: 0.0, z: 1.0 },
-//!     vertices: [
-//!         StlVertex { x: 0.0, y: 0.0, z: 0.0 },
-//!         StlVertex { x: 1.0, y: 0.0, z: 0.0 },
-//!         StlVertex { x: 0.0, y: 1.0, z: 0.0 },
-//!     ],
-//! }]);
-//! write_stl(&out, "part_out.stl")?;
+//! write_stl(&mesh, "part_out.stl")?;
 //! # Ok(())
 //! # }
 //! ```
@@ -41,18 +36,28 @@ pub mod stl;
 pub use csv::{CsvRecord, read_csv, write_csv};
 pub use error::{Error, Result};
 pub use json::{read_json, write_json};
-pub use obj::{ObjFace, ObjMesh, ObjNormal, ObjTexCoord, ObjVertex, read_obj, write_obj};
-pub use stl::{StlMesh, StlTriangle, StlVertex, read_stl, write_stl};
+pub use obj::{read_obj, write_obj};
+pub use stl::{read_stl, write_stl, write_stl_ascii};
+/// Re-export of the canonical mesh type used for STL/OBJ exchange.
+pub use tpt_eng_mesh::Mesh;
 
 /// Trait for types that can be read from a file.
 pub trait ReadFromFile: Sized {
     /// Read from a file path.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::Error`] if the file cannot be read or deserialized.
     fn read_from_file<P: AsRef<std::path::Path>>(path: P) -> Result<Self>;
 }
 
 /// Trait for types that can be written to a file.
 pub trait WriteToFile {
     /// Write to a file path.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::Error`] if the file cannot be created or written to.
     fn write_to_file<P: AsRef<std::path::Path>>(&self, path: P) -> Result<()>;
 }
 

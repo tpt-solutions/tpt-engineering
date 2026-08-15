@@ -1,4 +1,4 @@
-//! Markdown exporter for [`Report`](crate::Report).
+//! Markdown exporter for [`Report`].
 
 use crate::model::{NamedValue, Report, ResultEntry, Section, Table};
 

@@ -38,5 +38,9 @@ tpt-eng-cli calc beam 5 10000 --material steel rectangle 0.1 0.2 \
 
 - The `calc beam` example uses SI units (metres, newtons). Material properties and section
   second moments of area are looked up from the built-in tables.
+- Material / section inspection and beam calculation now use the
+  [`tpt-eng-materials`](../tpt-eng-materials/),
+  [`tpt-eng-sections`](../tpt-eng-sections/), and
+  [`tpt-eng-structural`](../tpt-eng-structural/) crates for evaluation.
 - Plotting uses a self-contained bitmap font so that no external (copyleft) font dependencies
   are required.

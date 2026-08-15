@@ -24,10 +24,16 @@
 //!
 //! All quantities are reported in the section's own consistent length units;
 //! the caller is responsible for unit consistency (integration with
-//! `tpt-eng-units` is deferred).
+//! `tpt-math-units` is deferred).
 //!
-//! Geometry integration with `tpt-eng3` (`tpt-eng-geometry`) is deferred until
-//! that repository/crate exists.
+//! ## Relationship to `tpt-eng-geometry`
+//!
+//! This crate models **2-D cross-section properties** (area, centroid, second
+//! moments, section/plastic moduli) as pure geometry. `tpt-eng-geometry`
+//! models **3-D solid geometry** (frames, surfaces, intersections). The split is
+//! a deliberate, permanent domain separation — 2-D section math and 3-D solid
+//! geometry have distinct concerns and are intentionally not merged — not a
+//! pending integration awaiting a crate that does not exist.
 //!
 //! ## Example
 //!

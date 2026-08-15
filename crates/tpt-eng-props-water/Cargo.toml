@@ -6,10 +6,16 @@ license.workspace = true
 authors.workspace = true
 description = "IAPWS-IF97 water/steam property tables."
 readme = "README.md"
+keywords = ["engineering", "thermodynamics", "water", "steam", "properties"]
+categories = ["science", "algorithms", "no-std"]
 repository.workspace = true
 homepage.workspace = true
 
 [dependencies]
+# tpt-math-units / tpt-math-numeric are kept as explicit paths with
+# `default-features = false`: `workspace = true` + `default-features = false` is
+# rejected by cargo (it cannot override an inherited default-features), which
+# would break these no_std-capable crates. See Phase 7.2 / todo.md 7.2.
 tpt-math-units = { version = "0.1.0", path = "../../../tpt-math/crates/tpt-math-units", default-features = false }
 tpt-math-numeric = { version = "0.1.0", path = "../../../tpt-math/crates/tpt-math-numeric", default-features = false, features = ["libm"] }
 

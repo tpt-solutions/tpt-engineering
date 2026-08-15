@@ -7,6 +7,8 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Tolerance analysis: worst-case, RSS, and Monte Carlo stack-up, sensitivity, and ranking."
+keywords = ["engineering", "tolerance", "stack-up", "gdt", "analysis"]
+categories = ["science", "mathematics", "algorithms"]
 
 [dependencies]
 tpt-math-stats.workspace = true
@@ -16,3 +18,6 @@ serde.workspace = true
 
 [dev-dependencies]
 approx.workspace = true
+
+[lints]
+workspace = true

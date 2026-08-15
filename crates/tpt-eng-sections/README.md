@@ -36,11 +36,12 @@ for area/centroid/second moments, with plastic moduli and torsion computed on a
 grid confined to the polygon.
 
 All quantities are reported in the section's own consistent length units; the
-caller is responsible for unit consistency (integration with `tpt-eng-units` is
-deferred).
+caller is responsible for unit consistency.
 
-Geometry integration with `tpt-eng3` (`tpt-eng-geometry`) is deferred until that
-repository/crate exists.
+`tpt-eng-geometry` already exists and models **3-D solid geometry** (frames,
+surfaces, intersections). The split between this crate's 2-D cross-section
+properties and `tpt-eng-geometry`'s 3-D solid geometry is a deliberate, permanent
+domain separation — not a pending integration.
 
 ## Installation
 
@@ -83,8 +84,9 @@ The `prelude` module re-exports the most commonly used items.
 
 ## Status
 
-Initial `0.1.0` release. No dependencies beyond the standard library; unit
-and geometry integrations are deferred.
+Initial `0.1.0` release. No dependencies beyond the standard library. Unit
+handling is the caller's responsibility; 3-D geometry lives in
+[`tpt-eng-geometry`](../tpt-eng-geometry).
 
 ## Changelog
 

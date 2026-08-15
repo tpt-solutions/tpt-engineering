@@ -88,10 +88,20 @@ The `prelude` module re-exports the most commonly used items.
 
 ## Related crates
 
-- [`tpt-eng-linalg`](../tpt-eng-linalg) — linear algebra utilities.
-- [`tpt-eng-optimize`](../tpt-eng-optimize) — engineering optimization.
+- [`tpt-eng-safety`](../tpt-eng-safety) — consolidated utilization/pass-fail evaluation.
+- [`tpt-eng-structural`](../tpt-eng-structural) — structural analysis and code checks.
 - [`tpt-eng-materials`](../tpt-eng-materials) — material property modeling.
 - [`tpt-eng-sections`](../tpt-eng-sections) — cross-section properties.
+
+## Relationship to other crates
+
+Utilization and pass/fail evaluation are **consolidated in
+[`tpt-eng-safety`](../tpt-eng-safety)** (`tpt_eng_safety::utilization` and the
+`evaluate_limit` / `evaluate_with_class` reports). This crate models the
+*shape* of standards-based calculations (load cases, combinations, factors,
+limit states) and delegates the actual demand/capacity math to `tpt-eng-safety`
+rather than re-implementing it. `tpt-eng-structural` does the same for its
+beam/section checks.
 
 ## Status
 

@@ -6,6 +6,8 @@ license.workspace = true
 authors.workspace = true
 description = "PID / state-space / transfer-function primitives."
 readme = "README.md"
+keywords = ["engineering", "control", "pid", "state-space", "transfer-function"]
+categories = ["science", "mathematics", "algorithms"]
 repository.workspace = true
 homepage.workspace = true
 

@@ -1,4 +1,4 @@
-//! HTML exporter for [`Report`](crate::Report).
+//! HTML exporter for [`Report`].
 
 use crate::model::{NamedValue, Report, ResultEntry, Section, Table};
 

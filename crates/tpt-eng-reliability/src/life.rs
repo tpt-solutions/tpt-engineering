@@ -19,6 +19,9 @@ pub fn weibull_reliability(t: f64, eta: f64, beta: f64) -> Result<f64, Reliabili
 }
 
 /// Weibull probability density `f(t)`.
+///
+/// # Errors
+/// Returns [`ReliabilityError::InvalidParameter`] for non-positive `eta`/`beta`.
 pub fn weibull_pdf(t: f64, eta: f64, beta: f64) -> Result<f64, ReliabilityError> {
     if eta <= 0.0 || beta <= 0.0 {
         return Err(ReliabilityError::InvalidParameter(
@@ -33,6 +36,9 @@ pub fn weibull_pdf(t: f64, eta: f64, beta: f64) -> Result<f64, ReliabilityError>
 }
 
 /// Weibull hazard (failure-rate) function `h(t) = (beta/eta) (t/eta)^(beta-1)`.
+///
+/// # Errors
+/// Returns [`ReliabilityError::InvalidParameter`] for non-positive `eta`/`beta`.
 pub fn weibull_failure_rate(t: f64, eta: f64, beta: f64) -> Result<f64, ReliabilityError> {
     if eta <= 0.0 || beta <= 0.0 {
         return Err(ReliabilityError::InvalidParameter(
@@ -47,6 +53,9 @@ pub fn weibull_failure_rate(t: f64, eta: f64, beta: f64) -> Result<f64, Reliabil
 }
 
 /// Mean life of a Weibull distribution: `eta * Gamma(1 + 1/beta)`.
+///
+/// # Errors
+/// Returns [`ReliabilityError::InvalidParameter`] for non-positive `eta`/`beta`.
 pub fn weibull_mean(eta: f64, beta: f64) -> Result<f64, ReliabilityError> {
     if eta <= 0.0 || beta <= 0.0 {
         return Err(ReliabilityError::InvalidParameter(
@@ -88,6 +97,9 @@ pub fn exponential_reliability(t: f64, lambda: f64) -> Result<f64, ReliabilityEr
 }
 
 /// Mean life of an exponential distribution: `1 / lambda`.
+///
+/// # Errors
+/// Returns [`ReliabilityError::InvalidParameter`] for non-positive `lambda`.
 pub fn exponential_mean(lambda: f64) -> Result<f64, ReliabilityError> {
     if lambda <= 0.0 {
         return Err(ReliabilityError::InvalidParameter(

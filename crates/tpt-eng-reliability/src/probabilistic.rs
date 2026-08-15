@@ -5,6 +5,10 @@ use tpt_math_stats::{ContinuousCDF, Normal};
 use crate::ReliabilityError;
 
 /// Standard-normal CDF `Phi(z)`.
+///
+/// # Panics
+/// This function does not panic in practice: the standard normal `N(0, 1)` is
+/// always constructible, and the `.expect` only guards an unreachable case.
 pub fn standard_normal_cdf(z: f64) -> f64 {
     Normal::new(0.0, 1.0)
         .expect("standard normal always valid")

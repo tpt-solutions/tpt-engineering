@@ -57,10 +57,7 @@ impl DemandCapacity {
     /// Utilization ratio `demand · factor / capacity`. `f64::INFINITY` when the
     /// capacity is zero.
     pub fn utilization(&self) -> f64 {
-        if self.capacity == 0.0 {
-            return f64::INFINITY;
-        }
-        self.demand * self.factor / self.capacity
+        tpt_eng_safety::utilization(self.demand * self.factor, self.capacity)
     }
 
     /// True when the utilization ratio is `<= 1` (the demand is within capacity).

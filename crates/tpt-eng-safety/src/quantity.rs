@@ -4,8 +4,13 @@
 //! the limit-check API here is generic over *which* dimension is being
 //! checked (any two design/allowable values, compared at runtime) — a shape
 //! that needs a runtime-tagged dimension rather than a distinct Rust type per
-//! unit. This is a small, self-contained wrapper for that purpose only.
+//! unit. Each [`Quantity`] is nonetheless *backed* by a real
+//! `tpt-math-units` (uom) value: the constructors build a uom-free `f64`
+//! magnitude by round-tripping through the SI uom quantities via `.get::<pascal>()`
+//! / `.get::<meter>()`, so the stored `value` is always the genuine SI scalar.
 
+use tpt_math_units::uom::si::f64::{Length as UomLength, Pressure as UomPressure};
+use tpt_math_units::uom::si::{length::meter, pressure::pascal};
 use thiserror::Error;
 
 /// The physical dimension a [`Quantity`] is expressed in.
@@ -32,14 +37,25 @@ impl Quantity {
         Self { value, dim }
     }
 
+    /// Construct a quantity from a real `tpt-math-units` pressure value (SI
+    /// pascal).
+    pub fn from_pressure(p: UomPressure) -> Self {
+        Self::new(p.get::<pascal>(), Dimension::Pressure)
+    }
+
+    /// Construct a quantity from a real `tpt-math-units` length value (SI metre).
+    pub fn from_length(l: UomLength) -> Self {
+        Self::new(l.get::<meter>(), Dimension::Length)
+    }
+
     /// Construct a pressure/stress quantity, in pascals.
     pub fn pascals(value: f64) -> Self {
-        Self::new(value, Dimension::Pressure)
+        Self::from_pressure(UomPressure::new::<pascal>(value))
     }
 
     /// Construct a length quantity, in metres.
     pub fn meters(value: f64) -> Self {
-        Self::new(value, Dimension::Length)
+        Self::from_length(UomLength::new::<meter>(value))
     }
 }
 

@@ -424,6 +424,12 @@ fn shaft_deviations_um(deviation: &str, d_mm: f32, t_um: f32) -> Option<(f32, f3
 
 /// ISO shaft size limits (mm) for a nominal size, IT grade (5..18), and
 /// fundamental-deviation letter (`a`..`h`, `js`).
+///
+/// # Errors
+///
+/// Returns `Err` if `grade` is outside the supported IT5..IT18 range (or the
+/// nominal size has no tabulated tolerance), or if `deviation` is not one of
+/// the supported shaft letters (`a`..`h`, `js`).
 pub fn iso_shaft_limits(nominal_mm: f32, grade: u8, deviation: &str) -> Result<Limits, String> {
     let t = iso_tolerance(grade, nominal_mm)
         .ok_or_else(|| format!("unsupported ISO grade IT{grade} (supported: IT5..IT18)"))?;
@@ -439,6 +445,12 @@ pub fn iso_shaft_limits(nominal_mm: f32, grade: u8, deviation: &str) -> Result<L
 /// ISO hole size limits (mm) for a nominal size, IT grade (5..18), and
 /// fundamental-deviation letter (`A`..`H`, `JS`). Hole deviations mirror the
 /// corresponding shaft letter.
+///
+/// # Errors
+///
+/// Returns `Err` if `grade` is outside the supported IT5..IT18 range (or the
+/// nominal size has no tabulated tolerance), or if `deviation` is not one of
+/// the supported hole letters (`A`..`H`, `JS`).
 pub fn iso_hole_limits(nominal_mm: f32, grade: u8, deviation: &str) -> Result<Limits, String> {
     let t = iso_tolerance(grade, nominal_mm)
         .ok_or_else(|| format!("unsupported ISO grade IT{grade} (supported: IT5..IT18)"))?;
@@ -457,9 +469,86 @@ pub fn iso_hole_limits(nominal_mm: f32, grade: u8, deviation: &str) -> Result<Li
     })
 }
 
-/// 1-D tolerance stack-up types, re-exported from [`tpt-eng-tolerance`]
+/// 1-D tolerance stack-up types, re-exported from [`tpt-eng-tolerance`](tpt_eng_tolerance)
 /// (the canonical home of the stack-up analysis).
 pub use tpt_eng_tolerance::{MonteCarloResult, Stackup, StackupMember};
+
+/// Result of checking measured points against a tolerance zone
+/// expressed in a datum reference frame.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ConformanceReport {
+    /// Maximum signed deviation across all samples (`<= 0` means inside the zone).
+    pub max_deviation: f32,
+    /// Whether every sampled point lies within the zone.
+    pub passed: bool,
+    /// Number of points checked.
+    pub sample_count: usize,
+}
+
+impl ToleranceZone {
+    /// Signed deviation of `p` (given in the zone's local frame) from the zone.
+    ///
+    /// `<= 0` indicates the point is inside the zone; `> 0` reports how far
+    /// outside, in the same units as the zone magnitude. `axis` is the zone's
+    /// reference axis (e.g. a datum axis) and `nominal` is the nominal point the
+    /// zone is centered on, both expressed in the local frame.
+    #[must_use]
+    pub fn deviation(&self, p: Point3, axis: Vector3, nominal: Point3) -> f32 {
+        let axis = axis.normalize();
+        let d = p - nominal;
+        let along = d.dot(axis);
+        let radial = (d - axis * along).length();
+        match self {
+            ToleranceZone::Cylindrical { diameter } => 2.0 * radial - diameter,
+            ToleranceZone::Sphere { diameter } => 2.0 * d.length() - diameter,
+            ToleranceZone::Circle { diameter } => 2.0 * radial - diameter,
+            ToleranceZone::ParallelPlanes { tolerance } => along.abs() - tolerance / 2.0,
+            ToleranceZone::TwoParallelLines { tolerance } => radial - tolerance / 2.0,
+            ToleranceZone::TotalRunoutBand { tolerance } => 2.0 * radial - tolerance,
+        }
+    }
+}
+
+impl DatumReferenceFrame {
+    /// Map a world point into this datum reference frame's local coordinates.
+    #[must_use]
+    pub fn to_local(&self, world: Point3) -> Point3 {
+        self.world_frame().to_local_point(world)
+    }
+
+    /// Check a set of measured world points against a tolerance zone.
+    ///
+    /// Each point is transformed into the DRF local frame, then its deviation
+    /// from `zone` is computed (centered on `nominal_local`, about `axis_local`).
+    /// The part is reported as passing only if no point exceeds the zone.
+    #[must_use]
+    pub fn check_conformance(
+        &self,
+        world_points: &[Point3],
+        zone: &ToleranceZone,
+        axis_local: Vector3,
+        nominal_local: Point3,
+    ) -> ConformanceReport {
+        let mut max_dev = f32::MIN;
+        for &wp in world_points {
+            let local = self.to_local(wp);
+            let dev = zone.deviation(local, axis_local, nominal_local);
+            if dev > max_dev {
+                max_dev = dev;
+            }
+        }
+        let max_dev = if world_points.is_empty() {
+            0.0
+        } else {
+            max_dev
+        };
+        ConformanceReport {
+            max_deviation: max_dev,
+            passed: max_dev <= 0.0,
+            sample_count: world_points.len(),
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {

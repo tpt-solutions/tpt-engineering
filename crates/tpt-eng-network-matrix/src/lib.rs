@@ -1,7 +1,7 @@
 //! # tpt-eng-network-matrix
 //!
 //! Automated generation of network matrices from an infrastructure
-//! [`Topology`](tpt_eng_geo_topology::Topology), for downstream solver
+//! [`Topology`], for downstream solver
 //! consumption.
 //!
 //! * [`incidence_matrix`] builds the reduced node–edge incidence matrix
@@ -11,7 +11,7 @@
 //!   from each edge's `capacity`).
 //!
 //! Matrices are returned as in-house [`DMatrix`] from
-//! [`tpt_math_linalg`](tpt_math_linalg).
+//! [`tpt_math_linalg`].
 //!
 //! ## Example
 //!

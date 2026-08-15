@@ -1,6 +1,6 @@
 # tpt-eng-cad
 
-Solid modeling and CAD kernel behavior for the `tpt-eng3` workspace.
+Solid modeling and CAD kernel behavior for the `tpt-engineering` workspace.
 
 This crate implements solid modeling and boolean CSG **in-house** using
 signed-distance fields (SDFs) — no external solid-modeling or geometry-kernel

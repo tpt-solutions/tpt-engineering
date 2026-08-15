@@ -6,6 +6,8 @@ license.workspace = true
 authors.workspace = true
 description = "Cross-crate integration scenarios composing the tpt-eng-* engineering primitives"
 readme = "README.md"
+keywords = ["engineering", "examples", "integration"]
+categories = ["science"]
 repository.workspace = true
 homepage.workspace = true
 

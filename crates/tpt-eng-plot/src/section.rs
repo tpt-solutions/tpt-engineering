@@ -189,11 +189,21 @@ impl Drawing for SectionDrawing {
 }
 
 /// Write a [`SectionDrawing`] to a PNG file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the drawing cannot be rendered or the PNG file
+/// cannot be created or written to.
 pub fn plot_section_png<P: AsRef<Path>>(drawing: &SectionDrawing, path: P) -> Result<()> {
     drawing.save_png(path)
 }
 
 /// Write a [`SectionDrawing`] to an SVG file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the drawing cannot be rendered or the SVG file
+/// cannot be created or written to.
 pub fn plot_section_svg<P: AsRef<Path>>(drawing: &SectionDrawing, path: P) -> Result<()> {
     drawing.save_svg(path)
 }

@@ -233,15 +233,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "float-cmp"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "98de4bbd547a563b716d8dfa9aad1cb19bfab00f4fa09a6a4ed21dbcf44ce9c4"
-dependencies = [
- "num-traits",
-]
-
-[[package]]
 name = "futures-core"
 version = "0.3.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -388,12 +379,6 @@ dependencies = [
  "autocfg",
  "libm",
 ]
-
-[[package]]
-name = "obj"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "059c95245738cdc7b40078cdd51a23200252a4c0a0a6dd005136152b3f467a4a"
 
 [[package]]
 name = "once_cell"
@@ -619,16 +604,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
 
 [[package]]
-name = "stl_io"
-version = "0.8.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a101fb44c7bbb34473ee14a0a9e2c06ad4b1aa22501b18223279fd21f0affd6"
-dependencies = [
- "byteorder",
- "float-cmp",
-]
-
-[[package]]
 name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -709,8 +684,12 @@ dependencies = [
  "clap",
  "serde_json",
  "tpt-eng-io",
+ "tpt-eng-materials",
  "tpt-eng-plot",
  "tpt-eng-report",
+ "tpt-eng-sections",
+ "tpt-eng-structural",
+ "tpt-math-units",
 ]
 
 [[package]]
@@ -772,12 +751,12 @@ name = "tpt-eng-io"
 version = "0.1.0"
 dependencies = [
  "csv",
- "obj",
  "serde",
  "serde_json",
- "stl_io",
  "tempfile",
  "thiserror",
+ "tpt-eng-geometry",
+ "tpt-eng-mesh",
 ]
 
 [[package]]
@@ -887,6 +866,7 @@ dependencies = [
  "thiserror",
  "tpt-eng-reliability",
  "tpt-eng-tolerance",
+ "tpt-math-units",
 ]
 
 [[package]]
@@ -899,12 +879,14 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
+ "tpt-eng-safety",
 ]
 
 [[package]]
 name = "tpt-eng-structural"
 version = "0.1.0"
 dependencies = [
+ "tpt-eng-safety",
  "tpt-math-units",
 ]
 

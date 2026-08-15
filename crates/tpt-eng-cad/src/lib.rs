@@ -354,6 +354,12 @@ const TET_EDGES: [(usize, usize); 6] = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), 
 /// each decomposed into six tetrahedra; surface-crossing edges are linearly
 /// interpolated and assembled into triangles. Every emitted triangle is
 /// oriented so its normal points outward (away from the solid).
+///
+/// # Panics
+///
+/// Panics if the generated positions and indices are rejected by
+/// [`Mesh::from_positions_indices`], which would indicate a broken internal
+/// invariant rather than bad input.
 #[must_use]
 pub fn marching_tetrahedra<S: Solid + ?Sized>(solid: &S, resolution: u32, bounds: &Aabb) -> Mesh {
     let res = resolution.max(1) as usize;

@@ -34,6 +34,10 @@ impl CsvRecord {
 }
 
 /// Read a CSV file into a vector of records.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the file cannot be opened or any record fails to parse.
 pub fn read_csv<P: AsRef<Path>>(path: P) -> Result<Vec<CsvRecord>> {
     let mut reader = ReaderBuilder::new().has_headers(false).from_path(path)?;
     let mut records = Vec::new();
@@ -48,6 +52,10 @@ pub fn read_csv<P: AsRef<Path>>(path: P) -> Result<Vec<CsvRecord>> {
 }
 
 /// Write a vector of records to a CSV file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the file cannot be created or written to.
 pub fn write_csv<P: AsRef<Path>>(records: &[CsvRecord], path: P) -> Result<()> {
     let mut writer = WriterBuilder::new().from_path(path)?;
 
@@ -60,6 +68,11 @@ pub fn write_csv<P: AsRef<Path>>(records: &[CsvRecord], path: P) -> Result<()> {
 }
 
 /// Read a CSV file with headers into a vector of records (skipping the header row).
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the file cannot be opened, the header row cannot
+/// be read, or any data record fails to parse.
 pub fn read_csv_with_headers<P: AsRef<Path>>(path: P) -> Result<(Vec<String>, Vec<CsvRecord>)> {
     let mut reader = ReaderBuilder::new().from_path(path)?;
     let headers = reader.headers()?.iter().map(|s| s.to_string()).collect();
@@ -75,6 +88,10 @@ pub fn read_csv_with_headers<P: AsRef<Path>>(path: P) -> Result<(Vec<String>, Ve
 }
 
 /// Write a CSV file with headers.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the file cannot be created or written to.
 pub fn write_csv_with_headers<P: AsRef<Path>>(
     headers: &[String],
     records: &[CsvRecord],

@@ -171,6 +171,12 @@ pub fn rss_contributions(dims: &[DimTol]) -> Vec<f64> {
 /// Rank dimensions by their RSS contribution (largest first).
 ///
 /// Returns `(original_index, contribution)` pairs sorted descending.
+///
+/// # Panics
+///
+/// Panics if any RSS contribution is NaN, which happens when `dims` contains
+/// non-finite tolerance values: the descending sort compares contributions with
+/// `partial_cmp` and no ordering exists for NaN.
 pub fn rank_contributors(dims: &[DimTol]) -> Vec<(usize, f64)> {
     let shares = rss_contributions(dims);
     let mut ranked: Vec<(usize, f64)> = shares.into_iter().enumerate().collect();

@@ -1,6 +1,6 @@
 # tpt-eng-nurbs
 
-In-house B-spline and NURBS modeling for `tpt-eng3`. Provides knot vectors,
+In-house B-spline and NURBS modeling for `tpt-engineering`. Provides knot vectors,
 non-rational B-spline curves, rational NURBS curves, and NURBS surfaces, all
 evaluated with the Cox–de Boor basis functions and the de Boor algorithm. No
 external NURBS dependency is used.

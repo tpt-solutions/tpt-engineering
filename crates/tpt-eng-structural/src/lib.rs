@@ -277,7 +277,7 @@ impl SectionCheck {
         let m = moment.get::<newton_meter>().abs();
         let z = self.section_modulus.get::<cubic_meter>();
         let sigma = self.allowable_stress.get::<pascal>();
-        m / (z * sigma)
+        tpt_eng_safety::utilization(m, z * sigma)
     }
 }
 

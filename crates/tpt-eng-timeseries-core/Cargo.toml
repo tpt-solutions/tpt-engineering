@@ -6,6 +6,8 @@ license.workspace = true
 authors.workspace = true
 description = "Time-series core types."
 readme = "README.md"
+keywords = ["engineering", "timeseries", "samples", "sensors", "data"]
+categories = ["science", "data-structures"]
 repository.workspace = true
 homepage.workspace = true
 

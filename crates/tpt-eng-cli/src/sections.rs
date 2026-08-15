@@ -1,8 +1,12 @@
-//! Built-in cross-section catalogue and property calculations for the CLI `sections inspect`
-//! command. Dimensions are in consistent length units; areas are that unit squared and second
-//! moments of area are that unit to the fourth power.
+//! Cross-section catalogue and property calculations for the CLI `sections inspect`
+//! command. The actual geometry is delegated to [`tpt_eng_sections`]; this module
+//! is a thin CLI-facing wrapper that maps the command-line shapes onto the
+//! canonical section types.
 
-/// A standard cross-section shape.
+use tpt_eng_sections::{Circle, ISection, Rectangle, Section as SectionsTrait};
+
+/// A standard cross-section shape (CLI-facing enum; delegates to
+/// [`tpt_eng_sections`]).
 #[derive(Debug, Clone)]
 pub enum Section {
     /// Rectangle of breadth `b` and height `h` (about centroidal axes).
@@ -17,53 +21,41 @@ impl Section {
     /// Cross-sectional area.
     pub fn area(&self) -> f64 {
         match self {
-            Section::Rectangle { b, h } => b * h,
-            Section::Circle { d } => std::f64::consts::PI * d * d / 4.0,
-            Section::IBeam { d, bf, tf, tw } => 2.0 * bf * tf + tw * (d - 2.0 * tf),
+            Section::Rectangle { b, h } => Rectangle::new(*b, *h).area(),
+            Section::Circle { d } => Circle::new(*d).area(),
+            Section::IBeam { d, bf, tf, tw } => ISection::new(*d, *bf, *tf, *tw).area(),
         }
     }
 
     /// Second moment of area about the strong (x) centroidal axis.
     pub fn second_moment_x(&self) -> f64 {
         match self {
-            Section::Rectangle { b, h } => b * h.powi(3) / 12.0,
-            Section::Circle { d } => std::f64::consts::PI * d.powi(4) / 64.0,
-            Section::IBeam { d, bf, tf, tw } => {
-                let h_web = d - 2.0 * tf;
-                let i_flanges = 2.0 * (bf * tf.powi(3) / 12.0 + bf * tf * ((d - tf) / 2.0).powi(2));
-                let i_web = tw * h_web.powi(3) / 12.0;
-                i_flanges + i_web
-            }
+            Section::Rectangle { b, h } => Rectangle::new(*b, *h).second_moments().0,
+            Section::Circle { d } => Circle::new(*d).second_moments().0,
+            Section::IBeam { d, bf, tf, tw } => ISection::new(*d, *bf, *tf, *tw).second_moments().0,
         }
     }
 
     /// Second moment of area about the weak (y) centroidal axis.
     pub fn second_moment_y(&self) -> f64 {
         match self {
-            Section::Rectangle { b, h } => h * b.powi(3) / 12.0,
-            Section::Circle { d } => std::f64::consts::PI * d.powi(4) / 64.0,
-            Section::IBeam { d, bf, tf, tw } => {
-                let i_flanges = 2.0 * (tf * bf.powi(3) / 12.0);
-                let i_web = (d - 2.0 * tf) * tw.powi(3) / 12.0;
-                i_flanges + i_web
-            }
+            Section::Rectangle { b, h } => Rectangle::new(*b, *h).second_moments().1,
+            Section::Circle { d } => Circle::new(*d).second_moments().1,
+            Section::IBeam { d, bf, tf, tw } => ISection::new(*d, *bf, *tf, *tw).second_moments().1,
         }
     }
 
     /// Section modulus about the strong axis (`Ix / (h/2)`).
     pub fn section_modulus_x(&self) -> f64 {
-        let h = match self {
-            Section::Rectangle { h, .. } => *h,
-            Section::Circle { d } => *d,
-            Section::IBeam { d, .. } => *d,
-        };
-        self.second_moment_x() / (h / 2.0)
+        match self {
+            Section::Rectangle { b, h } => Rectangle::new(*b, *h).section_modulus().0,
+            Section::Circle { d } => Circle::new(*d).section_modulus().0,
+            Section::IBeam { d, bf, tf, tw } => ISection::new(*d, *bf, *tf, *tw).section_modulus().0,
+        }
     }
 }
 
-/// Look up a named built-in section. Names: `rectangle`, `circle`, `ibeam` (with parameters supplied
-/// by the caller through [`Section`] directly). This helper is provided for symmetry with the
-/// materials module; section geometries are explicit.
+/// Format a section as a multi-line property listing.
 pub fn describe(section: &Section) -> String {
     let kind = match section {
         Section::Rectangle { .. } => "Rectangle",

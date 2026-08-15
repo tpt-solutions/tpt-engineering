@@ -7,11 +7,22 @@ authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
 rust-version.workspace = true
+description = "Command-line front-end for the TPT engineering toolkit: unit conversion, material/section inspection, beam calculations, and file validation."
+readme = "README.md"
+keywords = ["engineering", "cli", "units", "materials", "validation"]
+categories = ["command-line-utilities", "science"]
 
 [dependencies]
 clap = { workspace = true }
 anyhow = { workspace = true }
 serde_json = { workspace = true }
+tpt-math-units = { workspace = true }
 tpt-eng-io = { workspace = true }
 tpt-eng-report = { workspace = true }
 tpt-eng-plot = { workspace = true }
+tpt-eng-materials = { workspace = true }
+tpt-eng-sections = { workspace = true }
+tpt-eng-structural = { workspace = true }
+
+[lints]
+workspace = true

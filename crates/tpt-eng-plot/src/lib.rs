@@ -25,9 +25,18 @@ use std::path::Path;
 /// Common behaviour shared by all plot types: export to a raster (PNG) or vector (SVG) target.
 pub trait Drawing {
     /// Render onto a [`DrawingBackend`]. Implemented by each plot type.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::Error`] if rendering fails.
     fn draw<D: DrawingBackend>(&self, root: D) -> Result<()>;
 
     /// Export to a PNG file.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::Error`] if the plot cannot be rendered or the PNG file
+    /// cannot be created or written to.
     fn save_png<P: AsRef<Path>>(&self, path: P) -> Result<()> {
         let root =
             plotters::backend::BitMapBackend::new(path.as_ref(), (self.width(), self.height()));
@@ -35,6 +44,11 @@ pub trait Drawing {
     }
 
     /// Export to an SVG file.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::Error`] if the plot cannot be rendered or the SVG file
+    /// cannot be created or written to.
     fn save_svg<P: AsRef<Path>>(&self, path: P) -> Result<()> {
         let root = plotters::backend::SVGBackend::new(path.as_ref(), (self.width(), self.height()));
         self.draw(root)

@@ -33,13 +33,24 @@ pub struct Mesh {
     pub indices: Vec<u32>,
     /// Optional per-vertex normals (one entry per vertex).
     pub normals: Option<Vec<Vector3>>,
+    /// Optional texture coordinates (`vt`), referenced by `tex_indices`.
+    pub tex_coords: Option<Vec<[f32; 2]>>,
+    /// Optional per-corner texture-coordinate indices, parallel to `indices`
+    /// (one entry per triangle corner). Present only when `tex_coords` is.
+    pub tex_indices: Option<Vec<u32>>,
+    /// Optional per-corner normal indices, parallel to `indices` (one entry per
+    /// triangle corner). When present, `normals` is treated as the OBJ `vn`
+    /// pool rather than per-vertex data.
+    pub normal_indices: Option<Vec<u32>>,
 }
 
 impl Mesh {
     /// Build a mesh from explicit positions and triangle indices.
     ///
-    /// Returns an error if `indices` is not a multiple of 3 or if any index is
-    /// out of bounds for `positions`.
+    /// # Errors
+    ///
+    /// Returns `Err` with a descriptive message if `indices` is not a multiple
+    /// of 3 or if any index is out of bounds for `positions`.
     pub fn from_positions_indices(
         positions: Vec<Point3>,
         indices: Vec<u32>,
@@ -60,6 +71,9 @@ impl Mesh {
             positions,
             indices,
             normals: None,
+            tex_coords: None,
+            tex_indices: None,
+            normal_indices: None,
         })
     }
 
@@ -82,6 +96,9 @@ impl Mesh {
             positions,
             indices,
             normals: None,
+            tex_coords: None,
+            tex_indices: None,
+            normal_indices: None,
         }
     }
 
@@ -95,6 +112,13 @@ impl Mesh {
     #[must_use]
     pub fn face_count(&self) -> usize {
         self.indices.len() / 3
+    }
+
+    /// Number of triangles (alias of [`Mesh::face_count`], matching the STL
+    /// terminology where each face is a triangle).
+    #[must_use]
+    pub fn triangle_count(&self) -> usize {
+        self.face_count()
     }
 
     /// The three vertex positions of triangle `i`.
@@ -320,6 +344,9 @@ impl Mesh {
             positions,
             indices,
             normals: None,
+            tex_coords: None,
+            tex_indices: None,
+            normal_indices: None,
         }
     }
 
@@ -338,6 +365,9 @@ impl Mesh {
             positions: self.positions.clone(),
             indices,
             normals: None,
+            tex_coords: None,
+            tex_indices: None,
+            normal_indices: None,
         }
     }
 
@@ -374,6 +404,9 @@ impl Mesh {
             positions: new_positions,
             indices,
             normals: None,
+            tex_coords: None,
+            tex_indices: None,
+            normal_indices: None,
         }
     }
 
@@ -405,7 +438,14 @@ impl Mesh {
 
     /// Parse a binary STL buffer into a mesh, welding identical vertices.
     ///
-    /// Returns an error if the buffer is too short or malformed.
+    /// # Errors
+    ///
+    /// Returns `Err` if `data` is shorter than the 84-byte header, if the
+    /// declared triangle count overflows addressable size, or if the buffer is
+    /// shorter than the `84 + 50 * count` bytes the header declares.
+    // The `try_into().unwrap()` calls below cannot fail: every slice is exactly
+    // 4 bytes long and all offsets are pre-validated against `needed`.
+    #[allow(clippy::missing_panics_doc)]
     pub fn from_stl_binary(data: &[u8]) -> Result<Mesh, String> {
         if data.len() < 84 {
             return Err("STL binary buffer shorter than 84-byte header".to_string());
@@ -464,7 +504,65 @@ impl Mesh {
             positions,
             indices,
             normals: None,
+            tex_coords: None,
+            tex_indices: None,
+            normal_indices: None,
         })
+    }
+
+    /// Parse an ASCII STL string into a mesh, welding identical vertices.
+    ///
+    /// Each `facet normal ...`/`vertex ...` triple becomes one triangle. The
+    /// facet normal is ignored in favour of the geometric normal (consistency
+    /// with [`Mesh::from_stl_binary`]).
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if a `vertex` line has fewer than 3 parseable
+    /// coordinates, if the text ends with an incomplete facet (fewer than 3
+    /// vertices collected), or if the assembled positions and indices fail
+    /// [`Mesh::from_positions_indices`] validation.
+    pub fn from_stl_ascii(text: &str) -> Result<Mesh, String> {
+        let mut positions: Vec<Point3> = Vec::new();
+        let mut map: HashMap<(u32, u32, u32), u32> = HashMap::new();
+        let mut indices: Vec<u32> = Vec::new();
+
+        let mut verts: [Point3; 3] = [Point3::ZERO; 3];
+        let mut got = 0usize;
+
+        for line in text.lines() {
+            let mut parts = line.split_whitespace();
+            if let Some("vertex") = parts.next() {
+                let coords: Vec<f32> = parts.filter_map(|t| t.parse().ok()).collect();
+                if coords.len() < 3 {
+                    return Err("ASCII STL `vertex` needs 3 coordinates".to_string());
+                }
+                verts[got] = Point3::new(coords[0], coords[1], coords[2]);
+                got += 1;
+                if got == 3 {
+                    for v in verts {
+                        let k = key_of(v);
+                        let idx = match map.get(&k) {
+                            Some(&idx) => idx,
+                            None => {
+                                let idx = positions.len() as u32;
+                                positions.push(v);
+                                map.insert(k, idx);
+                                idx
+                            }
+                        };
+                        indices.push(idx);
+                    }
+                    got = 0;
+                }
+            }
+        }
+
+        if got != 0 {
+            return Err("ASCII STL ended with an incomplete facet".to_string());
+        }
+
+        Mesh::from_positions_indices(positions, indices)
     }
 
     /// Serialize the mesh to an ASCII STL string.
@@ -487,31 +585,92 @@ impl Mesh {
         s
     }
 
-    /// Serialize the mesh to a Wavefront OBJ string (`v` and `f` lines; faces
-    /// are 1-indexed triangles).
+    /// Serialize the mesh to a Wavefront OBJ string.
+    ///
+    /// Emits `v` lines, and (when present) `vt` texture coordinates, `vn`
+    /// normals, and `f` lines carrying per-corner vertex/texture/normal indices
+    /// in the OBJ `v/t/n` form. Faces are 1-indexed triangles.
     #[must_use]
     pub fn to_obj(&self) -> String {
         let mut s = String::new();
         for p in &self.positions {
             s.push_str(&format!("v {} {} {}\n", p.x, p.y, p.z));
         }
+        if let Some(ref tc) = self.tex_coords {
+            for t in tc {
+                s.push_str(&format!("vt {} {}\n", t[0], t[1]));
+            }
+        }
+        if self.normal_indices.is_some() {
+            if let Some(ref ns) = self.normals {
+                for n in ns {
+                    s.push_str(&format!("vn {} {} {}\n", n.x, n.y, n.z));
+                }
+            }
+        }
         for i in 0..self.face_count() {
-            let [a, b, c] = self.face_indices(i);
-            s.push_str(&format!("f {} {} {}\n", a + 1, b + 1, c + 1));
+            let base = i * 3;
+            let mut line = String::from("f");
+            for k in 0..3 {
+                let vi = self.indices[base + k] + 1;
+                let vt = self
+                    .tex_indices
+                    .as_ref()
+                    .map(|t| t[base + k] + 1);
+                let vn = self
+                    .normal_indices
+                    .as_ref()
+                    .map(|n| n[base + k] + 1);
+                match (vt, vn) {
+                    (Some(vt), Some(vn)) => line.push_str(&format!(" {}/{}/{}", vi, vt, vn)),
+                    (Some(vt), None) => line.push_str(&format!(" {}/{}", vi, vt)),
+                    (None, Some(vn)) => line.push_str(&format!(" {}//{}", vi, vn)),
+                    (None, None) => line.push_str(&format!(" {}", vi)),
+                }
+            }
+            s.push_str(&line);
+            s.push('\n');
         }
         s
     }
 
     /// Parse a Wavefront OBJ string into a mesh.
     ///
-    /// `v` lines define positions; `f` lines are triangulated as a fan (so
-    /// quads and higher polygons are supported). Face indices may use the
-    /// `i/j/k` form, in which case only the vertex index `i` is taken. Indices
-    /// are 1-indexed; negative (relative) indices are supported. Other lines are
-    /// ignored. Returns an error if face indices are out of bounds.
+    /// `v` lines define positions; `vt` define texture coordinates; `vn` define
+    /// normals. `f` lines are triangulated as a fan (so quads and higher
+    /// polygons are supported) and may use the `i/j/k` form, in which `i` is the
+    /// vertex index, `j` the (optional) texture-coordinate index, and `k` the
+    /// (optional) normal index. Indices are 1-indexed; negative (relative)
+    /// indices are supported. Other lines are ignored.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if a `v`/`vn` line has fewer than 3 coordinates, a `vt`
+    /// line fewer than 2, a face index is unparseable or out of bounds, or the
+    /// assembled positions and indices fail
+    /// [`Mesh::from_positions_indices`] validation.
     pub fn from_obj(text: &str) -> Result<Mesh, String> {
         let mut positions: Vec<Point3> = Vec::new();
+        let mut tex_coords: Vec<[f32; 2]> = Vec::new();
+        let mut normals: Vec<Vector3> = Vec::new();
         let mut indices: Vec<u32> = Vec::new();
+        let mut tex_indices: Vec<u32> = Vec::new();
+        let mut normal_indices: Vec<u32> = Vec::new();
+
+        let resolve = |raw: &str, len: usize| -> Result<u32, String> {
+            let idx: i64 = raw
+                .parse()
+                .map_err(|_| format!("invalid OBJ index `{raw}`"))?;
+            let resolved = if idx > 0 {
+                idx - 1
+            } else {
+                len as i64 + idx
+            };
+            if resolved < 0 || resolved >= len as i64 {
+                return Err(format!("OBJ index {idx} out of bounds"));
+            }
+            Ok(resolved as u32)
+        };
 
         for line in text.lines() {
             let mut parts = line.split_whitespace();
@@ -523,28 +682,52 @@ impl Mesh {
                     }
                     positions.push(Point3::new(coords[0], coords[1], coords[2]));
                 }
-                Some("f") => {
-                    let mut face: Vec<u32> = Vec::new();
-                    for tok in parts {
-                        let first = tok.split('/').next().unwrap_or(tok);
-                        let idx: i64 = first
-                            .parse()
-                            .map_err(|_| format!("invalid OBJ face index `{first}`"))?;
-                        let resolved = if idx > 0 {
-                            idx - 1
-                        } else {
-                            positions.len() as i64 + idx
-                        };
-                        if resolved < 0 || resolved >= positions.len() as i64 {
-                            return Err(format!("OBJ face index {idx} out of bounds"));
-                        }
-                        face.push(resolved as u32);
+                Some("vt") => {
+                    let coords: Vec<f32> = parts.filter_map(|t| t.parse().ok()).collect();
+                    if coords.len() < 2 {
+                        return Err("OBJ `vt` line needs at least 2 coordinates".to_string());
                     }
-                    if face.len() >= 3 {
-                        for k in 1..face.len() - 1 {
-                            indices.push(face[0]);
-                            indices.push(face[k]);
-                            indices.push(face[k + 1]);
+                    tex_coords.push([coords[0], coords[1]]);
+                }
+                Some("vn") => {
+                    let coords: Vec<f32> = parts.filter_map(|t| t.parse().ok()).collect();
+                    if coords.len() < 3 {
+                        return Err("OBJ `vn` line needs at least 3 coordinates".to_string());
+                    }
+                    normals.push(Vector3::new(coords[0], coords[1], coords[2]));
+                }
+                Some("f") => {
+                    let mut fv: Vec<u32> = Vec::new();
+                    let mut fvt: Vec<Option<u32>> = Vec::new();
+                    let mut fvn: Vec<Option<u32>> = Vec::new();
+                    for tok in parts {
+                        let mut it = tok.split('/');
+                        let v = it.next().unwrap_or("");
+                        let vt = it.next().unwrap_or("");
+                        let vn = it.next().unwrap_or("");
+                        fv.push(resolve(v, positions.len())?);
+                        fvt.push(if vt.is_empty() {
+                            None
+                        } else {
+                            Some(resolve(vt, tex_coords.len())?)
+                        });
+                        fvn.push(if vn.is_empty() {
+                            None
+                        } else {
+                            Some(resolve(vn, normals.len())?)
+                        });
+                    }
+                    if fv.len() >= 3 {
+                        for k in 1..fv.len() - 1 {
+                            for &c in &[fv[0], fv[k], fv[k + 1]] {
+                                indices.push(c);
+                            }
+                            for &c in &[fvt[0], fvt[k], fvt[k + 1]] {
+                                tex_indices.push(c.unwrap_or(0));
+                            }
+                            for &c in &[fvn[0], fvn[k], fvn[k + 1]] {
+                                normal_indices.push(c.unwrap_or(0));
+                            }
                         }
                     }
                 }
@@ -552,7 +735,16 @@ impl Mesh {
             }
         }
 
-        Mesh::from_positions_indices(positions, indices)
+        let mut mesh = Mesh::from_positions_indices(positions, indices)?;
+        if !tex_coords.is_empty() {
+            mesh.tex_coords = Some(tex_coords);
+            mesh.tex_indices = Some(tex_indices);
+        }
+        if !normals.is_empty() {
+            mesh.normals = Some(normals);
+            mesh.normal_indices = Some(normal_indices);
+        }
+        Ok(mesh)
     }
 }
 
@@ -663,6 +855,48 @@ mod tests {
         let m = cube().weld_vertices(1e-6);
         let obj = m.to_obj();
         let parsed = Mesh::from_obj(&obj).unwrap().weld_vertices(1e-6);
+        assert_eq!(parsed.face_count(), m.face_count());
+        assert_eq!(parsed.vertex_count(), m.vertex_count());
+    }
+
+    #[test]
+    fn obj_round_trips_texcoords_and_normals() {
+        // Build a tiny mesh with explicit texture coordinates and per-corner
+        // normal indices, exercising the extended OBJ codec.
+        let positions = vec![
+            Point3::new(0.0, 0.0, 0.0),
+            Point3::new(1.0, 0.0, 0.0),
+            Point3::new(0.0, 1.0, 0.0),
+        ];
+        let indices = vec![0, 1, 2];
+        let mut mesh = Mesh::from_positions_indices(positions, indices).unwrap();
+        mesh.tex_coords = Some(vec![[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]]);
+        mesh.tex_indices = Some(vec![0, 1, 2]);
+        mesh.normals = Some(vec![
+            Vector3::new(0.0, 0.0, 1.0),
+            Vector3::new(0.0, 0.0, 1.0),
+            Vector3::new(0.0, 0.0, 1.0),
+        ]);
+        mesh.normal_indices = Some(vec![0, 1, 2]);
+
+        let obj = mesh.to_obj();
+        let parsed = Mesh::from_obj(&obj).unwrap();
+        assert_eq!(parsed.tex_coords, mesh.tex_coords);
+        assert_eq!(parsed.tex_indices, mesh.tex_indices);
+        assert_eq!(parsed.normals, mesh.normals);
+        assert_eq!(parsed.normal_indices, mesh.normal_indices);
+
+        // The `f` line must carry the per-corner indices (v/t/n), here
+        // v=1..3, t=1..3 (matching `tex_indices`), n=1..3 (matching
+        // `normal_indices`).
+        assert!(obj.contains("f 1/1/1 2/2/2 3/3/3"));
+    }
+
+    #[test]
+    fn stl_ascii_round_trips() {
+        let m = cube().weld_vertices(1e-6);
+        let text = m.to_stl_ascii();
+        let parsed = Mesh::from_stl_ascii(&text).unwrap().weld_vertices(1e-6);
         assert_eq!(parsed.face_count(), m.face_count());
         assert_eq!(parsed.vertex_count(), m.vertex_count());
     }

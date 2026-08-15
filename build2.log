@@ -1,0 +1,23 @@
+﻿cargo :    Compiling tpt-eng-reliability v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-reliability)
+At line:4 char:36
++ ...  C:\Programming\tpt-engineering; cargo build --workspace 2>&1 | Out-F ...
++                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling tp...ng-reliability):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   Compiling tpt-eng-geometry v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-geometry)
+   Compiling tpt-eng-tolerance v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-tolerance)
+   Compiling tpt-eng-plot v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-plot)
+   Compiling tpt-eng-report v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-report)
+   Compiling tpt-eng-sections v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-sections)
+   Compiling tpt-eng-safety v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-safety)
+   Compiling tpt-eng-mesh v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-mesh)
+   Compiling tpt-eng-gdt v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-gdt)
+   Compiling tpt-eng-structural v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-structural)
+   Compiling tpt-eng-nurbs v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-nurbs)
+   Compiling tpt-eng-io v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-io)
+   Compiling tpt-eng-standards v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-standards)
+   Compiling tpt-eng-examples v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-examples)
+   Compiling tpt-eng-cad v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-cad)
+   Compiling tpt-eng-cli v0.1.0 (C:\Programming\tpt-engineering\crates\tpt-eng-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.34s

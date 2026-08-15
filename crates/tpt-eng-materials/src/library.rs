@@ -73,16 +73,28 @@ impl MaterialLibrary {
     }
 
     /// Deserialize a library from a JSON string.
+    ///
+    /// # Errors
+    /// Returns an error if `json` is malformed or does not match the
+    /// `MaterialLibrary` schema.
     pub fn from_json(json: &str) -> Result<Self> {
         let lib: MaterialLibrary = serde_json::from_str(json)?;
         Ok(lib)
     }
 
     /// Serialize the library to a pretty JSON string.
+    ///
+    /// # Errors
+    /// Returns an error if serialization of the library fails.
     pub fn to_json(&self) -> Result<String> {
         Ok(serde_json::to_string_pretty(self)?)
     }
 
+    /// # Errors
+    /// Returns an error if the CSV is malformed, missing a required column
+    /// (`id`, `name`, or `category`), or a category or scalar-property value
+    /// fails to parse.
+    ///
     /// Read a library from CSV. The first columns must be `id`, `name`,
     /// `category`; every remaining column is treated as a scalar property name
     /// (parsed as `f64`). A `description` or `source` column, if present, is
@@ -155,6 +167,10 @@ impl MaterialLibrary {
     /// across the library as columns. Temperature/anisotropic properties are
     /// exported as their representative value at the reference temperature
     /// `ref_temp` (NaN becomes an empty cell).
+    ///
+    /// # Errors
+    /// Returns an error if writing a record or flushing the underlying writer
+    /// fails.
     pub fn to_csv(&self, writer: impl Write, ref_temp: f64) -> Result<()> {
         let mut wtr = csv::Writer::from_writer(writer);
         let mut prop_keys: BTreeSet<String> = BTreeSet::new();
@@ -199,6 +215,10 @@ impl MaterialLibrary {
     ///
     /// Returns `Ok(())` when the library complies, or
     /// [`MaterialError::Validation`] listing the offending materials.
+    ///
+    /// # Errors
+    /// Returns [`MaterialError::Validation`] listing the offending materials
+    /// when a material lacks a source or records a disallowed license.
     pub fn validate(&self) -> Result<()> {
         let mut problems = Vec::new();
         for m in &self.materials {

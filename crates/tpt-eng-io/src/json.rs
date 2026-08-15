@@ -5,6 +5,11 @@ use serde::{Serialize, de::DeserializeOwned};
 use std::path::Path;
 
 /// Read a JSON file and deserialize it into type T.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the file cannot be opened, read, or deserialized
+/// into `T`.
 pub fn read_json<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T> {
     let file = std::fs::File::open(path)?;
     let reader = std::io::BufReader::new(file);
@@ -13,6 +18,11 @@ pub fn read_json<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T> {
 }
 
 /// Write a value as JSON to a file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the file cannot be created or the value fails to
+/// serialize.
 pub fn write_json<T: Serialize, P: AsRef<Path>>(value: &T, path: P) -> Result<()> {
     let file = std::fs::File::create(path)?;
     let writer = std::io::BufWriter::new(file);
@@ -21,6 +31,11 @@ pub fn write_json<T: Serialize, P: AsRef<Path>>(value: &T, path: P) -> Result<()
 }
 
 /// Write a value as compact JSON to a file.
+///
+/// # Errors
+///
+/// Returns [`crate::Error`] if the file cannot be created or the value fails to
+/// serialize.
 pub fn write_json_compact<T: Serialize, P: AsRef<Path>>(value: &T, path: P) -> Result<()> {
     let file = std::fs::File::create(path)?;
     let writer = std::io::BufWriter::new(file);

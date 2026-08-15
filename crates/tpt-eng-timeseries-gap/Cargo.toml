@@ -6,6 +6,8 @@ license.workspace = true
 authors.workspace = true
 description = "Staleness/gap detection and interpolation for sensor dropouts."
 readme = "README.md"
+keywords = ["engineering", "timeseries", "interpolation", "sensors", "data"]
+categories = ["science", "algorithms", "data-structures"]
 repository.workspace = true
 homepage.workspace = true
 

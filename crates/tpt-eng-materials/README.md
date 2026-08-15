@@ -87,8 +87,8 @@ The `prelude` module re-exports the most commonly used items.
 
 ## Related crates
 
-- [`tpt-eng-linalg`](../tpt-eng-linalg) — linear algebra utilities.
-- [`tpt-eng-optimize`](../tpt-eng-optimize) — engineering optimization.
+- [`tpt-eng-safety`](../tpt-eng-safety) — consolidated utilization/pass-fail evaluation.
+- [`tpt-eng-structural`](../tpt-eng-structural) — structural analysis and code checks.
 - [`tpt-eng-sections`](../tpt-eng-sections) — cross-section properties.
 - [`tpt-eng-standards`](../tpt-eng-standards) — standards modeling as data.
 

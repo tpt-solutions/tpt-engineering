@@ -42,11 +42,7 @@ impl CheckResult {
         factor: f64,
         limit_state: LimitState,
     ) -> Self {
-        let utilization = if capacity == 0.0 {
-            f64::INFINITY
-        } else {
-            combined_demand * factor / capacity
-        };
+        let utilization = tpt_eng_safety::utilization(combined_demand * factor, capacity);
         CheckResult {
             combination_id: combination_id.into(),
             combined_demand,
