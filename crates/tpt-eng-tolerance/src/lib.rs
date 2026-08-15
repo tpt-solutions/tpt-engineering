@@ -118,6 +118,10 @@ pub fn rss(dims: &[DimTol]) -> (f64, f64) {
 /// Monte-Carlo stack-up evaluation. Each dimension is sampled uniformly in
 /// its tolerance interval; the stack-up is the sum. If `spec` is provided as
 /// `(low, high)`, the yield fraction is also reported.
+///
+/// # Panics
+///
+/// Panics if any dimension has non-finite tolerance bounds.
 pub fn monte_carlo<R: Rng + ?Sized>(
     dims: &[DimTol],
     n: usize,
@@ -184,6 +188,10 @@ pub fn rank_contributors(dims: &[DimTol]) -> Vec<(usize, f64)> {
 /// Pearson correlation of each dimension with the stack-up output, estimated
 /// from a Monte-Carlo run. This measures linear sensitivity of the stack-up
 /// to each input's variation.
+///
+/// # Panics
+///
+/// Panics if any dimension has non-finite tolerance bounds.
 pub fn monte_carlo_sensitivities<R: Rng + ?Sized>(
     dims: &[DimTol],
     n: usize,
@@ -414,14 +422,14 @@ mod tests {
 
     #[test]
     fn monte_carlo_mean_near_nominal() {
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let r = monte_carlo(&dims(), 50_000, None, &mut rng);
         assert_relative_eq!(r.mean, 35.0, epsilon = 0.05);
     }
 
     #[test]
     fn yield_within_wide_spec() {
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         // Worst-case bounds are 34.6..35.4; a wider spec yields ~100%.
         let r = monte_carlo(&dims(), 20_000, Some((34.0, 36.0)), &mut rng);
         assert!((r.yield_fraction.unwrap() - 1.0).abs() < 0.02);
@@ -451,7 +459,7 @@ mod tests {
 
     #[test]
     fn sensitivity_uniform_correlations() {
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let corr = monte_carlo_sensitivities(&dims(), 50_000, &mut rng);
         // For a sum of independent uniforms, corr(X_i, sum) = sqrt(var_i / sum_var),
         // so it grows with each dimension's tolerance. "b" (tol 0.2) must rank
