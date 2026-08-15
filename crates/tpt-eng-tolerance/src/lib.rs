@@ -129,7 +129,7 @@ pub fn monte_carlo<R: Rng + ?Sized>(
     for _ in 0..n {
         let mut total = 0.0;
         for d in dims {
-            let u = Uniform::new(d.min(), d.max());
+            let u = Uniform::new(d.min(), d.max()).expect("finite tolerance bounds");
             total += u.sample(rng);
         }
         if let Some((lo, hi)) = spec {
@@ -195,7 +195,7 @@ pub fn monte_carlo_sensitivities<R: Rng + ?Sized>(
     for _ in 0..n {
         let mut total = 0.0;
         for (j, d) in dims.iter().enumerate() {
-            let u = Uniform::new(d.min(), d.max());
+            let u = Uniform::new(d.min(), d.max()).expect("finite tolerance bounds");
             let v = u.sample(rng);
             inputs[j].push(v);
             total += v;

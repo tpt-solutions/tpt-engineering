@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- `tpt-eng-tolerance` dropped the `rand_distr` dependency in favour of the
+  `Uniform` distribution now provided by `rand::distributions`.
+
+## [0.1.0] - 2026-08-16
+
 ### Added
 - `tpt-eng-examples`: cross-crate integration scenario (`thermal_loop`)
   composing geo-topology → network-matrix → controls → timeseries → structural.
@@ -27,8 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   jobs; `cargo-deny` now denies unknown sources and yanked crates.
 - `rustfmt.toml` no longer pins a conflicting `edition` (derived from
   `Cargo.toml`, workspace edition 2024).
-
-## [0.1.0] — pending
 
 Initial 13-crate release of applied engineering primitives:
 `props-{water,air,fuels,props}`, `timeseries-{core,align,gap,timeseries}`,
