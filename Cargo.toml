@@ -89,6 +89,8 @@ csv = "1"
 thiserror = "2"
 glam = { version = "0.33", features = ["serde"] }
 rand = "0.8"
+glam = { version = "0.27", features = ["serde"] }
+rand = "0.10"
 rand_distr = "0.4"
 approx = "0.5"
 plotters = { version = "0.3", default-features = false, features = ["svg_backend", "bitmap_backend", "bitmap_encoder", "line_series", "point_series"] }
