@@ -21,5 +21,6 @@ _agent_*/
 # Kilo internal state
 .kilo/
 
-# Local cargo config overrides
-.cargo/
+# Local cargo config overrides (but keep the workspace xtask alias tracked)
+.cargo/*
+!.cargo/config.toml

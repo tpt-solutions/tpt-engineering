@@ -1,0 +1,6 @@
+# Makes `cargo xtask <cmd>` resolve to the workspace `xtask` binary, mirroring
+# the `cargo xtask <cmd>` entry points documented in xtask/src/main.rs and used
+# by CI (`.github/workflows/ci.yml`). Without this alias cargo reports
+# `no such command: xtask`.
+[alias]
+xtask = "run --bin xtask --"
