@@ -20,6 +20,12 @@ tpt-eng-timeseries-core = { workspace = true }
 tpt-eng-timeseries-align = { workspace = true }
 tpt-eng-timeseries-gap = { workspace = true }
 tpt-eng-structural = { workspace = true }
+tpt-eng-sections = { workspace = true }
+tpt-eng-materials = { workspace = true }
+tpt-eng-tolerance = { workspace = true }
+tpt-eng-gdt = { workspace = true }
+tpt-eng-geometry = { workspace = true }
+tpt-eng-report = { workspace = true }
 tpt-math-units = { workspace = true }
 
 [features]

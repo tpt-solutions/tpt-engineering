@@ -50,7 +50,9 @@ impl Section {
         match self {
             Section::Rectangle { b, h } => Rectangle::new(*b, *h).section_modulus().0,
             Section::Circle { d } => Circle::new(*d).section_modulus().0,
-            Section::IBeam { d, bf, tf, tw } => ISection::new(*d, *bf, *tf, *tw).section_modulus().0,
+            Section::IBeam { d, bf, tf, tw } => {
+                ISection::new(*d, *bf, *tf, *tw).section_modulus().0
+            }
         }
     }
 }

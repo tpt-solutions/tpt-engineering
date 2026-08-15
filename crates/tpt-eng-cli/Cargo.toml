@@ -23,6 +23,12 @@ tpt-eng-plot = { workspace = true }
 tpt-eng-materials = { workspace = true }
 tpt-eng-sections = { workspace = true }
 tpt-eng-structural = { workspace = true }
+tpt-eng-props-water = { workspace = true }
+tpt-eng-props-air = { workspace = true }
+tpt-eng-props-fuels = { workspace = true }
+tpt-eng-controls = { workspace = true }
+tpt-eng-tolerance = { workspace = true }
+rand = { workspace = true }
 
 [lints]
 workspace = true

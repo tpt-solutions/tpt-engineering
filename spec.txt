@@ -106,6 +106,18 @@ CRATE INVENTORY
     tpt-flight-control/tpt-chassis/tpt-dynamo/tpt-servo before writing
     anything. Depends on: tpt-math-linalg.
 
+POST-PHASE-0 ADDITIONS
+The crate inventory above reflects only the original Phase 0 scope (14
+crates). The workspace has since grown to 29 crates as structural/
+mechanical and geometry/CAD domains were added: tpt-eng-materials,
+tpt-eng-sections, tpt-eng-standards, tpt-eng-tolerance, tpt-eng-gdt,
+tpt-eng-reliability, tpt-eng-safety (structural/mechanical); tpt-eng-
+geometry, tpt-eng-nurbs, tpt-eng-mesh, tpt-eng-cad, tpt-eng-io (geometry/
+CAD); tpt-eng-plot, tpt-eng-report (output); tpt-eng-cli, tpt-eng-examples
+(integration). See README.md's crate inventory table for the authoritative,
+up-to-date list and per-crate descriptions; this file is retained as the
+Phase 0 design record and is not kept in lockstep with later additions.
+
 OUT OF SCOPE / EXPLICITLY EXCLUDED
 tpt-tup-schema stays where it is (tpt-rust2 or wherever it currently lives)
 — protocol-specific plumbing tied to the TUP envelope format, not a

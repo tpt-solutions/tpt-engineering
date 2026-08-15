@@ -6,8 +6,11 @@ use std::path::PathBuf;
 
 use tpt_eng_plot::Drawing;
 
+mod controls;
 mod materials;
+mod props;
 mod sections;
+mod tolerance;
 mod units;
 
 use materials::{describe as describe_material, find as find_material};
@@ -35,6 +38,12 @@ enum Command {
     Sections(SectionsArgs),
     /// Run a simple calculation.
     Calc(CalcArgs),
+    /// Fluid/fuel property lookups (water/steam, moist air, fuels).
+    Props(props::PropsArgs),
+    /// PID controller step-response simulation.
+    Pid(controls::PidArgs),
+    /// Dimensional tolerance stack-up analysis.
+    Tolerance(tolerance::ToleranceArgs),
 }
 
 #[derive(Args)]
@@ -170,6 +179,9 @@ fn main() -> Result<()> {
         Command::Materials(args) => cmd_materials(args),
         Command::Sections(args) => cmd_sections(args),
         Command::Calc(args) => cmd_calc(args),
+        Command::Props(args) => props::run(args),
+        Command::Pid(args) => controls::run(args),
+        Command::Tolerance(args) => tolerance::run(args),
     }
 }
 

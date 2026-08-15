@@ -613,14 +613,8 @@ impl Mesh {
             let mut line = String::from("f");
             for k in 0..3 {
                 let vi = self.indices[base + k] + 1;
-                let vt = self
-                    .tex_indices
-                    .as_ref()
-                    .map(|t| t[base + k] + 1);
-                let vn = self
-                    .normal_indices
-                    .as_ref()
-                    .map(|n| n[base + k] + 1);
+                let vt = self.tex_indices.as_ref().map(|t| t[base + k] + 1);
+                let vn = self.normal_indices.as_ref().map(|n| n[base + k] + 1);
                 match (vt, vn) {
                     (Some(vt), Some(vn)) => line.push_str(&format!(" {}/{}/{}", vi, vt, vn)),
                     (Some(vt), None) => line.push_str(&format!(" {}/{}", vi, vt)),
@@ -661,11 +655,7 @@ impl Mesh {
             let idx: i64 = raw
                 .parse()
                 .map_err(|_| format!("invalid OBJ index `{raw}`"))?;
-            let resolved = if idx > 0 {
-                idx - 1
-            } else {
-                len as i64 + idx
-            };
+            let resolved = if idx > 0 { idx - 1 } else { len as i64 + idx };
             if resolved < 0 || resolved >= len as i64 {
                 return Err(format!("OBJ index {idx} out of bounds"));
             }

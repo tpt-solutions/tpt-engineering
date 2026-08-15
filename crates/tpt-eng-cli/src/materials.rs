@@ -7,14 +7,20 @@
 
 use std::sync::OnceLock;
 
-use tpt_eng_materials::{
-    DataSource, Material, MaterialCategory, MaterialLibrary, Property,
-};
+use tpt_eng_materials::{DataSource, Material, MaterialCategory, MaterialLibrary, Property};
 
 fn build_library() -> MaterialLibrary {
     let mut lib = MaterialLibrary::new();
     let entries = [
-        ("steel", "Steel", MaterialCategory::Metal, 7850.0, 200e9, 250e6, 0.30),
+        (
+            "steel",
+            "Steel",
+            MaterialCategory::Metal,
+            7850.0,
+            200e9,
+            250e6,
+            0.30,
+        ),
         (
             "aluminium",
             "Aluminium",
@@ -33,7 +39,15 @@ fn build_library() -> MaterialLibrary {
             40e6,
             0.20,
         ),
-        ("timber", "Timber", MaterialCategory::Other, 500.0, 11e9, 30e6, 0.40),
+        (
+            "timber",
+            "Timber",
+            MaterialCategory::Other,
+            500.0,
+            11e9,
+            30e6,
+            0.40,
+        ),
         (
             "titanium",
             "Titanium",
@@ -43,7 +57,15 @@ fn build_library() -> MaterialLibrary {
             880e6,
             0.32,
         ),
-        ("copper", "Copper", MaterialCategory::Metal, 8960.0, 117e9, 70e6, 0.34),
+        (
+            "copper",
+            "Copper",
+            MaterialCategory::Metal,
+            8960.0,
+            117e9,
+            70e6,
+            0.34,
+        ),
     ];
     for (id, name, cat, density, e, yield_s, poisson) in &entries {
         let m = Material::new(*id, *name, *cat)
@@ -79,7 +101,10 @@ fn build_library() -> MaterialLibrary {
         lib.add(m);
     }
     // The embedded library must satisfy the data-policy rules.
-    debug_assert!(lib.validate().is_ok(), "embedded material library failed validation");
+    debug_assert!(
+        lib.validate().is_ok(),
+        "embedded material library failed validation"
+    );
     lib
 }
 
@@ -91,9 +116,10 @@ fn library() -> &'static MaterialLibrary {
 /// Look up a material by id or name (case-insensitive). Returns `None` if not found.
 pub fn find(name: &str) -> Option<&'static Material> {
     let needle = name.trim();
-    library().materials.iter().find(|m| {
-        m.id.eq_ignore_ascii_case(needle) || m.name.eq_ignore_ascii_case(needle)
-    })
+    library()
+        .materials
+        .iter()
+        .find(|m| m.id.eq_ignore_ascii_case(needle) || m.name.eq_ignore_ascii_case(needle))
 }
 
 /// All built-in materials (for listing).

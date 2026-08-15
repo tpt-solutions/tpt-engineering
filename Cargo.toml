@@ -92,8 +92,6 @@ glam = { version = "0.27", features = ["serde"] }
 rand = "0.8"
 rand_distr = "0.4"
 approx = "0.5"
-stl_io = "0.8"
-obj = "0.10"
 plotters = { version = "0.3", default-features = false, features = ["svg_backend", "bitmap_backend", "bitmap_encoder", "line_series", "point_series"] }
 clap = { version = "4.5", features = ["derive", "cargo"] }
 anyhow = "1.0"

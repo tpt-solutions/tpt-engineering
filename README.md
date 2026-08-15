@@ -17,9 +17,12 @@ Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE).
 
 A set of small, single-purpose `tpt-eng-*` crates providing reusable
 engineering maths — fluid/gas properties, time-series conditioning,
-infrastructure topology, controls, and structural primitives — drawn out of
-the product verticals as foundation-pillar building blocks rather than
-product-shaped packages.
+infrastructure topology, controls, structural/mechanical analysis, and
+geometry/CAD primitives — drawn out of the product verticals as
+foundation-pillar building blocks rather than product-shaped packages. The
+workspace has grown from the original 14-crate Phase-0 scope (see
+`spec.txt`) to 29 crates as structural/mechanical and geometry/CAD domains
+were added.
 
 All crates are new implementations built from scratch (the spec's claimed
 consolidation source `tpt-rust2` does not exist on this machine, and the
@@ -38,12 +41,27 @@ environment).
 | `tpt-eng-timeseries-align` | timeseries | | Irregular multi-rate stream alignment |
 | `tpt-eng-timeseries-gap` | timeseries | | Staleness/gap detection + interpolation |
 | `tpt-eng-timeseries` | timeseries | | Umbrella: re-exports core + align + gap |
-| `tpt-eng-geo-asset` | geo | | Geographic asset registry |
-| `tpt-eng-geo-topology` | geo | | Directional infrastructure graphs |
-| `tpt-eng-network-matrix` | geo | | Incidence/admittance matrix generation |
+| `tpt-eng-geo-asset` | geo/topology | | Geographic asset registry |
+| `tpt-eng-geo-topology` | geo/topology | | Directional infrastructure graphs |
+| `tpt-eng-network-matrix` | geo/topology | | Incidence/admittance matrix generation |
 | `tpt-eng-controls` | controls | | PID / state-space / transfer-function |
-| `tpt-eng-structural` | structural | | Loads, beam/frame analysis, code checks |
-| `tpt-eng-examples` | integration | | Cross-crate scenario composing all of the above |
+| `tpt-eng-structural` | structural/mechanical | | Loads, beam/frame analysis, code checks |
+| `tpt-eng-materials` | structural/mechanical | | Material property library + data provenance |
+| `tpt-eng-sections` | structural/mechanical | | Cross-section properties (rect/circle/I-section) |
+| `tpt-eng-standards` | structural/mechanical | | Load cases, design factors, code-check results |
+| `tpt-eng-tolerance` | structural/mechanical | | 1-D dimensional tolerance stack-up (worst-case/RSS/Monte-Carlo) |
+| `tpt-eng-gdt` | structural/mechanical | | GD&T data model (zones, datum frames, material modifiers) |
+| `tpt-eng-reliability` | structural/mechanical | | Fatigue, Weibull, FMEA |
+| `tpt-eng-safety` | structural/mechanical | | Limit-state margins / utilization ratios |
+| `tpt-eng-geometry` | geometry/CAD | | Points, vectors, frames |
+| `tpt-eng-nurbs` | geometry/CAD | | B-spline / NURBS curves and surfaces |
+| `tpt-eng-mesh` | geometry/CAD | | Triangle mesh data structure, quality/repair |
+| `tpt-eng-cad` | geometry/CAD | | SDF solid modeling / CSG |
+| `tpt-eng-io` | geometry/CAD | | STL/OBJ/JSON/CSV file I/O |
+| `tpt-eng-plot` | output | | Charts and section drawings (via `plotters`) |
+| `tpt-eng-report` | output | | Markdown/HTML/JSON calculation reports |
+| `tpt-eng-cli` | integration | | Command-line tool over the above |
+| `tpt-eng-examples` | integration | | Cross-crate scenarios composing multiple domains |
 
 ## Building
 
@@ -90,6 +108,21 @@ The inventory above is a flat list. For choosing a starting point by task:
 | Generate incidence/admittance matrices from topology | `tpt-eng-network-matrix` |
 | Implement PID / state-space / transfer-function control | `tpt-eng-controls` |
 | Compute loads, beam/frame analysis, code checks | `tpt-eng-structural` |
+| Look up material properties (with data provenance) | `tpt-eng-materials` |
+| Compute cross-section properties (rect/circle/I-section) | `tpt-eng-sections` |
+| Apply code load cases / design factors / pass-fail checks | `tpt-eng-standards` |
+| Roll up 1-D dimensional tolerance stack-ups (worst-case/RSS/Monte-Carlo) | `tpt-eng-tolerance` |
+| Model GD&T zones, datum frames, material modifiers | `tpt-eng-gdt` |
+| Compute fatigue life, Weibull reliability, run an FMEA | `tpt-eng-reliability` |
+| Compute limit-state margins / utilization ratios | `tpt-eng-safety` |
+| Work with points/vectors/frames in 2D/3D | `tpt-eng-geometry` |
+| Build B-spline / NURBS curves and surfaces | `tpt-eng-nurbs` |
+| Represent/repair/query a triangle mesh | `tpt-eng-mesh` |
+| Build solids via SDF/CSG modeling | `tpt-eng-cad` |
+| Read/write STL, OBJ, JSON, or CSV files | `tpt-eng-io` |
+| Draw a chart or section diagram | `tpt-eng-plot` |
+| Generate a calculation report (Markdown/HTML/JSON) | `tpt-eng-report` |
+| Run any of the above from a command line, no Rust required | `tpt-eng-cli` |
 | A full worked cross-crate scenario | `tpt-eng-examples` |
 
 ## Quickstart

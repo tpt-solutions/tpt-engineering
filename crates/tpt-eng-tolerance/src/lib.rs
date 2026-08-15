@@ -170,17 +170,14 @@ pub fn rss_contributions(dims: &[DimTol]) -> Vec<f64> {
 
 /// Rank dimensions by their RSS contribution (largest first).
 ///
-/// Returns `(original_index, contribution)` pairs sorted descending.
-///
-/// # Panics
-///
-/// Panics if any RSS contribution is NaN, which happens when `dims` contains
-/// non-finite tolerance values: the descending sort compares contributions with
-/// `partial_cmp` and no ordering exists for NaN.
+/// Returns `(original_index, contribution)` pairs sorted descending. Uses a
+/// total order (`f64::total_cmp`) so non-finite contributions (from
+/// non-finite tolerance values in `dims`) sort deterministically instead of
+/// panicking.
 pub fn rank_contributors(dims: &[DimTol]) -> Vec<(usize, f64)> {
     let shares = rss_contributions(dims);
     let mut ranked: Vec<(usize, f64)> = shares.into_iter().enumerate().collect();
-    ranked.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+    ranked.sort_by(|a, b| b.1.total_cmp(&a.1));
     ranked
 }
 
@@ -438,6 +435,18 @@ mod tests {
         let shares: Vec<f64> = ranked.iter().map(|(_, s)| *s).collect();
         let sum: f64 = shares.iter().sum();
         assert_relative_eq!(sum, 1.0, epsilon = 1e-9);
+    }
+
+    #[test]
+    fn contributor_ranking_handles_non_finite_tolerance() {
+        let dims = vec![
+            DimTol::new("a", 10.0, 0.1),
+            DimTol::new("b", 20.0, f64::NAN),
+            DimTol::new("c", 5.0, 0.1),
+        ];
+        // Must not panic; NaN contributions sort deterministically via total_cmp.
+        let ranked = rank_contributors(&dims);
+        assert_eq!(ranked.len(), 3);
     }
 
     #[test]

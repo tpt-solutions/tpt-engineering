@@ -22,7 +22,9 @@ pub fn read_stl<P: AsRef<Path>>(path: P) -> Result<Mesh> {
     // dialect's 80-byte header is effectively never valid ASCII starting that
     // way in practice).
     let looks_ascii = data.len() >= 5
-        && data[..5].iter().all(|b| b.is_ascii_alphanumeric() || *b == b' ')
+        && data[..5]
+            .iter()
+            .all(|b| b.is_ascii_alphanumeric() || *b == b' ')
         && data[..5].eq_ignore_ascii_case(b"solid");
     if looks_ascii {
         let text = String::from_utf8_lossy(&data);

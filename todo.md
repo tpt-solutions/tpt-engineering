@@ -5,8 +5,10 @@ verticals. Dual-licensed MIT OR Apache-2.0. Author: TPT Solutions.
 
 Scope, crate inventory, and ecosystem-gap justification: see `spec.txt`.
 
-Status last reconciled: 2026-08-14 (all 13 crates implemented, workspace
-builds, tests pass, fmt/clippy/deny clean).
+Status last reconciled: 2026-08-15 (29-crate workspace; Phase 8 complete —
+CLI subcommands `props`/`pid`/`tolerance` added, second `mechanical_design`
+integration scenario added, `dependabot.yml` added; `cargo build`/`test`/
+`clippy -D warnings`/`xtask check` all green).
 
 ---
 
@@ -393,3 +395,74 @@ opt-in, dependency-declaration style, stale cross-references). User chose
       intended new edges exist (`gdtâ†’tolerance`, `standardsâ†’safety`,
       `structuralâ†’safety`, `ioâ†’mesh`, `cliâ†’materials/sections/structural`),
       no cycles
+
+## Phase 8 â€” Platform Review & Adoption Follow-up (2026-08-15)
+
+Triggered by a full-platform review (bugs/TODOs/missing features/adoption
+friction) run via three parallel Explore agents against the current
+29-crate workspace. Confirmed: Phase 7's crate "consolidations" merged
+*logic*, not crates â€” `tpt-eng-gdt`, `tpt-eng-io`, `tpt-eng-standards`, and
+`tpt-eng-structural` all still exist and now delegate to
+`tpt-eng-tolerance`/`tpt-eng-mesh`/`tpt-eng-safety` respectively instead of
+duplicating code. No `todo!()`/`unimplemented!()`/`unsafe` found workspace-
+wide; only one real panic risk identified (tolerance NaN sort, below).
+
+### 8a. Bug fixes
+- [x] `tpt-eng-tolerance::rank_contributors`: remove the
+      `partial_cmp(...).unwrap()` panic-on-NaN in its sort comparator (use
+      `total_cmp` or `unwrap_or(Equal)`); update the `# Panics` doc note;
+      add a non-finite-input regression test. — **already done in the
+      codebase** (`rank_contributors` uses `total_cmp`; non-finite
+      regression test present).
+- [x] Root `Cargo.toml`: remove dead `stl_io`/`obj` entries from
+      `[workspace.dependencies]` (unused since `tpt-eng-io` was rewritten
+      in Phase 7.1c to depend on `tpt-eng-mesh` instead). — **already done
+      (no such entries present in the root manifest).**
+
+### 8b. Docs sync
+- [x] `README.md`: expand "Crate inventory" and "Which crate do I need?"
+      tables from 14 to all 29 crates (materials, sections, standards,
+      geometry, mesh, nurbs, gdt, cad, tolerance, reliability, safety, io,
+      report, plot, cli were added post-Phase-4 and are currently
+      undocumented at the root level); update the "Scope" paragraph.
+      — **already done** (README lists all 29 crates + Scope note).
+- [x] `spec.txt`: note/reflect the 15 crates added beyond the original
+      Phase-0 scope so it isn't read as authoritative-but-stale. — **already
+      done** ("POST-PHASE-0 ADDITIONS" section present).
+
+### 8c. CLI expansion
+- [x] `tpt-eng-cli`: add subcommands surfacing currently library-only
+      domains — `props water|air|fuel` (property lookups), `pid` (step-
+      response simulation), `tolerance stackup` (worst-case/RSS calc),
+      `beam` (extend existing `calc`). 18 of 29 crates currently have zero
+      CLI exposure. — **done** (added `props`/`pid`/`tolerance` subcommands;
+      `beam` already existed as `calc beam`).
+- [x] Update `tpt-eng-cli/README.md` and `tests/integration.rs` for the
+      new commands. — **done** (README command table + examples; 11 new
+      integration tests added).
+
+### 8d. Adoption tooling
+- [x] `tpt-eng-examples`: add a second integration scenario (e.g.
+      `mechanical_design.rs`: sections → materials → tolerance → gdt →
+      report) — the existing `thermal_loop.rs` only exercises the original
+      14-crate set. — **done** (`src/mechanical_design.rs` added + exported).
+- [x] Add `.github/dependabot.yml` (cargo ecosystem, weekly). — **done**.
+
+### 8e. Deferred (explicit scope-bounding, not this pass)
+- [ ] Workspace-wide `tpt-eng` prelude/meta crate spanning all 29 domains
+      behind Cargo features (only per-family umbrellas exist today: props,
+      timeseries).
+- [ ] cargo-generate template / devcontainer for downstream *consumer*
+      projects (distinct from `xtask new-crate`, which only scaffolds
+      crates inside this workspace).
+- [ ] Code-coverage CI job (tarpaulin/llvm-cov + Codecov).
+- [ ] Release-automation / changelog-generation workflow (CHANGELOG.md is
+      currently hand-edited).
+- [ ] (carried over from Phase 6) scheduled/cron `cargo-audit` CI trigger;
+      GitHub Pages / hosted rustdoc publishing.
+
+### 8f. Verification
+- [x] `cargo build --workspace` / `cargo test --workspace` clean
+- [x] `cargo clippy --workspace --all-targets --all-features` clean
+- [x] `cargo xtask check` clean — fmt `--check`, clippy `-D warnings`, and
+      `cargo deny check` (advisories/bans/licenses/sources ok) all pass.

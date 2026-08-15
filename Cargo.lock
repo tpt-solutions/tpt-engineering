@@ -682,13 +682,19 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "rand",
  "serde_json",
+ "tpt-eng-controls",
  "tpt-eng-io",
  "tpt-eng-materials",
  "tpt-eng-plot",
+ "tpt-eng-props-air",
+ "tpt-eng-props-fuels",
+ "tpt-eng-props-water",
  "tpt-eng-report",
  "tpt-eng-sections",
  "tpt-eng-structural",
+ "tpt-eng-tolerance",
  "tpt-math-units",
 ]
 
@@ -704,13 +710,19 @@ name = "tpt-eng-examples"
 version = "0.1.0"
 dependencies = [
  "tpt-eng-controls",
+ "tpt-eng-gdt",
  "tpt-eng-geo-topology",
+ "tpt-eng-geometry",
+ "tpt-eng-materials",
  "tpt-eng-network-matrix",
  "tpt-eng-props-fuels",
+ "tpt-eng-report",
+ "tpt-eng-sections",
  "tpt-eng-structural",
  "tpt-eng-timeseries-align",
  "tpt-eng-timeseries-core",
  "tpt-eng-timeseries-gap",
+ "tpt-eng-tolerance",
  "tpt-math-units",
 ]
 

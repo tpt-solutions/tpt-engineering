@@ -9,9 +9,9 @@
 //! magnitude by round-tripping through the SI uom quantities via `.get::<pascal>()`
 //! / `.get::<meter>()`, so the stored `value` is always the genuine SI scalar.
 
+use thiserror::Error;
 use tpt_math_units::uom::si::f64::{Length as UomLength, Pressure as UomPressure};
 use tpt_math_units::uom::si::{length::meter, pressure::pascal};
-use thiserror::Error;
 
 /// The physical dimension a [`Quantity`] is expressed in.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
