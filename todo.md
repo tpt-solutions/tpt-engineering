@@ -523,24 +523,72 @@ registered in the workspace `members`/`[workspace.dependencies]` lists.
 Foundational crates must land first since most domain crates depend on them.
 
 New Foundational Primitives:
-- [ ] `tpt-eng-electrical` — no deps beyond `tpt-math-units`, `tpt-math-numeric`
-- [ ] `tpt-eng-heat-transfer` — depends on `tpt-eng-props-air`, `tpt-eng-props-water`
-- [ ] `tpt-eng-props-mixture` — no_std; depends on `tpt-math-units`; wire into
-      the `tpt-eng-props` umbrella's re-exports alongside water/air/fuels
+- [ ] `tpt-eng-electrical` — no deps beyond `tpt-math-units`, `tpt-math-numeric`.
+      Impedance/reactance (R/L/C, series/parallel combination), per-unit
+      system conversions, three-phase (balanced) power calculations,
+      conductor/insulator base property lookups (resistivity, dielectric
+      constant, ampacity) with `DataSource` provenance like `tpt-eng-materials`.
+- [ ] `tpt-eng-heat-transfer` — depends on `tpt-eng-props-air`, `tpt-eng-props-water`.
+      Convection correlations (Nu/Re/Pr for flat plate, cylinder, sphere,
+      internal pipe flow — laminar and turbulent), 1D and radial (cylindrical
+      shell) conduction, radiation view factors and black/grey-body exchange,
+      thermal-resistance-network composition (series/parallel R_th).
+- [ ] `tpt-eng-props-mixture` — no_std; depends on `tpt-math-units`. General
+      real-gas equation-of-state property lookups (e.g. Peng-Robinson or
+      similar) and basic VLE (bubble/dew point, K-values) for arbitrary
+      user-defined process fluids/mixtures; wire into the `tpt-eng-props`
+      umbrella's re-exports alongside water/air/fuels.
 
 Domain-Specific Component Models (can be scaffolded in parallel once the
 foundational crates above are registered):
-- [ ] `tpt-eng-pcb` — depends on `tpt-eng-electrical`, `tpt-eng-materials`
-- [ ] `tpt-eng-thermal-mgmt` — depends on `tpt-eng-heat-transfer`, `tpt-eng-props-air`
-- [ ] `tpt-eng-power-components` — depends on `tpt-eng-electrical`
-- [ ] `tpt-eng-renewables` — depends on `tpt-eng-electrical`, `tpt-eng-props-air`, `tpt-eng-reliability`
-- [ ] `tpt-eng-vehicle-dynamics` — depends on `tpt-eng-geometry`, `tpt-eng-structural`, `tpt-math-linalg`
-- [ ] `tpt-eng-biomech` — depends on `tpt-eng-materials`, `tpt-eng-geometry`
-- [ ] `tpt-eng-unit-ops` — depends on `tpt-eng-props`, `tpt-eng-heat-transfer`
-- [ ] `tpt-eng-crystallography` — depends on `tpt-eng-geometry`
-- [ ] `tpt-eng-geotech` — depends on `tpt-eng-materials`, `tpt-math-linalg`
-- [ ] `tpt-eng-building-sys` — depends on `tpt-eng-props-air`, `tpt-eng-heat-transfer`, `tpt-eng-electrical`
-- [ ] `tpt-eng-schedule` — depends on `tpt-math-numeric` only
+- [ ] `tpt-eng-pcb` — depends on `tpt-eng-electrical`, `tpt-eng-materials`.
+      PCB layer stackup definitions (copper/dielectric layer ordering,
+      thickness), trace routing primitives (width/spacing/current-capacity
+      via `tpt-eng-electrical` ampacity), via and footprint (pad/hole)
+      geometry definitions.
+- [ ] `tpt-eng-thermal-mgmt` — depends on `tpt-eng-heat-transfer`, `tpt-eng-props-air`.
+      Heat sink sizing (fin arrays, base spreading resistance), fan curves
+      (pressure-flow characteristic, operating-point intersection), and
+      thermal-resistance-network assembly for electronics/enclosure cooling.
+- [ ] `tpt-eng-power-components` — depends on `tpt-eng-electrical`.
+      Transformer equivalent-circuit models (turns ratio, leakage/magnetizing
+      impedance), synchronous/induction generator models, transmission-line
+      parameters (series impedance, shunt admittance per unit length).
+- [ ] `tpt-eng-renewables` — depends on `tpt-eng-electrical`, `tpt-eng-props-air`, `tpt-eng-reliability`.
+      Solar PV I-V/P-V curve models (single-diode equivalent circuit), wind
+      turbine power curves (cut-in/rated/cut-out, Betz-limited power),
+      battery degradation/cycle-life models built on `tpt-eng-reliability`'s
+      life-distribution machinery.
+- [ ] `tpt-eng-vehicle-dynamics` — depends on `tpt-eng-geometry`, `tpt-eng-structural`, `tpt-math-linalg`.
+      Tire force models (Pacejka "magic formula"), aerodynamic drag/lift
+      coefficients, suspension kinematics (double-wishbone/MacPherson
+      geometry, roll-center calculation).
+- [ ] `tpt-eng-biomech` — depends on `tpt-eng-materials`, `tpt-eng-geometry`.
+      Hyperelastic tissue constitutive models (Mooney-Rivlin, Ogden strain-
+      energy functions and stress-strain evaluation), implant geometry
+      primitives (stem/cup/plate parametric shapes) built on `tpt-eng-geometry`.
+- [ ] `tpt-eng-unit-ops` — depends on `tpt-eng-props`, `tpt-eng-heat-transfer`.
+      Distillation column stage-by-stage (McCabe-Thiele style) calculations,
+      shell-and-tube/plate heat exchanger sizing via LMTD and ε-NTU methods,
+      pump/compressor performance-curve fitting and operating-point solving.
+- [ ] `tpt-eng-crystallography` — depends on `tpt-eng-geometry`.
+      Miller index notation and plane/direction vector conversion, slip
+      system enumeration for common crystal structures (FCC/BCC/HCP), crystal
+      symmetry operations (point groups) over `tpt-eng-geometry` frames.
+- [ ] `tpt-eng-geotech` — depends on `tpt-eng-materials`, `tpt-math-linalg`.
+      Soil constitutive models (Mohr-Coulomb failure envelope, Cam-Clay
+      critical-state model), borehole/stratigraphy data structures (layer
+      depth, soil classification, index properties) with `tpt-eng-materials`
+      provenance tracking.
+- [ ] `tpt-eng-building-sys` — depends on `tpt-eng-props-air`, `tpt-eng-heat-transfer`, `tpt-eng-electrical`.
+      HVAC load calculation (envelope conduction/infiltration/internal gains
+      via `tpt-eng-heat-transfer` + `tpt-eng-props-air`), plumbing fixture-unit
+      sizing tables, electrical panel scheduling (circuit/branch load
+      tabulation via `tpt-eng-electrical`).
+- [ ] `tpt-eng-schedule` — depends on `tpt-math-numeric` only. CPM/PERT
+      network construction (activity-on-node, forward/backward pass, float
+      calculation), resource leveling, Earned Value Management metrics
+      (PV/EV/AC, CPI/SPI).
 
 ### 9d. Explicitly deferred
 - [ ] Implement each crate's actual domain logic (scaffolding above only
