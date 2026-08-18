@@ -466,3 +466,88 @@ wide; only one real panic risk identified (tolerance NaN sort, below).
 - [x] `cargo clippy --workspace --all-targets --all-features` clean
 - [x] `cargo xtask check` clean — fmt `--check`, clippy `-D warnings`, and
       `cargo deny check` (advisories/bans/licenses/sources ok) all pass.
+
+## Phase 9 — Expanded-Vision Crate Planning (2026-08-18)
+
+Triggered by `spec2.txt`, which proposes 11 new "Domain-Specific Component
+Models" crates extending the workspace from mechanical/civil/general
+engineering into electronics, energy, transport, medical, process, and
+earth verticals (pcb, thermal-mgmt, power-components, renewables,
+vehicle-dynamics, biomech, unit-ops, crystallography, geotech,
+building-sys, schedule). This phase is **planning/docs-only** — no crates
+were scaffolded or implemented.
+
+### 9a. Gap analysis
+Reviewing spec2.txt against the existing layering (props-* for fluid data,
+materials/sections/structural for mechanical, controls for systems theory)
+found that several of the 11 proposed crates assume foundational primitives
+that don't exist anywhere in the workspace today:
+- **Electrical/electronics base math** — `tpt-eng-pcb`,
+  `tpt-eng-power-components`, `tpt-eng-renewables`, and
+  `tpt-eng-building-sys` all need impedance, per-unit systems, and
+  three-phase power math. `tpt-eng-controls` is transfer-function/
+  state-space systems theory, not circuit analysis — nothing else covers
+  this.
+- **Heat-transfer correlations** — `tpt-eng-thermal-mgmt`,
+  `tpt-eng-unit-ops`, and `tpt-eng-building-sys` all need convection/
+  conduction correlations (Nu/Re/Pr, radiation view factors).
+  `tpt-eng-props-water`/`-air` are property *tables*, not transfer-rate
+  correlations.
+- **General process-fluid properties** — `tpt-eng-unit-ops` needs real-gas/
+  VLE property data for arbitrary process streams, beyond the three
+  specific media (water/steam, moist air, combustion fuels) covered today.
+
+### 9b. Decision
+Add foundational crates for the electrical and heat-transfer gaps
+(following the existing props/materials/sections layering pattern rather
+than letting each domain crate re-derive the same math), plus a general
+process-fluid props crate for the mixture gap. Finalized list — 14 new
+crates total, recorded in `spec2.txt` (§3, §4):
+
+- New Foundational Primitives: `tpt-eng-electrical`, `tpt-eng-heat-transfer`,
+  `tpt-eng-props-mixture` (joins the `tpt-eng-props` umbrella).
+- Domain-Specific Component Models (spec2.txt's original 11, now with
+  dependency edges onto the foundational crates and existing crates —
+  see spec2.txt's updated table for the full per-crate dependency list).
+
+`tpt-eng-biomech`'s hyperelastic constitutive models (Mooney-Rivlin, Ogden)
+stay domain-local rather than folding into `tpt-eng-materials`, matching
+the precedent of `tpt-eng-structural` keeping its own closed-form beam
+math instead of depending on a general FEM crate.
+
+### 9c. Crate scaffolding
+Each crate gets scaffolded with `cargo xtask new-crate <tpt-eng-name>`
+(Cargo.toml + src/lib.rs + README.md + tests/basic.rs + examples/basic.rs),
+then wired to the dependencies listed in spec2.txt's updated tables and
+registered in the workspace `members`/`[workspace.dependencies]` lists.
+Foundational crates must land first since most domain crates depend on them.
+
+New Foundational Primitives:
+- [ ] `tpt-eng-electrical` — no deps beyond `tpt-math-units`, `tpt-math-numeric`
+- [ ] `tpt-eng-heat-transfer` — depends on `tpt-eng-props-air`, `tpt-eng-props-water`
+- [ ] `tpt-eng-props-mixture` — no_std; depends on `tpt-math-units`; wire into
+      the `tpt-eng-props` umbrella's re-exports alongside water/air/fuels
+
+Domain-Specific Component Models (can be scaffolded in parallel once the
+foundational crates above are registered):
+- [ ] `tpt-eng-pcb` — depends on `tpt-eng-electrical`, `tpt-eng-materials`
+- [ ] `tpt-eng-thermal-mgmt` — depends on `tpt-eng-heat-transfer`, `tpt-eng-props-air`
+- [ ] `tpt-eng-power-components` — depends on `tpt-eng-electrical`
+- [ ] `tpt-eng-renewables` — depends on `tpt-eng-electrical`, `tpt-eng-props-air`, `tpt-eng-reliability`
+- [ ] `tpt-eng-vehicle-dynamics` — depends on `tpt-eng-geometry`, `tpt-eng-structural`, `tpt-math-linalg`
+- [ ] `tpt-eng-biomech` — depends on `tpt-eng-materials`, `tpt-eng-geometry`
+- [ ] `tpt-eng-unit-ops` — depends on `tpt-eng-props`, `tpt-eng-heat-transfer`
+- [ ] `tpt-eng-crystallography` — depends on `tpt-eng-geometry`
+- [ ] `tpt-eng-geotech` — depends on `tpt-eng-materials`, `tpt-math-linalg`
+- [ ] `tpt-eng-building-sys` — depends on `tpt-eng-props-air`, `tpt-eng-heat-transfer`, `tpt-eng-electrical`
+- [ ] `tpt-eng-schedule` — depends on `tpt-math-numeric` only
+
+### 9d. Explicitly deferred
+- [ ] Implement each crate's actual domain logic (scaffolding above only
+      produces empty-but-building stubs) — separate follow-up
+      implementation task per crate/family.
+- [ ] Update `CRATE_AUDIT.md` and root `README.md` crate tables once the
+      new crates exist.
+- [ ] `cargo build --workspace` / `cargo test --workspace` /
+      `cargo xtask check` clean after all 14 crates are scaffolded and
+      registered.

@@ -1,0 +1,97 @@
+# tpt-engineering Specification
+
+## 1. Purpose
+Applied engineering primitives for the TPT Solutions physical-systems verticals. A set of small, single-purpose `tpt-eng-*` crates providing reusable engineering maths — fluid/gas properties, time-series, infrastructure topology, controls, structural/mechanical, geometry/CAD, and domain-specific component models.
+
+## 2. Scope & Boundaries
+- IN SCOPE: Reusable engineering calculations, property databases, component models, and geometric primitives.
+- OUT OF SCOPE: Full system simulation, FEM solving, or domain-specific orchestration (delegated to Tier 1.5 and Tier 2).
+- DEPENDS ON: `tpt-math` (units, linalg, numeric, stats).
+
+## 3. Crate Inventory
+
+### Core Engineering Primitives
+| Crate | Domain | no_std | Description |
+|---|---|---|---|
+| `tpt-eng-props-water` | fluid | yes | IAPWS-IF97 water/steam property tables. |
+| `tpt-eng-props-air` | fluid | yes | ASHRAE psychrometrics / moist-air. |
+| `tpt-eng-props-fuels` | fluid | yes | Fuel heating values, density, combustion. |
+| `tpt-eng-props-mixture` | fluid | yes | General real-gas / VLE property lookups for arbitrary process fluids (see New Foundational Primitives). |
+| `tpt-eng-props` | fluid | yes | Umbrella: re-exports water + air + fuels + mixture. |
+| `tpt-eng-timeseries-*` | timeseries | no | Core, align, gap, umbrella for sensor streams. |
+| `tpt-eng-geo-*` | geo/topology | no | Asset registry, directional graphs, network matrices. |
+| `tpt-eng-controls` | controls | no | PID / state-space / transfer-function. |
+
+### New Foundational Primitives (required by the Domain-Specific Component Models below)
+| Crate | Domain | no_std | Description | Depends on |
+|---|---|---|---|---|
+| `tpt-eng-electrical` | electrical | no | Impedance/reactance, per-unit systems, three-phase power, conductor/insulator property lookups. | `tpt-math-units`, `tpt-math-numeric` |
+| `tpt-eng-heat-transfer` | thermal | no | Convection correlations (Nu/Re/Pr for common geometries), 1D/radial conduction, radiation view factors. | `tpt-math-units`, `tpt-eng-props-air`, `tpt-eng-props-water` |
+| `tpt-eng-props-mixture` | fluid | yes | General real-gas / VLE property lookups for arbitrary process fluids; joins the `tpt-eng-props` umbrella alongside water/air/fuels. | `tpt-math-units` |
+
+None of the existing crates provide circuit math, transfer-rate
+correlations, or general/multi-component fluid properties: `tpt-eng-controls`
+is transfer-function/state-space systems theory (not circuit analysis), and
+`tpt-eng-props-water`/`-air` are property *tables* for two specific media
+(not convection/conduction correlations or arbitrary-fluid data). These
+three crates close that gap so the Domain-Specific Component Models below
+can depend on them instead of each re-deriving the same math.
+
+### Structural & Mechanical
+| Crate | Domain | no_std | Description |
+|---|---|---|---|
+| `tpt-eng-structural` | structural | no | Loads, beam/frame analysis, code checks. |
+| `tpt-eng-materials` | structural | no | Material property library + data provenance. |
+| `tpt-eng-sections` | structural | no | Cross-section properties (rect/circle/I-section). |
+| `tpt-eng-standards` | structural | no | Load cases, design factors, code-check results. |
+| `tpt-eng-tolerance` | structural | no | 1-D dimensional tolerance stack-up. |
+| `tpt-eng-gdt` | structural | no | GD&T data model. |
+| `tpt-eng-reliability` | structural | no | Fatigue, Weibull, FMEA. |
+| `tpt-eng-safety` | structural | no | Limit-state margins / utilization ratios. |
+
+### Geometry & CAD
+| Crate | Domain | no_std | Description |
+|---|---|---|---|
+| `tpt-eng-geometry` | geometry | no | Points, vectors, frames. |
+| `tpt-eng-nurbs` | geometry | no | B-spline / NURBS curves and surfaces. |
+| `tpt-eng-mesh` | geometry | no | Triangle mesh data structure, quality/repair. |
+| `tpt-eng-cad` | geometry | no | SDF solid modeling / CSG. |
+| `tpt-eng-io` | geometry | no | STL/OBJ/JSON/CSV file I/O. |
+
+### Domain-Specific Component Models (New)
+| Crate | Domain | no_std | Description | Depends on (beyond `tpt-math-*`) |
+|---|---|---|---|---|
+| `tpt-eng-pcb` | electronics | no | PCB layer stackup, trace routing primitives, via/footprint definitions. | `tpt-eng-electrical`, `tpt-eng-materials` |
+| `tpt-eng-thermal-mgmt` | cross-domain | no | Heat sink sizing, fan curves, thermal resistance networks. | `tpt-eng-heat-transfer`, `tpt-eng-props-air` |
+| `tpt-eng-power-components` | energy | no | Transformer equivalent circuits, generator models, transmission line parameters. | `tpt-eng-electrical` |
+| `tpt-eng-renewables` | energy | no | Solar PV I-V curves, wind turbine power curves, battery degradation models. | `tpt-eng-electrical`, `tpt-eng-props-air`, `tpt-eng-reliability` (battery degradation as a life/fatigue model) |
+| `tpt-eng-vehicle-dynamics` | transport | no | Tire models (Pacejka), aerodynamic drag, suspension kinematics. | `tpt-eng-geometry`, `tpt-eng-structural`, `tpt-math-linalg` |
+| `tpt-eng-biomech` | medical | no | Tissue material models (Mooney-Rivlin, Ogden), implant geometry libraries. | `tpt-eng-materials`, `tpt-eng-geometry` (hyperelastic constitutive models stay domain-local, same precedent as `tpt-eng-structural`'s own closed-form beam math) |
+| `tpt-eng-unit-ops` | process | no | Distillation column stages, heat exchanger LMTD/ε-NTU, pump/compressor curves. | `tpt-eng-props` (water/air/fuels/mixture), `tpt-eng-heat-transfer` |
+| `tpt-eng-crystallography` | materials | no | Miller indices, slip systems, crystal symmetry operations. | `tpt-eng-geometry` |
+| `tpt-eng-geotech` | earth | no | Soil constitutive models (Mohr-Coulomb, Cam-Clay), borehole stratigraphy. | `tpt-eng-materials`, `tpt-math-linalg` |
+| `tpt-eng-building-sys` | construction | no | HVAC load calculation, plumbing fixture units, electrical panel scheduling. | `tpt-eng-props-air`, `tpt-eng-heat-transfer`, `tpt-eng-electrical` |
+| `tpt-eng-schedule` | construction | no | CPM/PERT network construction, resource leveling, Earned Value Management. | `tpt-math-numeric` only (no engineering-domain deps) |
+
+### Output & Integration
+| Crate | Domain | no_std | Description |
+|---|---|---|---|
+| `tpt-eng-plot` | output | no | Charts and section drawings. |
+| `tpt-eng-report` | output | no | Markdown/HTML/JSON calculation reports. |
+| `tpt-eng-cli` | integration | no | Command-line tool over the above. |
+| `tpt-eng-examples` | integration | no | Cross-crate scenarios. |
+
+## 4. Build Order
+1. Core primitives (props, timeseries, geo, controls).
+2. Structural & Mechanical crates.
+3. Geometry & CAD crates.
+4. New Foundational Primitives (`tpt-eng-electrical`, `tpt-eng-heat-transfer`,
+   `tpt-eng-props-mixture`) — must land before step 5, since most of its
+   crates depend on these.
+5. Domain-Specific Component Models (can be built in parallel with each
+   other once step 4 is complete).
+6. Output & Integration crates.
+
+## 5. Downstream Consumption
+- Tier 1.5 (`tpt-systems-optimization`, `tpt-thermodynamics`) consumes core primitives.
+- Tier 2 consumes domain-specific models (e.g., `tpt-energy` uses `tpt-eng-renewables`, `tpt-medical` uses `tpt-eng-biomech`).
