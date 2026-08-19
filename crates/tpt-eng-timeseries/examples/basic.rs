@@ -19,7 +19,10 @@ fn main() {
 
     println!("    t |  a |  b");
     for i in 0..grid.len() {
-        println!("{:5.1} | {:.2} | {:.2}", grid[i], aligned[0][i], aligned[1][i]);
+        println!(
+            "{:5.1} | {:.2} | {:.2}",
+            grid[i], aligned[0][i], aligned[1][i]
+        );
     }
 
     assert_eq!(aligned[1], vec![10.0, 15.0, 20.0]);

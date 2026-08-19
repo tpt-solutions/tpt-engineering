@@ -23,10 +23,7 @@ fn main() {
 
     // The centre should be the bilinear blend of the four corners: z = 0.125.
     let c = surface.eval(0.5, 0.5);
-    println!(
-        "surface centre = ({:.3},{:.3},{:.3})",
-        c.x, c.y, c.z
-    );
+    println!("surface centre = ({:.3},{:.3},{:.3})", c.x, c.y, c.z);
 
     // Tessellate to a triangle mesh and inspect it.
     let mesh = surface.tessellate(12, 12);
@@ -37,13 +34,14 @@ fn main() {
     );
 
     // Sweep the u-direction: sample the two boundary edges.
-    let edge0: Vec<Point3> = (0..=10).map(|i| surface.eval(0.0, i as f32 / 10.0)).collect();
-    let edge1: Vec<Point3> = (0..=10).map(|i| surface.eval(1.0, i as f32 / 10.0)).collect();
+    let edge0: Vec<Point3> = (0..=10)
+        .map(|i| surface.eval(0.0, i as f32 / 10.0))
+        .collect();
+    let edge1: Vec<Point3> = (0..=10)
+        .map(|i| surface.eval(1.0, i as f32 / 10.0))
+        .collect();
     let span = edge0[0].distance(edge1[0]);
-    println!(
-        "surface spans {:.3} in x at v=0 (expected ~1.0)",
-        span
-    );
+    println!("surface spans {:.3} in x at v=0 (expected ~1.0)", span);
 
     // Export the tessellation to a temp STL via the mesh crate.
     let dir = std::env::temp_dir();

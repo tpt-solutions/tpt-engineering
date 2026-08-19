@@ -1,11 +1,11 @@
 //! Runnable example: heat loss from an insulated hot-water pipe (combined
 //! convection, radial conduction and radiation in series).
 
+use std::f64::consts::PI;
 use tpt_eng_heat_transfer::{
     critical_insulation_radius, cylindrical_shell_resistance, heat_rate, nusselt_cylinder,
     parallel_grey_plates_flux, series_resistances,
 };
-use std::f64::consts::PI;
 
 fn main() {
     let l = 1.0; // per metre of pipe

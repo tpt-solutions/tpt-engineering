@@ -21,7 +21,10 @@ fn main() {
 
     // Tapered hip-implant stem: 120 mm long, 14 mm proximal, 9 mm distal.
     let stem = Stem::new(0.120, 0.014, 0.009, Frame3::from_origin(Point3::ZERO));
-    println!("Stem volume          : {:.3} cm^3", stem.volume_approx() * 1e6);
+    println!(
+        "Stem volume          : {:.3} cm^3",
+        stem.volume_approx() * 1e6
+    );
     let axis = stem.axis_world();
     println!(
         "Stem axis (world)    : ({:.3}, {:.3}, {:.3})",
@@ -30,6 +33,12 @@ fn main() {
 
     // Hemispherical acetabular cup: 28 mm inner radius, 32 mm outer radius.
     let cup = Cup::new(0.028, 0.032, 90.0, Frame3::from_origin(Point3::ZERO));
-    println!("Cup bearing area     : {:.3} cm^2", cup.surface_area() * 1e4);
-    println!("Cup wall thickness   : {:.3} mm", cup.wall_thickness() * 1e3);
+    println!(
+        "Cup bearing area     : {:.3} cm^2",
+        cup.surface_area() * 1e4
+    );
+    println!(
+        "Cup wall thickness   : {:.3} mm",
+        cup.wall_thickness() * 1e3
+    );
 }

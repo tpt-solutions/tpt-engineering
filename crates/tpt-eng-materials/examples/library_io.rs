@@ -12,42 +12,46 @@ fn catalogue() -> MaterialLibrary {
     let mut lib = MaterialLibrary::new();
 
     lib.add(
-        Material::new("steel-s355", "S355 structural steel", MaterialCategory::Metal)
-            .with_source(DataSource::standard("EN 10025-2 (user-entered)"))
-            .with_property(
-                "youngs-modulus",
-                Property::Scalar {
-                    value: 210.0,
-                    unit: "GPa".into(),
-                },
-            )
-            .with_property(
-                "density",
-                Property::Scalar {
-                    value: 7850.0,
-                    unit: "kg/m^3".into(),
-                },
-            )
-            .with_property(
-                "yield-strength",
-                Property::TemperatureDependent {
-                    unit: "MPa".into(),
-                    points: vec![
-                        TempPoint {
-                            temp: 20.0,
-                            value: 355.0,
-                        },
-                        TempPoint {
-                            temp: 300.0,
-                            value: 280.0,
-                        },
-                        TempPoint {
-                            temp: 600.0,
-                            value: 110.0,
-                        },
-                    ],
-                },
-            ),
+        Material::new(
+            "steel-s355",
+            "S355 structural steel",
+            MaterialCategory::Metal,
+        )
+        .with_source(DataSource::standard("EN 10025-2 (user-entered)"))
+        .with_property(
+            "youngs-modulus",
+            Property::Scalar {
+                value: 210.0,
+                unit: "GPa".into(),
+            },
+        )
+        .with_property(
+            "density",
+            Property::Scalar {
+                value: 7850.0,
+                unit: "kg/m^3".into(),
+            },
+        )
+        .with_property(
+            "yield-strength",
+            Property::TemperatureDependent {
+                unit: "MPa".into(),
+                points: vec![
+                    TempPoint {
+                        temp: 20.0,
+                        value: 355.0,
+                    },
+                    TempPoint {
+                        temp: 300.0,
+                        value: 280.0,
+                    },
+                    TempPoint {
+                        temp: 600.0,
+                        value: 110.0,
+                    },
+                ],
+            },
+        ),
     );
 
     lib.add(
@@ -90,22 +94,26 @@ fn catalogue() -> MaterialLibrary {
     );
 
     lib.add(
-        Material::new("concrete-c30", "Concrete C30/37", MaterialCategory::Concrete)
-            .with_source(DataSource::standard("project mix design (user-entered)"))
-            .with_property(
-                "youngs-modulus",
-                Property::Scalar {
-                    value: 33.0,
-                    unit: "GPa".into(),
-                },
-            )
-            .with_property(
-                "density",
-                Property::Scalar {
-                    value: 2400.0,
-                    unit: "kg/m^3".into(),
-                },
-            ),
+        Material::new(
+            "concrete-c30",
+            "Concrete C30/37",
+            MaterialCategory::Concrete,
+        )
+        .with_source(DataSource::standard("project mix design (user-entered)"))
+        .with_property(
+            "youngs-modulus",
+            Property::Scalar {
+                value: 33.0,
+                unit: "GPa".into(),
+            },
+        )
+        .with_property(
+            "density",
+            Property::Scalar {
+                value: 2400.0,
+                unit: "kg/m^3".into(),
+            },
+        ),
     );
 
     let mut timber = Material::new("glulam-gl28h", "Glulam GL28h", MaterialCategory::Wood)
@@ -140,7 +148,10 @@ fn main() {
 
     // --- 1. Specific stiffness ranking (E / density), a common screening step ---
     println!();
-    println!("{:<24} {:>10} {:>12} {:>14}", "material", "E [GPa]", "rho [kg/m3]", "E/rho [MJ/kg]");
+    println!(
+        "{:<24} {:>10} {:>12} {:>14}",
+        "material", "E [GPa]", "rho [kg/m3]", "E/rho [MJ/kg]"
+    );
     let mut ranked: Vec<(&str, f64, f64)> = lib
         .materials
         .iter()
@@ -153,7 +164,10 @@ fn main() {
     ranked.sort_by(|a, b| (b.1 / b.2).total_cmp(&(a.1 / a.2)));
     for (name, e, rho) in &ranked {
         // E in GPa over density in kg/m^3 gives MJ/kg (1 GPa/(kg/m^3) = 1 MJ/kg).
-        println!("{name:<24} {e:>10.3} {rho:>12.3} {:>14.3}", e / rho * 1000.0);
+        println!(
+            "{name:<24} {e:>10.3} {rho:>12.3} {:>14.3}",
+            e / rho * 1000.0
+        );
     }
 
     // --- 2. Elevated-temperature strength retention ---

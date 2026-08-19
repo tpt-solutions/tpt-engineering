@@ -6,7 +6,10 @@ fn main() {
     // Forced convection over a flat plate (laminar boundary layer).
     let nu = nusselt_flat_plate(1e5, 0.7, FlowRegime::Laminar);
     let h = convection_coefficient(nu, 0.026, 1.0);
-    println!("Flat plate (Re=1e5, Pr=0.7): Nu = {:.1}, h = {:.2} W/m²K", nu, h);
+    println!(
+        "Flat plate (Re=1e5, Pr=0.7): Nu = {:.1}, h = {:.2} W/m²K",
+        nu, h
+    );
 
     // External cylinder (Churchill–Bernstein).
     let nu_c = nusselt_cylinder(1e4, 0.7);
@@ -37,7 +40,10 @@ fn main() {
     // Series + parallel resistance networks.
     let r_total = series_resistances(&[r_wall, r_shell]);
     let r_par = parallel_resistances(&[0.2, 0.3]).unwrap();
-    println!("Series R = {:.3} K/W, parallel R = {:.3} K/W", r_total, r_par);
+    println!(
+        "Series R = {:.3} K/W, parallel R = {:.3} K/W",
+        r_total, r_par
+    );
     println!(
         "Heat rate across ΔT=10 K, R=0.5 K/W = {:.0} W",
         heat_rate(10.0, &[0.2, 0.3])

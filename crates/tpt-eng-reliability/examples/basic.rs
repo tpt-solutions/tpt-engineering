@@ -5,8 +5,8 @@
 
 use tpt_eng_reliability::{
     FmeaItem, basquin_cycles, basquin_stress, exponential_mean, exponential_reliability,
-    miners_rule, prob_failure_below, rank_by_rpn, reliability_strength_vs_stress,
-    weibull_b_life, weibull_mean, weibull_reliability,
+    miners_rule, prob_failure_below, rank_by_rpn, reliability_strength_vs_stress, weibull_b_life,
+    weibull_mean, weibull_reliability,
 };
 
 fn main() {
@@ -26,9 +26,7 @@ fn main() {
     let r = weibull_reliability(1000.0, 5000.0, 1.5).unwrap();
     let b10 = weibull_b_life(10.0, 5000.0, 1.5).unwrap();
     let mean = weibull_mean(5000.0, 1.5).unwrap();
-    println!(
-        "Weibull(eta=5000, beta=1.5): R(1000) = {r:.3}, B10 = {b10:.1} h, mean = {mean:.1} h"
-    );
+    println!("Weibull(eta=5000, beta=1.5): R(1000) = {r:.3}, B10 = {b10:.1} h, mean = {mean:.1} h");
 
     let er = exponential_reliability(1000.0, 1e-4).unwrap();
     let em = exponential_mean(1e-4).unwrap();
@@ -56,7 +54,5 @@ fn main() {
     // Strength S ~ N(100, 8), stress L ~ N(70, 10).
     let r_ss = reliability_strength_vs_stress(100.0, 8.0, 70.0, 10.0);
     let p_below = prob_failure_below(100.0, 8.0, 85.0);
-    println!(
-        "Strength>stress reliability = {r_ss:.3}, P(S < 85) = {p_below:.3}"
-    );
+    println!("Strength>stress reliability = {r_ss:.3}, P(S < 85) = {p_below:.3}");
 }

@@ -4,8 +4,8 @@
 // interplanar spacings, and verifies the cubic symmetry operations.
 
 use tpt_eng_crystallography::{
-    apply_symmetry, bcc_slip_systems, cubic_symmetry_matrices, d_spacing, fcc_slip_systems,
-    hcp_slip_systems, rotation_3fold_111, Miller,
+    Miller, apply_symmetry, bcc_slip_systems, cubic_symmetry_matrices, d_spacing, fcc_slip_systems,
+    hcp_slip_systems, rotation_3fold_111,
 };
 use tpt_eng_geometry::Vector3;
 

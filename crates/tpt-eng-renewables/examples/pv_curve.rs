@@ -54,13 +54,14 @@ fn main() {
 
     let i_sc_module = cell.current_at(0.0, g, temp_c);
     println!("\n  Short-circuit current      : {i_sc_module:.3} A");
-    println!(
-        "  Maximum power point        : V = {v_mpp:.3} V, I = {i_mpp:.3} A, P = {p_max:.3} W"
-    );
+    println!("  Maximum power point        : V = {v_mpp:.3} V, I = {i_mpp:.3} A, P = {p_max:.3} W");
     let fill = p_max / (v_oc_module * i_sc_module);
     println!("  Fill factor                : {fill:.3}");
 
     // Compare against standard-test-conditions reference. 60 cells ≈ 36 V module.
     let v_oc_stc = cell.voc_ref * n_cells as f64;
-    println!("\n  Reference Voc @ STC        : {v_oc_stc:.3} V (≈ {:.0} V class module)", v_oc_stc);
+    println!(
+        "\n  Reference Voc @ STC        : {v_oc_stc:.3} V (≈ {:.0} V class module)",
+        v_oc_stc
+    );
 }

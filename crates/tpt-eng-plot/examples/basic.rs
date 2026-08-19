@@ -4,9 +4,7 @@
 //!
 //! Run with: `cargo run --example basic -p tpt-eng-plot`
 
-use tpt_eng_plot::{
-    Drawing, ResultChart, SectionDrawing, SectionShape, XyPlot, XySeries,
-};
+use tpt_eng_plot::{Drawing, ResultChart, SectionDrawing, SectionShape, XyPlot, XySeries};
 
 fn main() {
     let dir = std::env::temp_dir();
@@ -14,17 +12,21 @@ fn main() {
     // Multi-series XY plot.
     let sine = XySeries::new(
         "sin",
-        (0..100).map(|i| {
-            let x = i as f64 / 10.0;
-            (x, x.sin())
-        }).collect(),
+        (0..100)
+            .map(|i| {
+                let x = i as f64 / 10.0;
+                (x, x.sin())
+            })
+            .collect(),
     );
     let cosine = XySeries::new(
         "cos",
-        (0..100).map(|i| {
-            let x = i as f64 / 10.0;
-            (x, x.cos())
-        }).collect(),
+        (0..100)
+            .map(|i| {
+                let x = i as f64 / 10.0;
+                (x, x.cos())
+            })
+            .collect(),
     )
     .with_color(plotters::prelude::BLUE);
     let xy = XyPlot::new("Trigonometry")

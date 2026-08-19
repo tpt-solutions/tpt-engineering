@@ -3,16 +3,36 @@
 //! Registers a small geographic asset registry, looks assets up by id, and runs
 //! the haversine-based spatial queries (`nearest`, `within_radius`).
 
-use tpt_eng_geo_asset::{haversine, Asset, AssetKind, AssetRegistry, GeoCoord};
+use tpt_eng_geo_asset::{Asset, AssetKind, AssetRegistry, GeoCoord, haversine};
 
 fn main() {
     let mut reg = AssetRegistry::new();
 
     // A handful of field devices scattered around a city centre.
-    reg.register(Asset::new("meter-01", AssetKind::Meter, GeoCoord::new(-36.852, 174.764), "node-a"));
-    reg.register(Asset::new("sensor-02", AssetKind::Sensor, GeoCoord::new(-36.858, 174.770), "node-b"));
-    reg.register(Asset::new("pump-03", AssetKind::Actuator, GeoCoord::new(-36.844, 174.758), "node-c"));
-    reg.register(Asset::new("tee-04", AssetKind::Junction, GeoCoord::new(-36.850, 174.780), "node-c"));
+    reg.register(Asset::new(
+        "meter-01",
+        AssetKind::Meter,
+        GeoCoord::new(-36.852, 174.764),
+        "node-a",
+    ));
+    reg.register(Asset::new(
+        "sensor-02",
+        AssetKind::Sensor,
+        GeoCoord::new(-36.858, 174.770),
+        "node-b",
+    ));
+    reg.register(Asset::new(
+        "pump-03",
+        AssetKind::Actuator,
+        GeoCoord::new(-36.844, 174.758),
+        "node-c",
+    ));
+    reg.register(Asset::new(
+        "tee-04",
+        AssetKind::Junction,
+        GeoCoord::new(-36.850, 174.780),
+        "node-c",
+    ));
 
     println!("registered {} assets", reg.all().len());
     for a in reg.all() {
@@ -31,7 +51,10 @@ fn main() {
 
     // Id lookup.
     let a = reg.get("pump-03").expect("pump-03 present");
-    println!("lookup 'pump-03': kind={:?}, node={}", a.kind, a.logical_node);
+    println!(
+        "lookup 'pump-03': kind={:?}, node={}",
+        a.kind, a.logical_node
+    );
 
     // Nearest asset to a query point near the centre.
     let query = GeoCoord::new(-36.851, 174.766);

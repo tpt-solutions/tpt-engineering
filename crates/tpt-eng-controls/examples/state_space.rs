@@ -29,6 +29,9 @@ fn main() {
     }
     let x = ss.state()[0];
     println!("steady x ≈ {:.3} (expected {:.3})", x, 1.0 / k);
-    assert!((x - 1.0 / k).abs() < 0.1, "should settle near static deflection");
+    assert!(
+        (x - 1.0 / k).abs() < 0.1,
+        "should settle near static deflection"
+    );
     println!("controls state_space example passed");
 }

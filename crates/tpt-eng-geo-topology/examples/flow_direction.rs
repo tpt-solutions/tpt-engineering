@@ -14,8 +14,20 @@ fn main() {
     topo.add_edge(Edge::new("e1", "reservoir", "main", EdgeKind::Pipe, 500.0));
     topo.add_edge(Edge::new("e2", "main", "district_a", EdgeKind::Pipe, 250.0));
     topo.add_edge(Edge::new("e3", "main", "district_b", EdgeKind::Pipe, 250.0));
-    topo.add_edge(Edge::new("e4", "district_a", "tank_a", EdgeKind::Pipe, 250.0));
-    topo.add_edge(Edge::new("e5", "district_b", "tank_b", EdgeKind::Pipe, 250.0));
+    topo.add_edge(Edge::new(
+        "e4",
+        "district_a",
+        "tank_a",
+        EdgeKind::Pipe,
+        250.0,
+    ));
+    topo.add_edge(Edge::new(
+        "e5",
+        "district_b",
+        "tank_b",
+        EdgeKind::Pipe,
+        250.0,
+    ));
 
     // Classify each node by flow direction.
     for node in topo.nodes() {

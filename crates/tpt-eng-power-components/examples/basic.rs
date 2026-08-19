@@ -6,8 +6,8 @@
 
 use tpt_eng_electrical::Complex;
 use tpt_eng_power_components::{
-    generator_electrical_power, induction_slip, synchronous_speed_rpm, Transformer,
-    TransmissionLine,
+    Transformer, TransmissionLine, generator_electrical_power, induction_slip,
+    synchronous_speed_rpm,
 };
 
 fn main() {
@@ -22,11 +22,7 @@ fn main() {
         v_sec.re, v_sec.im
     );
 
-    let real = Transformer::new(
-        10.0,
-        Complex::new(1.0, 5.0),
-        Complex::new(1e-4, -1e-3),
-    );
+    let real = Transformer::new(10.0, Complex::new(1.0, 5.0), Complex::new(1e-4, -1e-3));
     let v_sec_r = real.secondary_voltage(230.0, Complex::new(10.0, 0.0));
     println!(
         "  With leakage Z: secondary = {:.3} + j{:.3} V",
@@ -35,7 +31,10 @@ fn main() {
     let reg = real.voltage_regulation(230.0, Complex::new(10.0, 0.0));
     println!("  Voltage regulation           : {reg:.3}");
     let z_in = real.input_impedance(Complex::new(10.0, 0.0));
-    println!("  Input impedance (primary)    : {:.3} + j{:.3} Ω", z_in.re, z_in.im);
+    println!(
+        "  Input impedance (primary)    : {:.3} + j{:.3} Ω",
+        z_in.re, z_in.im
+    );
 
     // --- Generator ----------------------------------------------------------
     println!("\nGenerator:");
@@ -56,10 +55,7 @@ fn main() {
 
     // --- Transmission line --------------------------------------------------
     println!("\nTransmission line (100 km, 50 Hz):");
-    let line = TransmissionLine::new(
-        Complex::new(5.0e-5, 4.0e-4),
-        Complex::new(0.0, 3.0e-9),
-    );
+    let line = TransmissionLine::new(Complex::new(5.0e-5, 4.0e-4), Complex::new(0.0, 3.0e-9));
     let (a, b, c, _d) = line.abc_parameters(100.0e3);
     println!(
         "  ABCD: A=D={:.6} + j{:.6}, B={:.4} + j{:.4} Ω, C={:.6} + j{:.6} S",

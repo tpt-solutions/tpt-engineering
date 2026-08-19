@@ -23,7 +23,11 @@ fn main() {
         eta * 100.0
     );
     println!("  fuel input        = {:.1} MW", fuel_power / 1e6);
-    println!("  fuel flow         = {:.3} kg/s ({:.0} kg/h)", m_fuel, m_fuel * 3600.0);
+    println!(
+        "  fuel flow         = {:.3} kg/s ({:.0} kg/h)",
+        m_fuel,
+        m_fuel * 3600.0
+    );
     println!(
         "  stoichiometric air = {:.1} kg/s ({:.0} kg/h)",
         m_air,

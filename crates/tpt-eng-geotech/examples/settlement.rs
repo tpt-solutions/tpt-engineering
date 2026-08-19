@@ -5,7 +5,7 @@
 // for the same subsoil profile. Soil data is provenance-tagged.
 
 use tpt_eng_geotech::bearing_capacity::{
-    meyerhof_ultimate_bearing_capacity, terzaghi_ultimate_bearing_capacity, FoundationShape,
+    FoundationShape, meyerhof_ultimate_bearing_capacity, terzaghi_ultimate_bearing_capacity,
 };
 use tpt_eng_geotech::consolidation::{
     coeff_consolidation, consolidation_settlement, consolidation_time, time_factor_from_degree,
@@ -31,7 +31,13 @@ fn main() {
 
     // --- Bearing capacity of a 2 m square footing at 1.5 m depth ---
     let q_terz = terzaghi_ultimate_bearing_capacity(
-        10_000.0, 30.0, 19_000.0, 2.0, 1.5, FoundationShape::Square, 2.0,
+        10_000.0,
+        30.0,
+        19_000.0,
+        2.0,
+        1.5,
+        FoundationShape::Square,
+        2.0,
     );
     let q_mey = meyerhof_ultimate_bearing_capacity(10_000.0, 30.0, 19_000.0, 2.0, 1.5, 2.0);
     println!("Terzaghi q_ult           : {:.1} kPa", q_terz / 1e3);

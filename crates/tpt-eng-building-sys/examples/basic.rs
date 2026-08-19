@@ -5,9 +5,9 @@
 // panel scheduling.
 
 use tpt_eng_building_sys::{
-    Branch, Fixture, FixtureType, assembly_u_value, cooling_load, envelope_ua, heating_load,
-    infiltration_loss_ach_w, fixture_unit_demand_gpm, panel_utilization, schedule_panel, sum_fixture_units,
-    INTERIOR_FILM_RESISTANCE, EXTERIOR_FILM_RESISTANCE,
+    Branch, EXTERIOR_FILM_RESISTANCE, Fixture, FixtureType, INTERIOR_FILM_RESISTANCE,
+    assembly_u_value, cooling_load, envelope_ua, fixture_unit_demand_gpm, heating_load,
+    infiltration_loss_ach_w, panel_utilization, schedule_panel, sum_fixture_units,
 };
 
 fn main() {

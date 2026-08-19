@@ -19,8 +19,16 @@ struct Bearing {
 
 fn main() {
     let designs = [
-        Bearing { name: "Std", eta: 40_000.0, beta: 1.6 },
-        Bearing { name: "Premium", eta: 60_000.0, beta: 2.2 },
+        Bearing {
+            name: "Std",
+            eta: 40_000.0,
+            beta: 1.6,
+        },
+        Bearing {
+            name: "Premium",
+            eta: 60_000.0,
+            beta: 2.2,
+        },
     ];
 
     let horizon = 20_000.0; // hours of service life to report over
@@ -28,8 +36,14 @@ fn main() {
     let warranty = 5_000.0; // hours
 
     for d in &designs {
-        println!("\n=== {} bearing: eta={} h, beta={} ===", d.name, d.eta, d.beta);
-        println!("  mean life        = {:.1} h", weibull_mean(d.eta, d.beta).unwrap());
+        println!(
+            "\n=== {} bearing: eta={} h, beta={} ===",
+            d.name, d.eta, d.beta
+        );
+        println!(
+            "  mean life        = {:.1} h",
+            weibull_mean(d.eta, d.beta).unwrap()
+        );
         println!(
             "  B10 life         = {:.1} h",
             weibull_b_life(10.0, d.eta, d.beta).unwrap()

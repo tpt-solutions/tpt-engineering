@@ -5,7 +5,7 @@
 //! and "how many devices are in range?" questions, including a non-finite
 //! coordinate that spatial queries must ignore.
 
-use tpt_eng_geo_asset::{haversine, Asset, AssetKind, AssetRegistry, GeoCoord};
+use tpt_eng_geo_asset::{Asset, AssetKind, AssetRegistry, GeoCoord, haversine};
 
 fn main() {
     let mut reg = AssetRegistry::new();
@@ -25,7 +25,12 @@ fn main() {
 
     // A malformed entry: a NaN coordinate must NOT be selected as the nearest
     // (NaN compares false) nor matched as a zero-distance hit.
-    reg.register(Asset::new("broken", AssetKind::Sensor, GeoCoord::new(f64::NAN, 0.0), "net"));
+    reg.register(Asset::new(
+        "broken",
+        AssetKind::Sensor,
+        GeoCoord::new(f64::NAN, 0.0),
+        "net",
+    ));
 
     let query = GeoCoord::new(-36.851, 174.766);
 

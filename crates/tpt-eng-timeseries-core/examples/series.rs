@@ -33,7 +33,11 @@ fn main() {
         .iter()
         .max_by(|a, b| a.value.partial_cmp(&b.value).unwrap())
         .unwrap();
-    println!("peak value = {:.3} @ {:.3} s", peak.value, peak.t.as_seconds());
+    println!(
+        "peak value = {:.3} @ {:.3} s",
+        peak.value,
+        peak.t.as_seconds()
+    );
 
     assert!(s.is_sorted());
     assert!(max - min > 0.0);

@@ -17,8 +17,10 @@ fn main() {
     let xfmr = Transformer::new(turns, z_leak_pu, y_m_pu);
 
     let v_prim = 110.0e3; // primary line-to-neutral-ish reference
-    println!("\nTransformer: {}:1, Z_leak = {} + j{} pu, Y_m = {} − j{} pu",
-        turns, z_leak_pu.re, z_leak_pu.im, y_m_pu.re, -y_m_pu.im);
+    println!(
+        "\nTransformer: {}:1, Z_leak = {} + j{} pu, Y_m = {} − j{} pu",
+        turns, z_leak_pu.re, z_leak_pu.im, y_m_pu.re, -y_m_pu.im
+    );
 
     // Load: 20 MVA at 0.9 lagging power factor on the secondary.
     let s_load = 20.0e6;
@@ -31,7 +33,10 @@ fn main() {
     let z_load = complex_scale(Complex::new(theta.cos(), theta.sin()), z_load_mag);
 
     println!("  Load: {:.1} MVA @ pf={pf} (lagging)", s_load / 1e6);
-    println!("  Load impedance (secondary)  : {:.3} + j{:.3} Ω", z_load.re, z_load.im);
+    println!(
+        "  Load impedance (secondary)  : {:.3} + j{:.3} Ω",
+        z_load.re, z_load.im
+    );
 
     let v_sec = xfmr.secondary_voltage(v_prim, z_load);
     let v_sec_mag = v_sec.magnitude();
@@ -43,14 +48,19 @@ fn main() {
     let i0 = xfmr.exciting_current(v_prim);
     println!(
         "  Exciting current I0         : {:.3} + j{:.3} A (|I0| = {:.3} A)",
-        i0.re, i0.im, i0.magnitude()
+        i0.re,
+        i0.im,
+        i0.magnitude()
     );
 
     let p0 = xfmr.no_load_loss(v_prim);
     println!("  No-load (core) loss P0      : {:.3} W", p0);
 
     let reg = xfmr.voltage_regulation(v_prim, z_load);
-    println!("  Voltage regulation         : {reg:.3} ({:.2}%)", reg * 100.0);
+    println!(
+        "  Voltage regulation         : {reg:.3} ({:.2}%)",
+        reg * 100.0
+    );
 
     // Find the load impedance that just hits 5% regulation by scaling PF load.
     let z_heavy = complex_scale(z_load, 0.5); // double the load
@@ -58,6 +68,8 @@ fn main() {
     let v_sec_heavy = xfmr.secondary_voltage(v_prim, z_heavy).magnitude();
     println!(
         "  At 2× load: |V_sec| = {:.3} V, regulation = {:.3} ({:.2}%)",
-        v_sec_heavy, reg_heavy, reg_heavy * 100.0
+        v_sec_heavy,
+        reg_heavy,
+        reg_heavy * 100.0
     );
 }

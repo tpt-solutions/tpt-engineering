@@ -31,12 +31,12 @@ fn main() {
 
     // Roll-center height of a double-wishbone front suspension (front view).
     let rc = roll_center_height(
-        Point3::new(0.10, 0.0, 0.48), // lower inner pivot
-        Point3::new(0.80, 0.0, 0.20), // lower outer pivot
+        Point3::new(0.10, 0.0, 0.48),   // lower inner pivot
+        Point3::new(0.80, 0.0, 0.20),   // lower outer pivot
         Point3::new(0.15, 0.0, 0.3625), // upper inner pivot
-        Point3::new(0.70, 0.0, 0.50), // upper outer pivot
-        Point3::new(0.80, 0.0, 0.0),  // tire contact patch (left track edge)
-        1.6,                          // track width
+        Point3::new(0.70, 0.0, 0.50),   // upper outer pivot
+        Point3::new(0.80, 0.0, 0.0),    // tire contact patch (left track edge)
+        1.6,                            // track width
     );
     println!(
         "Roll-center height    : {:.3} m",

@@ -11,51 +11,57 @@ use tpt_eng_materials::{
 
 fn main() {
     // --- 1. A metal: scalar stiffness + temperature-dependent yield strength ---
-    let steel = Material::new("steel-s355", "Structural steel S355", MaterialCategory::Metal)
-        .with_description("Hot-rolled structural steel, user-entered values")
-        .with_source(DataSource::standard("EN 10025-2 (user-entered)"))
-        .with_property(
-            "youngs-modulus",
-            Property::Scalar {
-                value: 210.0,
-                unit: "GPa".into(),
-            },
-        )
-        .with_property(
-            "density",
-            Property::Scalar {
-                value: 7850.0,
-                unit: "kg/m^3".into(),
-            },
-        )
-        .with_property(
-            "yield-strength",
-            Property::TemperatureDependent {
-                unit: "MPa".into(),
-                points: vec![
-                    TempPoint {
-                        temp: 20.0,
-                        value: 355.0,
-                    },
-                    TempPoint {
-                        temp: 200.0,
-                        value: 320.0,
-                    },
-                    TempPoint {
-                        temp: 400.0,
-                        value: 230.0,
-                    },
-                    TempPoint {
-                        temp: 600.0,
-                        value: 110.0,
-                    },
-                ],
-            },
-        );
+    let steel = Material::new(
+        "steel-s355",
+        "Structural steel S355",
+        MaterialCategory::Metal,
+    )
+    .with_description("Hot-rolled structural steel, user-entered values")
+    .with_source(DataSource::standard("EN 10025-2 (user-entered)"))
+    .with_property(
+        "youngs-modulus",
+        Property::Scalar {
+            value: 210.0,
+            unit: "GPa".into(),
+        },
+    )
+    .with_property(
+        "density",
+        Property::Scalar {
+            value: 7850.0,
+            unit: "kg/m^3".into(),
+        },
+    )
+    .with_property(
+        "yield-strength",
+        Property::TemperatureDependent {
+            unit: "MPa".into(),
+            points: vec![
+                TempPoint {
+                    temp: 20.0,
+                    value: 355.0,
+                },
+                TempPoint {
+                    temp: 200.0,
+                    value: 320.0,
+                },
+                TempPoint {
+                    temp: 400.0,
+                    value: 230.0,
+                },
+                TempPoint {
+                    temp: 600.0,
+                    value: 110.0,
+                },
+            ],
+        },
+    );
 
     println!("== {} ({}) ==", steel.name, steel.category);
     println!("source            : {}", steel.source.label);
-    let e = steel.value("youngs-modulus", 20.0).expect("modulus present");
+    let e = steel
+        .value("youngs-modulus", 20.0)
+        .expect("modulus present");
     let rho = steel.value("density", 20.0).expect("density present");
     println!("E                 = {e:.3} GPa");
     println!("density           = {rho:.3} kg/m^3");
@@ -67,10 +73,7 @@ fn main() {
     }
     println!(
         "fy unit           = {}",
-        steel
-            .property("yield-strength")
-            .expect("fy present")
-            .unit()
+        steel.property("yield-strength").expect("fy present").unit()
     );
     println!(
         "temp-dependent    = {}, anisotropic = {}",
@@ -84,15 +87,19 @@ fn main() {
     moduli.insert("22".to_string(), 10.0); // transverse
     moduli.insert("33".to_string(), 10.0); // through-thickness
 
-    let cfrp = Material::new("cfrp-ud", "Unidirectional CFRP", MaterialCategory::Composite)
-        .with_source(DataSource::file("coupon-tests-2024.csv"))
-        .with_property(
-            "youngs-modulus",
-            Property::Anisotropic {
-                unit: "GPa".into(),
-                values: moduli,
-            },
-        );
+    let cfrp = Material::new(
+        "cfrp-ud",
+        "Unidirectional CFRP",
+        MaterialCategory::Composite,
+    )
+    .with_source(DataSource::file("coupon-tests-2024.csv"))
+    .with_property(
+        "youngs-modulus",
+        Property::Anisotropic {
+            unit: "GPa".into(),
+            values: moduli,
+        },
+    );
 
     println!();
     println!("== {} ({}) ==", cfrp.name, cfrp.category);

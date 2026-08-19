@@ -4,8 +4,8 @@
 //! Run with: `cargo run --example report_doc -p tpt-eng-report`
 
 use tpt_eng_report::{
-    NamedValue, Report, ResultEntry, Table, ValidationStatus,
-    to_html, to_markdown, write_html, write_json, write_markdown,
+    NamedValue, Report, ResultEntry, Table, ValidationStatus, to_html, to_markdown, write_html,
+    write_json, write_markdown,
 };
 
 fn main() {
@@ -20,7 +20,9 @@ fn main() {
         .assumptions(vec![
             NamedValue::new("Span L", 5.0).with_unit("m"),
             NamedValue::new("Load w", 10.0).with_unit("kN/m"),
-            NamedValue::new("f_y", 355.0).with_unit("MPa").with_description("yield strength"),
+            NamedValue::new("f_y", 355.0)
+                .with_unit("MPa")
+                .with_description("yield strength"),
         ])
         .results(vec![
             ResultEntry::with_limits(
@@ -55,9 +57,24 @@ fn main() {
                     "Status".into(),
                 ],
                 vec![
-                    vec!["M".into(), "31.25 kNm".into(), "45.0 kNm".into(), "PASS".into()],
-                    vec!["V".into(), "25.0 kN".into(), "40.0 kN".into(), "PASS".into()],
-                    vec!["defl".into(), "19.5 mm".into(), "20.0 mm".into(), "WARN".into()],
+                    vec![
+                        "M".into(),
+                        "31.25 kNm".into(),
+                        "45.0 kNm".into(),
+                        "PASS".into(),
+                    ],
+                    vec![
+                        "V".into(),
+                        "25.0 kN".into(),
+                        "40.0 kN".into(),
+                        "PASS".into(),
+                    ],
+                    vec![
+                        "defl".into(),
+                        "19.5 mm".into(),
+                        "20.0 mm".into(),
+                        "WARN".into(),
+                    ],
                 ],
             )
             .with_caption("Summary of results"),

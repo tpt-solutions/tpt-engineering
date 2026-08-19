@@ -2,7 +2,7 @@
 //! and zero-order fill strategies and compare them.
 
 use tpt_eng_timeseries_core::{Sample, Series, Timestamp};
-use tpt_eng_timeseries_gap::{fill_gaps, interpolate_at, Strategy};
+use tpt_eng_timeseries_gap::{Strategy, fill_gaps, interpolate_at};
 
 fn main() {
     // Sampled signal with a large dropout between t=2 and t=8.
@@ -20,20 +20,31 @@ fn main() {
     let zero = fill_gaps(&raw, &grid, Strategy::Zero);
 
     println!("  t | hold | linear | zero");
-    for i in 0..grid.len() {
+    for (((&t, h), lin), z) in grid
+        .iter()
+        .zip(hold.iter())
+        .zip(linear.iter())
+        .zip(zero.iter())
+    {
         println!(
             "{:3.0} | {:4.2} | {:6.2} | {:4.2}",
-            grid[i],
-            hold.iter().nth(i).unwrap().value,
-            linear.iter().nth(i).unwrap().value,
-            zero.iter().nth(i).unwrap().value
+            t, h.value, lin.value, z.value
         );
     }
 
     println!("\ninterpolate_at t=5.0 (inside the gap):");
-    println!("  hold   = {:.3}", interpolate_at(&raw, 5.0, Strategy::Hold));
-    println!("  linear = {:.3}", interpolate_at(&raw, 5.0, Strategy::Linear));
-    println!("  zero   = {:.3}", interpolate_at(&raw, 5.0, Strategy::Zero));
+    println!(
+        "  hold   = {:.3}",
+        interpolate_at(&raw, 5.0, Strategy::Hold)
+    );
+    println!(
+        "  linear = {:.3}",
+        interpolate_at(&raw, 5.0, Strategy::Linear)
+    );
+    println!(
+        "  zero   = {:.3}",
+        interpolate_at(&raw, 5.0, Strategy::Zero)
+    );
 
     assert!((interpolate_at(&raw, 5.0, Strategy::Linear) - 7.0).abs() < 1e-9);
     assert!((interpolate_at(&raw, 5.0, Strategy::Hold) - 4.0).abs() < 1e-9);

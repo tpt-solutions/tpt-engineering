@@ -28,7 +28,16 @@ fn main() {
     // Implant geometry summary for a hip reconstruction.
     let stem = Stem::new(0.150, 0.013, 0.008, Frame3::from_origin(Point3::ZERO));
     let cup = Cup::new(0.026, 0.030, 90.0, Frame3::from_origin(Point3::ZERO));
-    println!("\nStem volume          : {:.3} cm^3", stem.volume_approx() * 1e6);
-    println!("Cup bearing area     : {:.3} cm^2", cup.surface_area() * 1e4);
-    println!("Cup wall thickness   : {:.3} mm", cup.wall_thickness() * 1e3);
+    println!(
+        "\nStem volume          : {:.3} cm^3",
+        stem.volume_approx() * 1e6
+    );
+    println!(
+        "Cup bearing area     : {:.3} cm^2",
+        cup.surface_area() * 1e4
+    );
+    println!(
+        "Cup wall thickness   : {:.3} mm",
+        cup.wall_thickness() * 1e3
+    );
 }

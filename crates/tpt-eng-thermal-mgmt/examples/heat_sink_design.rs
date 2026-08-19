@@ -1,7 +1,7 @@
 //! Runnable example: sizing a heat sink + forced-air fan for a device so its
 //! junction temperature stays below a limit, with a network-consistency check.
 
-use tpt_eng_thermal_mgmt::{junction_temperature, FanCurve, HeatSink, ThermalPath};
+use tpt_eng_thermal_mgmt::{FanCurve, HeatSink, ThermalPath, junction_temperature};
 
 fn main() {
     let power = 75.0; // W
@@ -40,7 +40,10 @@ fn main() {
     let theta_ja = theta_jc + theta_cs + theta_sa;
 
     // Fan must overcome the system curve at the required airflow.
-    let fan = FanCurve { a: 300.0, b: 1500.0 };
+    let fan = FanCurve {
+        a: 300.0,
+        b: 1500.0,
+    };
     let q = fan.operating_point(2000.0).unwrap();
 
     let tj = junction_temperature(power, theta_ja, t_amb);

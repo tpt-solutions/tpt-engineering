@@ -2,9 +2,9 @@
 //! conductor properties and skin effect.
 
 use tpt_eng_electrical::{
-    admittance, dc_resistance, impedance_capacitor, impedance_inductor, impedance_parallel,
-    impedance_resistor, impedance_series, material_property, Complex, PerUnitSystem,
-    skin_effect_ratio, three_phase_power,
+    Complex, PerUnitSystem, admittance, dc_resistance, impedance_capacitor, impedance_inductor,
+    impedance_parallel, impedance_resistor, impedance_series, material_property, skin_effect_ratio,
+    three_phase_power,
 };
 
 fn main() {
@@ -14,7 +14,9 @@ fn main() {
     let z = impedance_series(&[r, l]);
     println!(
         "R-L branch: Z = {:.3} + j{:.3} Ω, |Z| = {:.3} Ω",
-        z.re, z.im, z.magnitude()
+        z.re,
+        z.im,
+        z.magnitude()
     );
 
     // R || C parallel branch at 50 Hz.

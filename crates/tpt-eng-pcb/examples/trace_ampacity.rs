@@ -30,7 +30,10 @@ fn main() {
     let a_needed = (target / (k * 10.0_f64.powf(0.44))).powf(1.0 / 0.725);
     let t_mil = thickness_m / tpt_eng_pcb::MIL_TO_M;
     let w_needed_m = (a_needed / t_mil) * tpt_eng_pcb::MIL_TO_M;
-    println!("Required width       : {:.3} mm for 5 A (ΔT = 10 °C)", w_needed_m * 1e3);
+    println!(
+        "Required width       : {:.3} mm for 5 A (ΔT = 10 °C)",
+        w_needed_m * 1e3
+    );
 
     // DC resistance of a 100 mm length of the original trace.
     let rho = material_property("copper")

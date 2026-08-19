@@ -23,12 +23,48 @@ struct Task {
 fn main() {
     // Three-point estimates (in days) for a software-release project.
     let tasks = [
-        Task { id: "Design", o: 4.0, m: 6.0, p: 10.0, predecessors: &[] },
-        Task { id: "Backend", o: 6.0, m: 10.0, p: 18.0, predecessors: &["Design"] },
-        Task { id: "Frontend", o: 5.0, m: 8.0, p: 15.0, predecessors: &["Design"] },
-        Task { id: "Integrate", o: 3.0, m: 5.0, p: 9.0, predecessors: &["Backend", "Frontend"] },
-        Task { id: "Test", o: 4.0, m: 6.0, p: 12.0, predecessors: &["Integrate"] },
-        Task { id: "Launch", o: 1.0, m: 2.0, p: 4.0, predecessors: &["Test"] },
+        Task {
+            id: "Design",
+            o: 4.0,
+            m: 6.0,
+            p: 10.0,
+            predecessors: &[],
+        },
+        Task {
+            id: "Backend",
+            o: 6.0,
+            m: 10.0,
+            p: 18.0,
+            predecessors: &["Design"],
+        },
+        Task {
+            id: "Frontend",
+            o: 5.0,
+            m: 8.0,
+            p: 15.0,
+            predecessors: &["Design"],
+        },
+        Task {
+            id: "Integrate",
+            o: 3.0,
+            m: 5.0,
+            p: 9.0,
+            predecessors: &["Backend", "Frontend"],
+        },
+        Task {
+            id: "Test",
+            o: 4.0,
+            m: 6.0,
+            p: 12.0,
+            predecessors: &["Integrate"],
+        },
+        Task {
+            id: "Launch",
+            o: 1.0,
+            m: 2.0,
+            p: 4.0,
+            predecessors: &["Test"],
+        },
     ];
 
     // Convert each task to a PERT expected duration and remember its variance.
@@ -64,7 +100,10 @@ fn main() {
 
     let critical = sched.critical_path();
     println!("\nCritical path: {:?}", critical);
-    println!("Expected project duration: {:.3} days", sched.project_duration());
+    println!(
+        "Expected project duration: {:.3} days",
+        sched.project_duration()
+    );
 
     // Project variance = sum of variances along the critical path (independent
     // activity estimates assumed). Standard deviation is its square root.

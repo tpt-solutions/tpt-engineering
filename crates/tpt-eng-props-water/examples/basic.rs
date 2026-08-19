@@ -1,6 +1,6 @@
 //! Basic runnable example: IAPWS-IF97 water/steam states and saturation.
 
-use tpt_eng_props_water::{saturation_pressure, saturation_temperature, state, Region};
+use tpt_eng_props_water::{Region, saturation_pressure, saturation_temperature, state};
 use tpt_math_units::uom::si::f64::*;
 use tpt_math_units::uom::si::{
     mass_density::kilogram_per_cubic_meter,
@@ -45,7 +45,9 @@ fn main() {
     );
     println!(
         "  cp              = {:.4} kJ/(kg·K)",
-        s_liq.isobaric_heat_capacity.get::<kilojoule_per_kilogram_kelvin>()
+        s_liq
+            .isobaric_heat_capacity
+            .get::<kilojoule_per_kilogram_kelvin>()
     );
 
     // --- Superheated-vapour state (Region 2). ---
@@ -55,7 +57,10 @@ fn main() {
     )
     .expect("vapour state in Region 2");
     assert_eq!(s_vap.region, Region::Two);
-    println!("\nSuperheated steam @ 300 K, 3.5 kPa (Region {:?}):", s_vap.region);
+    println!(
+        "\nSuperheated steam @ 300 K, 3.5 kPa (Region {:?}):",
+        s_vap.region
+    );
     println!(
         "  density         = {:.4} kg/m³",
         s_vap.density.get::<kilogram_per_cubic_meter>()

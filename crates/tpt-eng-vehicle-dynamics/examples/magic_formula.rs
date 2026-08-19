@@ -21,7 +21,10 @@ fn main() {
         }
         println!("  α = {a:5.1}°   Fy = {f:8.1} N");
     }
-    println!("Peak lateral force   : {:.1} N at α = {:.1}°", peak, peak_angle);
+    println!(
+        "Peak lateral force   : {:.1} N at α = {:.1}°",
+        peak, peak_angle
+    );
 
     // Longitudinal force vs slip ratio -0.20 .. 0.20.
     println!("\nLongitudinal force vs slip ratio:");

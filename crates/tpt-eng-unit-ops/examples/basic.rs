@@ -5,9 +5,9 @@
 // ε-NTU), and pump / compressor power. All quantities are SI `f64`.
 
 use tpt_eng_unit_ops::{
-    capacity_ratio, compressor_discharge_temperature, compressor_isentropic_power, effectiveness_to_q,
-    fenske_min_stages, gilliland_stages, lmtd, mccabe_thiele_stages, npsh_available, ntu,
-    overall_u, pump_power, PumpCurve, underwood_rmin,
+    PumpCurve, capacity_ratio, compressor_discharge_temperature, compressor_isentropic_power,
+    effectiveness_to_q, fenske_min_stages, gilliland_stages, lmtd, mccabe_thiele_stages,
+    npsh_available, ntu, overall_u, pump_power, underwood_rmin,
 };
 
 fn main() {

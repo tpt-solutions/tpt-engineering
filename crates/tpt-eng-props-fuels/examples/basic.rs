@@ -5,7 +5,12 @@ use tpt_eng_props_fuels::{BlendedFuel, Fuel};
 use tpt_math_units::uom::si::mass_density::kilogram_per_cubic_meter;
 
 fn main() {
-    for f in [Fuel::Methane, Fuel::Hydrogen, Fuel::NaturalGas, Fuel::Diesel] {
+    for f in [
+        Fuel::Methane,
+        Fuel::Hydrogen,
+        Fuel::NaturalGas,
+        Fuel::Diesel,
+    ] {
         println!(
             "{f:<10?} LHV = {:>6.1} MJ/kg  HHV = {:>6.1} MJ/kg  ρ = {:>6.1} kg/m³  AFR = {:>5.1}  CO₂ = {:>5.3} kg/MJ",
             f.lhv_mj_kg(),

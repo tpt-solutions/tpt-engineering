@@ -3,7 +3,9 @@
 // Demonstrates Miller indices (normals and interplanar spacing), the standard
 // FCC slip-system family, and a cubic symmetry rotation.
 
-use tpt_eng_crystallography::{apply_symmetry, d_spacing, fcc_slip_systems, rotation_4fold_z, Miller};
+use tpt_eng_crystallography::{
+    Miller, apply_symmetry, d_spacing, fcc_slip_systems, rotation_4fold_z,
+};
 use tpt_eng_geometry::Vector3;
 
 fn main() {
@@ -16,7 +18,10 @@ fn main() {
 
     // Plane normal of (100) in a cubic lattice.
     let n = Miller::new(1, 0, 0).to_normal(true);
-    println!("Normal of (100)       : ({:.3}, {:.3}, {:.3})", n.x, n.y, n.z);
+    println!(
+        "Normal of (100)       : ({:.3}, {:.3}, {:.3})",
+        n.x, n.y, n.z
+    );
 
     // FCC slip systems (expect the canonical 12).
     let fcc = fcc_slip_systems();

@@ -6,10 +6,10 @@
 // and the required pipe diameter.
 
 use tpt_eng_building_sys::{
-    AssemblyLayer, Branch, Fixture, FixtureType, annual_heating_energy_kwh, cooling_load,
-    envelope_ua, fixture_unit_demand_lps, gpm_to_lps, heating_load, infiltration_loss_w,
+    AssemblyLayer, Branch, EXTERIOR_FILM_RESISTANCE, Fixture, FixtureType,
+    INTERIOR_FILM_RESISTANCE, annual_heating_energy_kwh, cooling_load, envelope_ua,
+    fixture_unit_demand_lps, gpm_to_lps, heating_load, infiltration_loss_w,
     required_pipe_diameter_m, schedule_panel, sum_fixture_units, transmission_heat_rate,
-    INTERIOR_FILM_RESISTANCE, EXTERIOR_FILM_RESISTANCE,
 };
 
 fn main() {
@@ -17,10 +17,10 @@ fn main() {
 
     // --- Envelope from individual surfaces ---------------------------------
     let walls = [
-        (120.0, 0.28),  // facade: 120 m² @ 0.28 W/m²K
-        (60.0, 0.22),   // roof:    60 m² @ 0.22 W/m²K
-        (40.0, 0.35),   // floor:   40 m² @ 0.35 W/m²K
-        (15.0, 2.80),   // glazing: 15 m² @ 2.80 W/m²K
+        (120.0, 0.28), // facade: 120 m² @ 0.28 W/m²K
+        (60.0, 0.22),  // roof:    60 m² @ 0.22 W/m²K
+        (40.0, 0.35),  // floor:   40 m² @ 0.35 W/m²K
+        (15.0, 2.80),  // glazing: 15 m² @ 2.80 W/m²K
     ];
     let ua = envelope_ua(&walls);
     println!("\nEnvelope conductance UA = {ua:.3} W/K");
@@ -49,8 +49,10 @@ fn main() {
     let q_cool = cooling_load(ua, design_dt, infil, solar);
     println!("\nDesign heating load = {q_heat:.3} W");
     println!("Design cooling load = {q_cool:.3} W");
-    println!("Heat through facade alone = {:.3} W",
-        transmission_heat_rate(120.0 * 0.28, design_dt));
+    println!(
+        "Heat through facade alone = {:.3} W",
+        transmission_heat_rate(120.0 * 0.28, design_dt)
+    );
 
     let annual_e = annual_heating_energy_kwh(q_heat, 4000.0); // 4000 K·h season
     println!("Estimated annual heating energy = {annual_e:.3} kWh");

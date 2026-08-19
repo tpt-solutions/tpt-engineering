@@ -61,5 +61,10 @@ fn main() {
         "\nDesign summary: {:.1} theoretical stages including reboiler,",
         mt.stages
     );
-    println!("feed stage {}, operating at R = {:.3} (~{:.0}% above R_min).", mt.feed_stage.unwrap(), r, (r / rmin - 1.0) * 100.0);
+    println!(
+        "feed stage {}, operating at R = {:.3} (~{:.0}% above R_min).",
+        mt.feed_stage.unwrap(),
+        r,
+        (r / rmin - 1.0) * 100.0
+    );
 }

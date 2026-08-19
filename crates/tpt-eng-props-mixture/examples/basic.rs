@@ -2,7 +2,7 @@
 //! (compressibility factor, saturation pressure, bubble/dew points).
 
 use tpt_eng_props_mixture::{
-    bubble_point, dew_point, peng_robinson_z, pr_saturation_pressure, Component, Mixture,
+    Component, Mixture, bubble_point, dew_point, peng_robinson_z, pr_saturation_pressure,
 };
 
 fn main() {
@@ -10,7 +10,10 @@ fn main() {
     let ch4 = Component::from_name("methane").unwrap();
     let methane = Mixture::pure(ch4);
     let z = peng_robinson_z(300.0, 5e6, &methane);
-    println!("methane Z (300 K, 5 MPa)   = {:.4} (vapour)", z.vapour().unwrap());
+    println!(
+        "methane Z (300 K, 5 MPa)   = {:.4} (vapour)",
+        z.vapour().unwrap()
+    );
 
     // Pure propane saturation pressure at 350 K.
     let c3 = Component::from_name("propane").unwrap();

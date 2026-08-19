@@ -17,8 +17,8 @@ fn main() {
         nonlinear.push((d, f));
         linear.push((d, 10.0 * d));
     }
-    let n_series = XySeries::new("nonlinear k(x)=10+2x", nonlinear)
-        .with_color(plotters::prelude::RED);
+    let n_series =
+        XySeries::new("nonlinear k(x)=10+2x", nonlinear).with_color(plotters::prelude::RED);
     let l_series = XySeries::new("linear k=10", linear).with_color(plotters::prelude::BLUE);
 
     let plot = XyPlot::new("Load–displacement response")

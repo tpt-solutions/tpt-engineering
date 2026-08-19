@@ -1,7 +1,7 @@
 //! Runnable example: binary VLE of an ethane/propane mixture across
 //! compositions, with Peng–Robinson fugacity coefficients.
 
-use tpt_eng_props_mixture::{bubble_point, peng_robinson_z, Component, Mixture};
+use tpt_eng_props_mixture::{Component, Mixture, bubble_point, peng_robinson_z};
 
 fn main() {
     let c2 = Component::from_name("ethane").unwrap();
@@ -17,12 +17,15 @@ fn main() {
         println!("  {x:.2}    {:>8.2}         {:.3}", pb / 1e3, y[1]);
     }
 
-    // Fugacity coefficients of the equimolar vapour at 300 K, 2 MPa.
+    // Fugacity coefficients of the equimolar vapour at the bubble-point T, 2 MPa.
     let mix = Mixture::new(&comps, &[0.5, 0.5]).unwrap();
     let z = peng_robinson_z(t, 2e6, &mix);
     let zv = z.vapour().unwrap();
     let phi = mix.fugacity_coefficients(t, 2e6, zv);
-    println!("\nfugacity coeffs @ 300 K, 2 MPa (vapour Z = {zv:.4}):");
+    println!(
+        "\nfugacity coeffs @ {:.0} K, 2 MPa (vapour Z = {zv:.4}):",
+        t
+    );
     println!("  φ_ethane   = {:.4}", phi[0]);
     println!("  φ_propane  = {:.4}", phi[1]);
 

@@ -18,6 +18,9 @@ fn main() {
         }
     }
     println!("final y = {:.3} (setpoint 10.000)", y);
-    assert!((y - 10.0).abs() < 0.5, "controller should track the setpoint");
+    assert!(
+        (y - 10.0).abs() < 0.5,
+        "controller should track the setpoint"
+    );
     println!("controls basic (PID) example passed");
 }

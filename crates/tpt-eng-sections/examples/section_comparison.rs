@@ -1,23 +1,25 @@
-//! Richer scenario: pick a beam section for a fixed bending demand.
+//! Richer scenario: pick a steel beam section for a fixed bending demand.
 //!
-//! Six candidate sections (rolled, cold-formed, built-up, and a custom
-//! trapezoidal profile) are evaluated with the same [`Section`] interface, then
-//! ranked by structural efficiency (elastic modulus per unit area). Dimensions
-//! are millimetres, so `Sx` is mm^3 and the demand is entered in kN*m.
+//! Seven candidate sections (rolled, hollow, built-up, and a custom cold-formed
+//! outline) are evaluated through the same [`Section`] interface, then ranked by
+//! structural efficiency (elastic modulus per unit area). Dimensions are
+//! millimetres, so `Sx` is mm^3 and the demand is entered in kN*m.
+//!
+//! Note: for [`CustomPolygon`], area/centroid/second moments are exact
+//! (Green's theorem) while the plastic modulus and torsion constant are grid
+//! estimates, so only the exact quantities are compared below.
 //!
 //! Run with `cargo run -p tpt-eng-sections --example section_comparison`.
 
 use tpt_eng_sections::compose::{self, Rect};
 use tpt_eng_sections::polygon::PolygonError;
-use tpt_eng_sections::{
-    Angle, Channel, CustomPolygon, ISection, Section, SectionProperties, Tube,
-};
+use tpt_eng_sections::{Angle, Channel, CustomPolygon, ISection, Section, SectionProperties, Tube};
 
 /// Steel density used to turn area (mm^2) into mass per metre (kg/m).
 const STEEL_DENSITY: f64 = 7850.0e-9; // kg/mm^3
 
 /// Design bending moment, kN*m.
-const M_DESIGN: f64 = 180.0;
+const M_DESIGN: f64 = 90.0;
 /// Allowable bending stress, MPa (= N/mm^2).
 const SIGMA_ALLOW: f64 = 165.0;
 
@@ -72,31 +74,30 @@ fn main() {
         compose::plastic_y(&girder, gcx),
         compose::torsion(&girder),
     );
-    candidates.push((
-        "Plate girder 790 deep (built-up)".to_string(),
-        girder_props,
-    ));
+    candidates.push(("Plate girder 790 deep (built-up)".to_string(), girder_props));
 
-    // 7. A custom trapezoidal profile (e.g. a folded-plate deck rib), evaluated
-    //    exactly by Green's theorem with a grid-based plastic/torsion estimate.
-    let trapezoid = CustomPolygon::new(vec![
-        (-150.0, 0.0),
-        (150.0, 0.0),
-        (90.0, 400.0),
-        (-90.0, 400.0),
+    // 7. A custom cold-formed outline: a 200 x 80 x 4 lipless channel traced as
+    //    a single closed (non-convex) boundary.
+    let cold_formed = CustomPolygon::new(vec![
+        (0.0, 0.0),
+        (80.0, 0.0),
+        (80.0, 4.0),
+        (4.0, 4.0),
+        (4.0, 196.0),
+        (80.0, 196.0),
+        (80.0, 200.0),
+        (0.0, 200.0),
     ]);
-    match trapezoid.validate() {
+    match cold_formed.validate() {
         Ok(()) => candidates.push((
-            "Trapezoid 300/180 x 400 (polygon)".to_string(),
-            trapezoid.properties(),
+            "CF channel 200x80x4 (polygon)".to_string(),
+            cold_formed.properties(),
         )),
-        Err(e) => println!("trapezoid rejected: {e}"),
+        Err(e) => println!("cold-formed outline rejected: {e}"),
     }
 
     // --- Report ------------------------------------------------------------
-    println!(
-        "Design check: M = {M_DESIGN:.3} kN*m, allowable stress = {SIGMA_ALLOW:.3} MPa\n"
-    );
+    println!("Design check: M = {M_DESIGN:.3} kN*m, allowable stress = {SIGMA_ALLOW:.3} MPa\n");
     println!(
         "{:<34}{:>10}{:>9}{:>13}{:>11}{:>8}{:>7}",
         "section", "A [mm2]", "kg/m", "Ix [mm4]", "Sx [mm3]", "rx", "util"

@@ -22,10 +22,16 @@ fn main() {
     let h = moist_air_enthalpy(t, w);
 
     println!("Moist air @ 25 °C, 101.325 kPa, p_w = 2.0 kPa:");
-    println!("  saturation pressure = {:.3} kPa", psat.get::<kilopascal>());
+    println!(
+        "  saturation pressure = {:.3} kPa",
+        psat.get::<kilopascal>()
+    );
     println!("  humidity ratio      = {:.4} kg water / kg dry air", w);
     println!("  relative humidity   = {:.1} %", rh * 100.0);
-    println!("  dew point           = {:.2} °C", dp.get::<kelvin>() - 273.15);
+    println!(
+        "  dew point           = {:.2} °C",
+        dp.get::<kelvin>() - 273.15
+    );
     println!("  moist-air enthalpy  = {:.1} kJ/kg dry air", h);
 
     // Round-trip: recover the partial pressure from the humidity ratio.

@@ -3,7 +3,7 @@
 // Demonstrates the core public API: PV single-diode cell model, wind-turbine
 // power envelope, Betz limit, and lithium-ion capacity-fade end-of-life.
 
-use tpt_eng_renewables::{cycles_to_threshold, wind_power, PvCell, G_REF};
+use tpt_eng_renewables::{G_REF, PvCell, cycles_to_threshold, wind_power};
 
 fn main() {
     println!("=== tpt-eng-renewables: core API ===");

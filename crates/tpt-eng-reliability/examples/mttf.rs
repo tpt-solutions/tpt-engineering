@@ -19,7 +19,9 @@ fn main() {
     let mttf_seal = exponential_mean(lambda_seal).unwrap();
     let mttf_ctrl = exponential_mean(lambda_ctrl).unwrap();
     let mttf_pump2 = exponential_mean(lambda_pump2).unwrap();
-    println!("Component MTTF (h): motor={mttf_motor:.1}, seal={mttf_seal:.1}, ctrl={mttf_ctrl:.1}, pump2={mttf_pump2:.1}");
+    println!(
+        "Component MTTF (h): motor={mttf_motor:.1}, seal={mttf_seal:.1}, ctrl={mttf_ctrl:.1}, pump2={mttf_pump2:.1}"
+    );
 
     let t = 1_000.0; // mission time (h)
 
