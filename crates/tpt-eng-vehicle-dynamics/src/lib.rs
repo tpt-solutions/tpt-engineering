@@ -9,7 +9,7 @@
 //! - **Aerodynamics** — quadratic drag and lift forces
 //!   ([`drag_force`], [`lift_force`]).
 //! - **Suspension kinematics** — a kinematic roll-center calculator for a
-//!   double-wishbone / SLA front view using [`tpt-eng-geometry`] points
+//!   double-wishbone / SLA front view using [`tpt_eng_geometry`] points
 //!   ([`roll_center_height`]).
 //!
 //! ## Units
@@ -145,9 +145,10 @@ pub fn lift_force(rho: f64, cl: f64, area: f64, v: f64) -> f64 {
 ///    line (through `lower_inner` and `lower_outer`) and the upper-arm line
 ///    (through `upper_inner` and `upper_outer`), found with
 ///    [`tpt_eng_geometry::intersection::line_line_closest`].
-/// 2. A line is drawn from the tire [`contact_patch`] (on the ground, at the
-///    left track edge) through the IC. The **roll center** is where this line
-///    crosses the vehicle centerline (`x = 0`).
+/// 2. A line is drawn from the tire contact patch (the `contact_patch`
+///    parameter, on the ground, at the left track edge) through the IC. The
+///    **roll center** is where this line crosses the vehicle centerline
+///    (`x = 0`).
 ///
 /// # Parameters
 ///
