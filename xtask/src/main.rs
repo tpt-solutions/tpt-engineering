@@ -367,7 +367,7 @@ fn render_crate_tests_basic() -> String {
 
 #[test]
 fn basic() {
-    assert!(true);
+    // Placeholder smoke test; expand with real assertions as the public API lands.
 }
 "
     .to_string()

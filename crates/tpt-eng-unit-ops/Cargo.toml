@@ -1,0 +1,19 @@
+[package]
+name = "tpt-eng-unit-ops"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Distillation stages, heat exchanger LMTD/epsilon-NTU, pump/compressor curves."
+readme = "README.md"
+repository.workspace = true
+homepage.workspace = true
+keywords = ["engineering", "process", "distillation", "heat-exchanger", "pump"]
+categories = ["science", "algorithms"]
+
+[dependencies]
+tpt-eng-props = { workspace = true }
+tpt-eng-heat-transfer = { workspace = true }
+
+[lints]
+workspace = true

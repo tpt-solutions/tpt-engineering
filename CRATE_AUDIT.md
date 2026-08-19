@@ -5,7 +5,7 @@ already a well-maintained Rust crate that does the same thing?
 
 ## Summary
 
-Of the 28 workspace crates, the large majority are genuine, purpose-built engineering-domain
+Of the 43 workspace crates, the large majority are genuine, purpose-built engineering-domain
 logic with **no direct Rust-ecosystem equivalent** — this is a niche domain (GD&T, tolerance
 stack-up, IAPWS steam tables, cross-section properties, reliability/FMEA, structural beam
 statics) that Rust simply doesn't have libraries for. A handful of crates do overlap
@@ -67,6 +67,20 @@ built *on* `plotters`, not reinventing it), `tpt-eng-props` / `-air` / `-fuels` 
 | **tpt-eng-timeseries-core** | Core time-series types (`Timestamp`, `Sample<T>`, `Series`) shared across the timeseries family | 158 | Minimal `std`-only newtype/struct wrappers |
 | **tpt-eng-timeseries-gap** | Staleness and gap detection/repair for dropout-prone sensor streams | 195 | Gap detection via max-`dt` threshold scan; hold/linear/zero-order fill `Strategy` enum |
 | **tpt-eng-tolerance** | Tolerance stack-up analysis for mechanical dimensioning | 464 | Worst-case, RSS, and Monte Carlo methods (`rand`/`rand_distr`) with sensitivity/contributor ranking |
+| **tpt-eng-electrical** | Electrical primitives: impedance/reactance, per-unit systems, three-phase power, conductor/insulator property lookups | stub | Scaffolded in Phase 9 (spec2.txt); implementation deferred |
+| **tpt-eng-heat-transfer** | Heat-transfer correlations: convection (Nu/Re/Pr), 1D/radial conduction, radiation view factors, thermal-resistance networks | stub | Scaffolded in Phase 9; implementation deferred |
+| **tpt-eng-props-mixture** | General real-gas / VLE property lookups for arbitrary process mixtures (`no_std`); joins the `tpt-eng-props` umbrella | stub | Scaffolded in Phase 9; re-exported by `tpt-eng-props` |
+| **tpt-eng-pcb** | PCB layer stackup, trace routing primitives, via/footprint definitions | stub | Scaffolded in Phase 9; depends on `tpt-eng-electrical`, `tpt-eng-materials` |
+| **tpt-eng-thermal-mgmt** | Heat sink sizing, fan curves, thermal-resistance networks for electronics | stub | Scaffolded in Phase 9; depends on `tpt-eng-heat-transfer`, `tpt-eng-props-air` |
+| **tpt-eng-power-components** | Transformer/generator equivalent circuits, transmission-line parameters | stub | Scaffolded in Phase 9; depends on `tpt-eng-electrical` |
+| **tpt-eng-renewables** | Solar PV, wind turbine, battery degradation models | stub | Scaffolded in Phase 9; depends on `tpt-eng-electrical`, `tpt-eng-props-air`, `tpt-eng-reliability` |
+| **tpt-eng-vehicle-dynamics** | Tire models, aero drag, suspension kinematics | stub | Scaffolded in Phase 9; depends on `tpt-eng-geometry`, `tpt-eng-structural`, `tpt-math-linalg` |
+| **tpt-eng-biomech** | Hyperelastic tissue models, implant geometry | stub | Scaffolded in Phase 9; depends on `tpt-eng-materials`, `tpt-eng-geometry` |
+| **tpt-eng-unit-ops** | Distillation, heat exchangers, pump/compressor curves | stub | Scaffolded in Phase 9; depends on `tpt-eng-props`, `tpt-eng-heat-transfer` |
+| **tpt-eng-crystallography** | Miller indices, slip systems, crystal symmetry | stub | Scaffolded in Phase 9; depends on `tpt-eng-geometry` |
+| **tpt-eng-geotech** | Soil constitutive models, borehole stratigraphy | stub | Scaffolded in Phase 9; depends on `tpt-eng-materials`, `tpt-math-linalg` |
+| **tpt-eng-building-sys** | HVAC loads, plumbing fixture units, electrical panel scheduling | stub | Scaffolded in Phase 9; depends on `tpt-eng-props-air`, `tpt-eng-heat-transfer`, `tpt-eng-electrical` |
+| **tpt-eng-schedule** | CPM/PERT networks, resource leveling, Earned Value Management | stub | Scaffolded in Phase 9; depends only on `tpt-math-numeric` |
 
 ### Notable architectural patterns across the workspace
 

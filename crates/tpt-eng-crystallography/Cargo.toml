@@ -1,0 +1,18 @@
+[package]
+name = "tpt-eng-crystallography"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Miller indices, slip systems, crystal symmetry operations."
+readme = "README.md"
+repository.workspace = true
+homepage.workspace = true
+keywords = ["engineering", "crystallography", "miller-indices", "materials", "slip-systems"]
+categories = ["science", "algorithms"]
+
+[dependencies]
+tpt-eng-geometry = { workspace = true }
+
+[lints]
+workspace = true

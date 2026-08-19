@@ -17,12 +17,14 @@ Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE).
 
 A set of small, single-purpose `tpt-eng-*` crates providing reusable
 engineering maths — fluid/gas properties, time-series conditioning,
-infrastructure topology, controls, structural/mechanical analysis, and
-geometry/CAD primitives — drawn out of the product verticals as
-foundation-pillar building blocks rather than product-shaped packages. The
-workspace has grown from the original 14-crate Phase-0 scope (see
-`spec.txt`) to 29 crates as structural/mechanical and geometry/CAD domains
-were added.
+infrastructure topology, controls, structural/mechanical analysis,
+geometry/CAD primitives, and domain-specific component models — drawn out of
+the product verticals as foundation-pillar building blocks rather than
+product-shaped packages. The workspace has grown from the original 14-crate
+Phase-0 scope (see `spec.txt`) to 43 crates: structural/mechanical and
+geometry/CAD domains were added post-Phase-4, and a further 14
+electronics/energy/transport/medical/process/earth/construction
+component-model crates were added per `spec2.txt` (Phase 9).
 
 All crates are new implementations built from scratch (the spec's claimed
 consolidation source `tpt-rust2` does not exist on this machine, and the
@@ -62,6 +64,20 @@ environment).
 | `tpt-eng-report` | output | | Markdown/HTML/JSON calculation reports |
 | `tpt-eng-cli` | integration | | Command-line tool over the above |
 | `tpt-eng-examples` | integration | | Cross-crate scenarios composing multiple domains |
+| `tpt-eng-electrical` | electrical | no | Impedance/reactance, per-unit systems, three-phase power |
+| `tpt-eng-heat-transfer` | thermal | no | Convection/radiation correlations, conduction, thermal-resistance networks |
+| `tpt-eng-props-mixture` | fluid-properties | yes | General real-gas / VLE property lookups for arbitrary mixtures |
+| `tpt-eng-pcb` | electronics | no | PCB layer stackup, trace routing, via/footprint definitions |
+| `tpt-eng-thermal-mgmt` | cross-domain | no | Heat sink sizing, fan curves, thermal-resistance networks |
+| `tpt-eng-power-components` | energy | no | Transformer/generator models, transmission-line parameters |
+| `tpt-eng-renewables` | energy | no | Solar PV, wind turbine, battery degradation models |
+| `tpt-eng-vehicle-dynamics` | transport | no | Tire models, aero drag, suspension kinematics |
+| `tpt-eng-biomech` | medical | no | Hyperelastic tissue models, implant geometry |
+| `tpt-eng-unit-ops` | process | no | Distillation, heat exchangers, pump/compressor curves |
+| `tpt-eng-crystallography` | materials | no | Miller indices, slip systems, symmetry operations |
+| `tpt-eng-geotech` | earth | no | Soil constitutive models, borehole stratigraphy |
+| `tpt-eng-building-sys` | construction | no | HVAC loads, plumbing fixture units, panel scheduling |
+| `tpt-eng-schedule` | construction | no | CPM/PERT, resource leveling, Earned Value Management |
 
 ## Building
 
@@ -119,6 +135,20 @@ The inventory above is a flat list. For choosing a starting point by task:
 | Generate a calculation report (Markdown/HTML/JSON) | `tpt-eng-report` |
 | Run any of the above from a command line, no Rust required | `tpt-eng-cli` |
 | A full worked cross-crate scenario | `tpt-eng-examples` |
+| Compute electrical impedance / per-unit / three-phase power | `tpt-eng-electrical` |
+| Compute convection/radiation heat transfer and conduction | `tpt-eng-heat-transfer` |
+| Look up general real-gas / VLE mixture properties | `tpt-eng-props-mixture` |
+| Design a PCB stackup / trace / via | `tpt-eng-pcb` |
+| Size a heat sink or solve a fan-curve operating point | `tpt-eng-thermal-mgmt` |
+| Model transformers, generators, or transmission lines | `tpt-eng-power-components` |
+| Model solar PV, wind turbines, or battery degradation | `tpt-eng-renewables` |
+| Model tire forces, aero drag, or suspension kinematics | `tpt-eng-vehicle-dynamics` |
+| Model hyperelastic tissue or implant geometry | `tpt-eng-biomech` |
+| Size distillation columns / heat exchangers, pump curves | `tpt-eng-unit-ops` |
+| Work with Miller indices, slip systems, crystal symmetry | `tpt-eng-crystallography` |
+| Model soil behavior or borehole stratigraphy | `tpt-eng-geotech` |
+| Compute HVAC loads, plumbing, or electrical panel schedules | `tpt-eng-building-sys` |
+| Plan/schedule projects (CPM/PERT, Earned Value Management) | `tpt-eng-schedule` |
 
 ## Quickstart
 

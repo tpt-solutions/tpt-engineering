@@ -1,0 +1,20 @@
+[package]
+name = "tpt-eng-renewables"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Solar PV I-V curves, wind turbine power curves, battery degradation models."
+readme = "README.md"
+repository.workspace = true
+homepage.workspace = true
+keywords = ["engineering", "renewable-energy", "solar", "wind", "battery"]
+categories = ["science", "algorithms"]
+
+[dependencies]
+tpt-eng-electrical = { workspace = true }
+tpt-eng-props-air = { workspace = true }
+tpt-eng-reliability = { workspace = true }
+
+[lints]
+workspace = true

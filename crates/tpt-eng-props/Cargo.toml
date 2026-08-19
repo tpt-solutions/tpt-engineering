@@ -21,6 +21,7 @@ tpt-math-units = { version = "0.1.0", default-features = false }
 tpt-eng-props-water = { workspace = true }
 tpt-eng-props-air = { workspace = true }
 tpt-eng-props-fuels = { workspace = true }
+tpt-eng-props-mixture = { workspace = true }
 
 [features]
 default = ["std"]
@@ -28,12 +29,14 @@ std = [
     "tpt-eng-props-water/std",
     "tpt-eng-props-air/std",
     "tpt-eng-props-fuels/std",
+    "tpt-eng-props-mixture/std",
     "tpt-math-units/std",
 ]
 alloc = [
     "tpt-eng-props-water/alloc",
     "tpt-eng-props-air/alloc",
     "tpt-eng-props-fuels/alloc",
+    "tpt-eng-props-mixture/alloc",
     "tpt-math-units/alloc",
 ]
 

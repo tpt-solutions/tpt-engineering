@@ -31,6 +31,20 @@ members = [
     "crates/tpt-eng-cli",
     "crates/tpt-eng-examples",
     "xtask",
+    "crates/tpt-eng-electrical",
+    "crates/tpt-eng-heat-transfer",
+    "crates/tpt-eng-props-mixture",
+    "crates/tpt-eng-pcb",
+    "crates/tpt-eng-thermal-mgmt",
+    "crates/tpt-eng-power-components",
+    "crates/tpt-eng-renewables",
+    "crates/tpt-eng-vehicle-dynamics",
+    "crates/tpt-eng-biomech",
+    "crates/tpt-eng-unit-ops",
+    "crates/tpt-eng-crystallography",
+    "crates/tpt-eng-geotech",
+    "crates/tpt-eng-building-sys",
+    "crates/tpt-eng-schedule",
 ]
 exclude = []
 
@@ -95,6 +109,20 @@ plotters = { version = "0.3", default-features = false, features = ["svg_backend
 clap = { version = "4.5", features = ["derive", "cargo"] }
 anyhow = "1.0"
 
+tpt-eng-electrical = { version = "0.1.0", path = "crates/tpt-eng-electrical" }
+tpt-eng-heat-transfer = { version = "0.1.0", path = "crates/tpt-eng-heat-transfer" }
+tpt-eng-props-mixture = { version = "0.1.0", path = "crates/tpt-eng-props-mixture" }
+tpt-eng-pcb = { version = "0.1.0", path = "crates/tpt-eng-pcb" }
+tpt-eng-thermal-mgmt = { version = "0.1.0", path = "crates/tpt-eng-thermal-mgmt" }
+tpt-eng-power-components = { version = "0.1.0", path = "crates/tpt-eng-power-components" }
+tpt-eng-renewables = { version = "0.1.0", path = "crates/tpt-eng-renewables" }
+tpt-eng-vehicle-dynamics = { version = "0.1.0", path = "crates/tpt-eng-vehicle-dynamics" }
+tpt-eng-biomech = { version = "0.1.0", path = "crates/tpt-eng-biomech" }
+tpt-eng-unit-ops = { version = "0.1.0", path = "crates/tpt-eng-unit-ops" }
+tpt-eng-crystallography = { version = "0.1.0", path = "crates/tpt-eng-crystallography" }
+tpt-eng-geotech = { version = "0.1.0", path = "crates/tpt-eng-geotech" }
+tpt-eng-building-sys = { version = "0.1.0", path = "crates/tpt-eng-building-sys" }
+tpt-eng-schedule = { version = "0.1.0", path = "crates/tpt-eng-schedule" }
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "warn"
 # No crate here is allowed to introduce `unsafe`; the math substrate we wrap is

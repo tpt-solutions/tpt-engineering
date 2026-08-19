@@ -653,6 +653,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "tpt-eng-biomech"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-geometry",
+ "tpt-eng-materials",
+]
+
+[[package]]
+name = "tpt-eng-building-sys"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-electrical",
+ "tpt-eng-heat-transfer",
+ "tpt-eng-props-air",
+]
+
+[[package]]
 name = "tpt-eng-cad"
 version = "0.1.0"
 dependencies = [
@@ -691,6 +708,21 @@ name = "tpt-eng-controls"
 version = "0.1.0"
 dependencies = [
  "tpt-math-linalg",
+]
+
+[[package]]
+name = "tpt-eng-crystallography"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-geometry",
+]
+
+[[package]]
+name = "tpt-eng-electrical"
+version = "0.1.0"
+dependencies = [
+ "tpt-math-numeric",
+ "tpt-math-units",
 ]
 
 [[package]]
@@ -747,6 +779,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "tpt-eng-geotech"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-materials",
+ "tpt-math-linalg",
+]
+
+[[package]]
+name = "tpt-eng-heat-transfer"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-props-air",
+ "tpt-eng-props-water",
+ "tpt-math-units",
+]
+
+[[package]]
 name = "tpt-eng-io"
 version = "0.1.0"
 dependencies = [
@@ -796,6 +845,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "tpt-eng-pcb"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-electrical",
+ "tpt-eng-materials",
+]
+
+[[package]]
 name = "tpt-eng-plot"
 version = "0.1.0"
 dependencies = [
@@ -804,11 +861,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "tpt-eng-power-components"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-electrical",
+]
+
+[[package]]
 name = "tpt-eng-props"
 version = "0.1.0"
 dependencies = [
  "tpt-eng-props-air",
  "tpt-eng-props-fuels",
+ "tpt-eng-props-mixture",
  "tpt-eng-props-water",
  "tpt-math-units",
 ]
@@ -823,6 +888,14 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-props-fuels"
+version = "0.1.0"
+dependencies = [
+ "tpt-math-numeric",
+ "tpt-math-units",
+]
+
+[[package]]
+name = "tpt-eng-props-mixture"
 version = "0.1.0"
 dependencies = [
  "tpt-math-numeric",
@@ -848,6 +921,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "tpt-eng-renewables"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-electrical",
+ "tpt-eng-props-air",
+ "tpt-eng-reliability",
+]
+
+[[package]]
 name = "tpt-eng-report"
 version = "0.1.0"
 dependencies = [
@@ -870,6 +952,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tpt-eng-schedule"
+version = "0.1.0"
+dependencies = [
+ "tpt-math-numeric",
+]
+
+[[package]]
 name = "tpt-eng-sections"
 version = "0.1.0"
 
@@ -888,6 +977,14 @@ version = "0.1.0"
 dependencies = [
  "tpt-eng-safety",
  "tpt-math-units",
+]
+
+[[package]]
+name = "tpt-eng-thermal-mgmt"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-heat-transfer",
+ "tpt-eng-props-air",
 ]
 
 [[package]]
@@ -929,6 +1026,23 @@ dependencies = [
  "rand_distr",
  "serde",
  "tpt-math-stats",
+]
+
+[[package]]
+name = "tpt-eng-unit-ops"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-heat-transfer",
+ "tpt-eng-props",
+]
+
+[[package]]
+name = "tpt-eng-vehicle-dynamics"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-geometry",
+ "tpt-eng-structural",
+ "tpt-math-linalg",
 ]
 
 [[package]]

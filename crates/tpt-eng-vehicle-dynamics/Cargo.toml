@@ -1,0 +1,20 @@
+[package]
+name = "tpt-eng-vehicle-dynamics"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Tire models (Pacejka), aerodynamic drag, suspension kinematics."
+readme = "README.md"
+repository.workspace = true
+homepage.workspace = true
+keywords = ["engineering", "vehicle-dynamics", "tire", "aerodynamics", "suspension"]
+categories = ["science", "algorithms", "simulation"]
+
+[dependencies]
+tpt-eng-geometry = { workspace = true }
+tpt-eng-structural = { workspace = true }
+tpt-math-linalg = { workspace = true }
+
+[lints]
+workspace = true
