@@ -22,7 +22,7 @@ const KB_EV: f64 = 8.617_333_262e-5;
 
 /// Reference plane-of-array irradiance (W/m²) at which [`PvCell`] reference
 /// parameters are quoted (standard test conditions).
-const G_REF: f64 = 1000.0;
+pub const G_REF: f64 = 1000.0;
 
 /// Absolute zero in degrees Celsius.
 const CELSIUS_OFFSET: f64 = 273.15;

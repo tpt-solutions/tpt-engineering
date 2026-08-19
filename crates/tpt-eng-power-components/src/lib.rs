@@ -311,8 +311,7 @@ pub fn generator_mechanical_power(electrical_power: f64, efficiency: f64) -> f64
 /// terminal output, from the line-to-line voltage `v_ll` (V), line current
 /// `i_line` (A), power factor `pf` (0…1) and overall efficiency (0…1).
 ///
-/// The real terminal power is taken from
-/// [`three_phase_power`](tpt_eng_electrical::three_phase_power)
+/// The real terminal power is taken from [`three_phase_power`]
 /// (`P = √3·V_ll·I_line·pf`) and divided by the efficiency.
 ///
 /// # Panics
