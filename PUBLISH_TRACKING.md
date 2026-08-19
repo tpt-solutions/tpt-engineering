@@ -23,11 +23,11 @@ error and re-run the same command.
 
 ## Batch 6 — foundation (only Batches 1–5 + `tpt-math-*` deps, no interdependencies)
 
-- [ ] `tpt-eng-props-mixture` — `cargo publish -p tpt-eng-props-mixture`
-- [ ] `tpt-eng-electrical` — `cargo publish -p tpt-eng-electrical`
-- [ ] `tpt-eng-schedule` — `cargo publish -p tpt-eng-schedule`
-- [ ] `tpt-eng-biomech` — `cargo publish -p tpt-eng-biomech`
-- [ ] `tpt-eng-crystallography` — `cargo publish -p tpt-eng-crystallography`
+- [x] `tpt-eng-props-mixture` — `cargo publish -p tpt-eng-props-mixture`
+- [x] `tpt-eng-electrical` — `cargo publish -p tpt-eng-electrical`
+- [x] `tpt-eng-schedule` — `cargo publish -p tpt-eng-schedule`
+- [x] `tpt-eng-biomech` — `cargo publish -p tpt-eng-biomech`
+- [x] `tpt-eng-crystallography` — `cargo publish -p tpt-eng-crystallography`
 
 Why this order: none of these five depend on each other or on anything outside the
 already-published 29 crates, so they can go in any order within the batch.
