@@ -2,14 +2,12 @@
 
 use tpt_eng_electrical::material_property;
 use tpt_eng_pcb::{
-    footprint::Pad,
-    ipc_2221_current_capacity,
-    microstrip_impedance,
-    stackup::{Layer, Stackup},
-    trace_area_mil2,
-    trace_dc_resistance,
-    via::Via,
     MIL_TO_M,
+    footprint::Pad,
+    ipc_2221_current_capacity, microstrip_impedance,
+    stackup::{Layer, Stackup},
+    trace_area_mil2, trace_dc_resistance,
+    via::Via,
 };
 
 #[test]

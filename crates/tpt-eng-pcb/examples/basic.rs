@@ -2,7 +2,9 @@
 
 use tpt_eng_electrical::material_property;
 use tpt_eng_pcb::{
-    ipc_2221_current_capacity, microstrip_impedance, stackup::{Layer, Stackup}, trace_area_mil2,
+    ipc_2221_current_capacity, microstrip_impedance,
+    stackup::{Layer, Stackup},
+    trace_area_mil2,
     via::Via,
 };
 
@@ -13,7 +15,10 @@ fn main() {
         Layer::new("FR-4 core", 1.6e-3, 4.4, 0.0),
         Layer::new("L2 copper", 35e-6, 1.0, 5.8e7),
     ]);
-    println!("Stackup thickness : {:.3} mm", stackup.total_thickness() * 1e3);
+    println!(
+        "Stackup thickness : {:.3} mm",
+        stackup.total_thickness() * 1e3
+    );
     println!(
         "Effective εᵣ      : {:.3}",
         stackup.effective_dielectric_constant()

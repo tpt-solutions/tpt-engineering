@@ -594,9 +594,14 @@ foundational crates above are registered):
       (PV/EV/AC, CPI/SPI).
 
 ### 9d. Explicitly deferred
-- [ ] Implement each crate's actual domain logic (scaffolding above only
-      produces empty-but-building stubs) — separate follow-up
-      implementation task per crate/family.
+- [x] Implement each crate's actual domain logic — done: the 14 crates carry real
+      implementations (no `todo!`/`unimplemented!`/`unreachable!`/`panic!` in
+      `src`), all 14 build and `cargo test --workspace --all-features` /
+      `cargo xtask check` (fmt `--check`, clippy `-D warnings`, `cargo deny
+      check`) pass; `tpt-eng-unit-ops` distillation/ε-NTU math had real defects
+      (Underwood quadratic solve, McCabe–Thiele stepping, ε-NTU inverse, Fenske
+      and relative-volatility test expectations) which were fixed and covered
+      with new tests. Verified 2026-08-19.
 - [x] Update `CRATE_AUDIT.md` and root `README.md` crate tables once the new
       crates exist.
 - [x] `cargo build --workspace` / `cargo test --workspace` /

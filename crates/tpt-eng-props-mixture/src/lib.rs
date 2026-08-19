@@ -32,7 +32,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-const PI: f64 = 3.141_592_653_589_793;
+const PI: f64 = core::f64::consts::PI;
 
 #[cfg(not(feature = "std"))]
 use tpt_math_numeric::libm::{acos, cos, ln, powf, sqrt};
@@ -168,6 +168,10 @@ impl<T: Copy> FixedVec<T> {
     pub fn len(&self) -> usize {
         self.len
     }
+    /// Whether the vector holds no elements.
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
     /// Iterate over the stored elements.
     pub fn iter(&self) -> impl Iterator<Item = T> + '_ {
         (0..self.len).filter_map(move |i| self.data[i])
@@ -265,14 +269,13 @@ impl Mixture {
             let mut sum = 0.0;
             for j in 0..n {
                 let aj = pr_a(self.components[j], t);
-                let aij = (ai_vec[i] * aj).sqrt() * (1.0 - kij(self.components[i], self.components[j]));
+                let aij =
+                    (ai_vec[i] * aj).sqrt() * (1.0 - kij(self.components[i], self.components[j]));
                 sum += self.mole_fractions[j] * aij;
             }
             let ratio = ((z + (1.0 + sqrt(2.0)) * bb) / (z + (1.0 - sqrt(2.0)) * bb)).max(1e-12);
             let log_phi = (bi / b_mix) * (z - 1.0)
-                - (aa / (2.0 * sqrt(2.0) * bb))
-                    * (2.0 * sum / a_mix - bi / b_mix)
-                    * ln(ratio);
+                - (aa / (2.0 * sqrt(2.0) * bb)) * (2.0 * sum / a_mix - bi / b_mix) * ln(ratio);
             phi.push(log_phi.exp());
         }
         phi
@@ -379,7 +382,7 @@ pub fn peng_robinson_z(t: f64, p: f64, mix: &Mixture) -> ZRoots {
             real.push(z);
         }
     }
-    if real.len() == 0 {
+    if real.is_empty() {
         return ZRoots {
             z_vapour: None,
             z_liquid: None,
@@ -542,7 +545,10 @@ mod tests {
         assert!((s - 1.0).abs() < 1e-9, "Σy = {s}");
         let lo = p_pure_c2.min(p_pure_c3);
         let hi = p_pure_c2.max(p_pure_c3);
-        assert!(p_mix >= lo && p_mix <= hi, "p_mix={p_mix} range [{lo},{hi}]");
+        assert!(
+            p_mix >= lo && p_mix <= hi,
+            "p_mix={p_mix} range [{lo},{hi}]"
+        );
     }
 
     #[test]

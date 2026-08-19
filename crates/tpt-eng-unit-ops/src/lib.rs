@@ -31,18 +31,18 @@
 //! use tpt_eng_unit_ops::{fenske_min_stages, lmtd, epsilon_ntu_counterflow};
 //!
 //! // Minimum stages to split 0.95 overhead / 0.05 bottoms at α = 2.5.
-//! let n_min = fenske_min_stages(0.95, 0.05, 2.5);
-//! assert!(n_min > 3.0 && n_min < 4.0);
+//! let n_min = fenske_min_stages(0.95, 0.05, 2.5).unwrap();
+//! assert!(n_min > 6.0 && n_min < 7.0);
 //!
 //! // Counterflow ε-NTU with NTU=2, capacity ratio 0.5.
-//! let eps = epsilon_ntu_counterflow(2.0, 0.5);
+//! let eps = epsilon_ntu_counterflow(2.0, 0.5).unwrap();
 //! assert!(eps > 0.5 && eps < 0.8);
 //! ```
 
 use tpt_eng_heat_transfer::{
     convection_coefficient, nusselt_internal_pipe, parallel_grey_plates_flux, parallel_resistances,
 };
-use tpt_eng_props::mixture::{pr_saturation_pressure, Component};
+use tpt_eng_props::mixture::{Component, pr_saturation_pressure};
 
 /// Gravitational acceleration (m/s²), SI value.
 pub const G: f64 = 9.806_65;
@@ -157,12 +157,10 @@ pub fn underwood_theta(xf: f64, q: f64, alpha: f64) -> Option<f64> {
         }
         return None;
     }
-    for cand in [(-bo + sq) / (2.0 * ao), (-bo - sq) / (2.0 * ao)] {
-        if cand > 1.0 && cand < alpha && cand.is_finite() {
-            return Some(cand);
-        }
-    }
-    None
+    let candidates = [(-bo + sq) / (2.0 * ao), (-bo - sq) / (2.0 * ao)];
+    candidates
+        .into_iter()
+        .find(|&cand| cand > 1.0 && cand < alpha && cand.is_finite())
 }
 
 /// Minimum reflux ratio `R_min` for a binary (Underwood):
@@ -331,7 +329,7 @@ pub fn mccabe_thiele_stages(
             stages += f.clamp(0.0, 1.0);
             return Some(McCabeThiele { stages, feed_stage });
         }
-        if !(x_next < xl) {
+        if x_next >= xl {
             return None;
         }
         xl = x_next;
@@ -377,7 +375,12 @@ pub fn lmtd(dt_hot: f64, dt_cold: f64) -> Option<f64> {
 ///
 /// Returns `None` when `u`, `a` or `c_min` is non-positive or non-finite.
 pub fn ntu(u: f64, a: f64, c_min: f64) -> Option<f64> {
-    if u <= 0.0 || a <= 0.0 || c_min <= 0.0 || !u.is_finite() || !a.is_finite() || !c_min.is_finite()
+    if u <= 0.0
+        || a <= 0.0
+        || c_min <= 0.0
+        || !u.is_finite()
+        || !a.is_finite()
+        || !c_min.is_finite()
     {
         return None;
     }
@@ -392,12 +395,7 @@ pub fn ntu(u: f64, a: f64, c_min: f64) -> Option<f64> {
 /// Returns `None` when `c_min` is negative or non-finite, `c_max` is
 /// non-positive or non-finite, or `c_min > c_max`.
 pub fn capacity_ratio(c_min: f64, c_max: f64) -> Option<f64> {
-    if c_min < 0.0
-        || c_max <= 0.0
-        || !c_min.is_finite()
-        || !c_max.is_finite()
-        || c_min > c_max
-    {
+    if c_min < 0.0 || c_max <= 0.0 || !c_min.is_finite() || !c_max.is_finite() || c_min > c_max {
         return None;
     }
     Some(c_min / c_max)
@@ -412,7 +410,7 @@ pub fn capacity_ratio(c_min: f64, c_max: f64) -> Option<f64> {
 /// Returns `None` when `eps` is outside `[0, 1]`, `c_min` is negative or
 /// non-finite, or `dt_in` is non-finite.
 pub fn effectiveness_to_q(eps: f64, c_min: f64, dt_in: f64) -> Option<f64> {
-    if !(eps >= 0.0 && eps <= 1.0) || c_min < 0.0 || !c_min.is_finite() || !dt_in.is_finite() {
+    if !(0.0..=1.0).contains(&eps) || c_min < 0.0 || !c_min.is_finite() || !dt_in.is_finite() {
         return None;
     }
     Some(eps * c_min * dt_in)
@@ -427,7 +425,7 @@ pub fn effectiveness_to_q(eps: f64, c_min: f64, dt_in: f64) -> Option<f64> {
 /// Returns `None` when `ntu` is negative or non-finite, `cr` is outside
 /// `[0, 1]`, or the expression is non-finite.
 pub fn epsilon_ntu_counterflow(ntu: f64, cr: f64) -> Option<f64> {
-    if ntu < 0.0 || !ntu.is_finite() || !(cr >= 0.0 && cr <= 1.0) {
+    if ntu < 0.0 || !ntu.is_finite() || !(0.0..=1.0).contains(&cr) {
         return None;
     }
     if (1.0 - cr).abs() < 1e-9 {
@@ -448,7 +446,7 @@ pub fn epsilon_ntu_counterflow(ntu: f64, cr: f64) -> Option<f64> {
 /// Returns `None` when `ntu` is negative or non-finite, `cr` is outside
 /// `[0, 1]`, or the expression is non-finite.
 pub fn epsilon_ntu_parallel(ntu: f64, cr: f64) -> Option<f64> {
-    if ntu < 0.0 || !ntu.is_finite() || !(cr >= 0.0 && cr <= 1.0) {
+    if ntu < 0.0 || !ntu.is_finite() || !(0.0..=1.0).contains(&cr) {
         return None;
     }
     let e = (1.0 - (-ntu * (1.0 + cr)).exp()) / (1.0 + cr);
@@ -479,7 +477,7 @@ pub fn epsilon_ntu_phase_change(ntu: f64) -> Option<f64> {
 /// Returns `None` when `eps` is outside `[0, 1)`, `cr` is outside `[0, 1]`, or
 /// the required NTU is non-finite / negative.
 pub fn ntu_from_epsilon_counterflow(eps: f64, cr: f64) -> Option<f64> {
-    if !(eps >= 0.0 && eps < 1.0) || !(cr >= 0.0 && cr <= 1.0) {
+    if !(0.0..1.0).contains(&eps) || !(0.0..=1.0).contains(&cr) {
         return None;
     }
     let n = if (1.0 - cr).abs() < 1e-9 {
@@ -505,7 +503,8 @@ pub fn overall_u(resistances: &[f64]) -> Option<f64> {
         return None;
     }
     let total: f64 = resistances.iter().copied().fold(0.0, |a, b| a + b);
-    if total <= 0.0 || !total.is_finite() || resistances.iter().any(|r| *r <= 0.0 || !r.is_finite()) {
+    if total <= 0.0 || !total.is_finite() || resistances.iter().any(|r| *r <= 0.0 || !r.is_finite())
+    {
         return None;
     }
     Some(1.0 / total)
@@ -545,12 +544,7 @@ pub fn overall_u_parallel(resistances: &[f64]) -> Option<f64> {
 ///
 /// Returns `None` when `flow_m3s` or `head_m` is negative or non-finite,
 /// `rho` is non-positive or non-finite, or `efficiency` is outside `(0, 1]`.
-pub fn pump_power(
-    flow_m3s: f64,
-    head_m: f64,
-    rho: f64,
-    efficiency: f64,
-) -> Option<f64> {
+pub fn pump_power(flow_m3s: f64, head_m: f64, rho: f64, efficiency: f64) -> Option<f64> {
     if flow_m3s < 0.0
         || head_m < 0.0
         || rho <= 0.0
@@ -618,8 +612,12 @@ pub fn npsh_available(
     z_static: f64,
     h_friction: f64,
 ) -> Option<f64> {
-    if rho <= 0.0 || !rho.is_finite() || !p_suction.is_finite() || !p_vapour.is_finite()
-        || !z_static.is_finite() || !h_friction.is_finite()
+    if rho <= 0.0
+        || !rho.is_finite()
+        || !p_suction.is_finite()
+        || !p_vapour.is_finite()
+        || !z_static.is_finite()
+        || !h_friction.is_finite()
     {
         return None;
     }
@@ -677,12 +675,12 @@ pub fn compressor_isentropic_power(
 ///
 /// Returns `None` when `t_in` is non-positive / non-finite, `p_ratio <= 1`,
 /// `gamma <= 1`, or any input is non-finite.
-pub fn compressor_discharge_temperature(
-    t_in: f64,
-    p_ratio: f64,
-    gamma: f64,
-) -> Option<f64> {
-    if t_in <= 0.0 || p_ratio <= 1.0 || gamma <= 1.0 || !t_in.is_finite() || !p_ratio.is_finite()
+pub fn compressor_discharge_temperature(t_in: f64, p_ratio: f64, gamma: f64) -> Option<f64> {
+    if t_in <= 0.0
+        || p_ratio <= 1.0
+        || gamma <= 1.0
+        || !t_in.is_finite()
+        || !p_ratio.is_finite()
         || !gamma.is_finite()
     {
         return None;
@@ -725,13 +723,7 @@ pub fn tube_film_coefficient(
 ///
 /// Does not panic; returns a non-finite value for non-positive `area` or for
 /// non-finite temperature / factor inputs.
-pub fn radiant_loss(
-    area: f64,
-    emissivity: f64,
-    f: f64,
-    t_surface_k: f64,
-    t_ambient_k: f64,
-) -> f64 {
+pub fn radiant_loss(area: f64, emissivity: f64, f: f64, t_surface_k: f64, t_ambient_k: f64) -> f64 {
     area * f * emissivity * SIGMA_FAC * (t_surface_k.powi(4) - t_ambient_k.powi(4))
 }
 
@@ -790,7 +782,10 @@ mod tests {
         eprintln!("DIAG theta={theta} rmin={rmin}");
         let n_min = fenske_min_stages(0.95, 0.05, 2.4).unwrap();
         let mt = mccabe_thiele_stages(0.95, 0.05, 0.5, 0.0, 2.4, 100.0).unwrap();
-        eprintln!("DIAG n_min={n_min} mt.stages={} feed={:?}", mt.stages, mt.feed_stage);
+        eprintln!(
+            "DIAG n_min={n_min} mt.stages={} feed={:?}",
+            mt.stages, mt.feed_stage
+        );
         let eps = epsilon_ntu_counterflow(3.0, 0.4).unwrap();
         let n = ntu_from_epsilon_counterflow(eps, 0.4).unwrap();
         eprintln!("DIAG eps={eps} n={n}");
@@ -890,4 +885,3 @@ mod tests {
         assert!(a.is_finite() && a > 1.0);
     }
 }
-                                                               

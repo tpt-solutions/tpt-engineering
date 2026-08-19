@@ -122,7 +122,10 @@ pub fn impedance_capacitor(capacitance_f: f64, frequency_hz: f64) -> Complex {
 
 /// Combine impedances in series: `Z = Σ Zᵢ`.
 pub fn impedance_series(impedances: &[Complex]) -> Complex {
-    impedances.iter().copied().fold(Complex::new(0.0, 0.0), Add::add)
+    impedances
+        .iter()
+        .copied()
+        .fold(Complex::new(0.0, 0.0), Add::add)
 }
 
 /// Combine impedances in parallel: `1/Z = Σ 1/Zᵢ`.
@@ -242,14 +245,13 @@ pub struct MaterialProperty {
 /// (case-insensitive). Returns `None` if the material is unknown.
 pub fn material_property(name: &str) -> Option<MaterialProperty> {
     let n = name.to_ascii_lowercase();
-    let rec = |resistivity_ohm_m: f64, relative_permittivity: f64, ampacity_a: f64| {
-        MaterialProperty {
+    let rec =
+        |resistivity_ohm_m: f64, relative_permittivity: f64, ampacity_a: f64| MaterialProperty {
             resistivity_ohm_m,
             relative_permittivity,
             ampacity_a,
             source: DataSource::OpenLiterature,
-        }
-    };
+        };
     match n.as_str() {
         "cu" | "copper" => Some(rec(1.68e-8, 1.0, 320.0)),
         "al" | "aluminium" | "aluminum" => Some(rec(2.65e-8, 1.0, 250.0)),
@@ -272,7 +274,12 @@ pub fn dc_resistance(length_m: f64, area_m2: f64, resistivity_ohm_m: f64) -> f64
 /// (m) at frequency `f` (Hz) with resistivity `ρ` (Ω·m) and permeability `μ`
 /// (H/m). Uses the low-frequency asymptotic approximation
 /// `R_ac/R_dc ≈ 1 + (r/2δ)²` with penetration depth `δ = √(ρ / (π·f·μ))`.
-pub fn skin_effect_ratio(radius_m: f64, frequency_hz: f64, resistivity_ohm_m: f64, mu_h_per_m: f64) -> f64 {
+pub fn skin_effect_ratio(
+    radius_m: f64,
+    frequency_hz: f64,
+    resistivity_ohm_m: f64,
+    mu_h_per_m: f64,
+) -> f64 {
     let delta = (resistivity_ohm_m / (std::f64::consts::PI * frequency_hz * mu_h_per_m)).sqrt();
     let x = radius_m / (2.0 * delta);
     1.0 + x * x
@@ -354,7 +361,8 @@ mod tests {
 
     #[test]
     fn admittance_inverts_impedance() {
-        let z = impedance_resistor(4.0) + impedance_inductor(1.0, 50.0 / (2.0 * std::f64::consts::PI));
+        let z =
+            impedance_resistor(4.0) + impedance_inductor(1.0, 50.0 / (2.0 * std::f64::consts::PI));
         let y = admittance(z);
         let back = Complex::new(1.0, 0.0) / y;
         assert!((back.re - z.re).abs() < 1e-9);

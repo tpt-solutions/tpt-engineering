@@ -92,7 +92,10 @@ pub fn microstrip_impedance(
 /// Panics if `area_mil2` or `temp_rise_c` is negative (non-physical inputs would
 /// produce `NaN`).
 pub fn ipc_2221_current_capacity(area_mil2: f64, temp_rise_c: f64, external: bool) -> f64 {
-    assert!(area_mil2 >= 0.0, "cross-sectional area must be non-negative");
+    assert!(
+        area_mil2 >= 0.0,
+        "cross-sectional area must be non-negative"
+    );
     assert!(temp_rise_c >= 0.0, "temperature rise must be non-negative");
     let k = if external { 0.048 } else { 0.024 };
     k * temp_rise_c.powf(0.44) * area_mil2.powf(0.725)

@@ -21,15 +21,17 @@
 //! assert!((z0 - 50.0).abs() < 6.0);
 //! ```
 
+pub mod footprint;
 pub mod stackup;
 pub mod trace;
 pub mod via;
-pub mod footprint;
 
-pub use stackup::{Layer, Stackup};
-pub use trace::{ipc_2221_current_capacity, microstrip_impedance, trace_area_mil2, trace_dc_resistance};
-pub use via::Via;
 pub use footprint::Pad;
+pub use stackup::{Layer, Stackup};
+pub use trace::{
+    ipc_2221_current_capacity, microstrip_impedance, trace_area_mil2, trace_dc_resistance,
+};
+pub use via::Via;
 
 /// One mil = 1/1000 inch = 25.4 µm, expressed in metres.
 pub const MIL_TO_M: f64 = 2.54e-5;

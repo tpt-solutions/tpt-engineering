@@ -32,9 +32,7 @@
 use tpt_eng_props_air as air;
 use tpt_eng_props_water as water;
 use tpt_math_units::uom::si::f64::*;
-use tpt_math_units::uom::si::{
-    pressure::pascal, thermodynamic_temperature::kelvin,
-};
+use tpt_math_units::uom::si::{pressure::pascal, thermodynamic_temperature::kelvin};
 
 /// Stefan–Boltzmann constant, W/(m²·K⁴).
 pub const SIGMA: f64 = 5.670_374_419e-8;
@@ -88,12 +86,7 @@ pub fn convection_coefficient(nu: f64, conductivity: f64, length: f64) -> f64 {
 }
 
 /// 1-D planar conduction heat rate (W): `q = k·A·ΔT / L`.
-pub fn plane_wall_heat_rate(
-    conductivity: f64,
-    area: f64,
-    delta_t: f64,
-    thickness: f64,
-) -> f64 {
+pub fn plane_wall_heat_rate(conductivity: f64, area: f64, delta_t: f64, thickness: f64) -> f64 {
     conductivity * area * delta_t / thickness
 }
 
