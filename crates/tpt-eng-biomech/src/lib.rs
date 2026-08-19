@@ -7,10 +7,13 @@
 //! * **Hyperelastic constitutive models** for soft tissue under incompressible,
 //!   uniaxial extension parameterized by the stretch ratio `λ` (ratio of
 //!   deformed to reference length, dimensionless). Two models are provided:
-//!   * the [Mooney-Rivlin][mooney_rivlin_stress] two-parameter model, and
-//!   * the [Ogden][ogden_stress] sum-of-terms model (which reduces to the
-//!     neo-Hookean form for a single `α = 2` term).
-//! * **Implant geometry primitives** ([`Stem`], [`Cup`]) built on the
+//!   * the [`mooney_rivlin_stress`](crate::constitutive::mooney_rivlin_stress)
+//!     two-parameter model, and
+//!   * the [`ogden_stress`](crate::constitutive::ogden_stress)
+//!     sum-of-terms model (which reduces to the neo-Hookean form for a single
+//!     `α = 2` term).
+//! * **Implant geometry primitives** ([`Stem`](crate::implant::Stem),
+//!   [`Cup`](crate::implant::Cup)) built on the
 //!   [`tpt_eng_geometry`] frame/point types, with closed-form volume and
 //!   surface-area approximations.
 //!
