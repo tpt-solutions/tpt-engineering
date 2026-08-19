@@ -19,6 +19,9 @@ crates together?".
 - **Mechanical design** ([`mechanical_design`]) — define a cross-section and
   material, roll up a dimensional tolerance stack-up, check measured points
   against a GD&T zone, and render the result as a calculation report.
+- **Solar PV sizing** ([`solar_pv`]) — sweep a single-diode PV cell to its
+  maximum-power point, scale to an array, and size the balanced three-phase
+  grid-tie connection (composes `tpt-eng-renewables` + `tpt-eng-electrical`).
 
 ## Installation
 
@@ -45,6 +48,7 @@ assert!(report.max_gap_seconds < 6.0);
 | --- | --- |
 | `thermal_loop` | `run_thermal_loop` and `ThermalLoopReport`. |
 | `mechanical_design` | `run_mechanical_design`, `design_report`, `MechanicalDesignReport`. |
+| `solar_pv` | `run_solar_pv_sizing`, `SolarPvReport`. |
 
 ## Related crates
 

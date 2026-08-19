@@ -12,10 +12,12 @@
 .vscode/*
 !.vscode/settings.json
 
-# Stray build/verify debug output (root-level _*.log, _verify*.log) and agent
-# scratch directories generated during tool runs.
+# Stray build/verify debug output (root-level _*.log, _verify*.log, and any
+# bare *.log emitted by tool runs) and agent scratch directories generated
+# during tool runs.
 _*.log
 _verify*.log
+/*.log
 _agent_*/
 
 # Kilo internal state

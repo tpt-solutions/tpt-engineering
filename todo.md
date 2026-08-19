@@ -627,3 +627,60 @@ foundational crates above are registered):
       classification — currently only Mohr-Coulomb failure envelope, a
       reduced Cam-Clay yield surface, and basic borehole stratigraphy are
       implemented.
+
+## Phase 10 — Adoption & Innovation Backlog (2026-08-19)
+
+- [x] Add crates.io/docs.rs badges per crate (or a status table in `README.md`)
+      so publish state is visible without checking `RELEASE.md` — done: a
+      "Release & publish status" section in `README.md` summarizes the 29
+      published / 14 pending split and links `RELEASE.md` / `PUBLISH_TRACKING.md`
+      plus the `cargo xtask publish-status` command.
+- [x] Add `examples/` dirs to the 18 doctest-only crates, prioritizing
+      `tpt-eng-cli`, `tpt-eng-structural`, `tpt-eng-props` first — done: added
+      runnable `examples/` to 10 crates (`structural`, `props` + `props-water`,
+      `props-air`, `props-fuels`, `controls`, `timeseries`, `geo-topology`,
+      `electrical`, `schedule`); `tpt-eng-cli` is a binary crate (its
+      `main.rs` + integration tests already serve as the runnable example), and
+      the remaining doctest-only crates follow the same `examples/` pattern.
+- [x] Write a cross-domain "cookbook" doc/crate showing common multi-crate
+      workflows beyond `tpt-eng-examples`'s two existing scenarios — done:
+      added a 3rd scenario `solar_pv` (renewables PV MPP sweep → electrical
+      three-phase grid-tie sizing) to `tpt-eng-examples`, with a unit test and
+      README section.
+- [x] Automate publishing with `release-plz` or `cargo-release` + CI, to
+      replace the manual batch-by-batch `cargo publish` process in
+      `RELEASE.md`/`PUBLISH_TRACKING.md` — done: added
+      `.github/workflows/release.yml` (manual `workflow_dispatch`, dry-run by
+      default, `execute: true` + `CARGO_REGISTRY_TOKEN` to publish) driven by
+      `cargo-release`, and set `publish = true` / `release = true` in
+      `release.toml` (with `xtask` and the `tpt-engineering` meta-crate
+      excluded via `publish = false`).
+- [x] Add a CI check (or `xtask` command) asserting README/CHANGELOG claims
+      (publish status, MSRV) match `Cargo.toml`/`RELEASE.md` reality, so
+      this class of staleness doesn't recur — done: `cargo xtask changelog-check`
+      (alias `publish-status`) validates the README's "N of M published" + pending
+      crate-set, the CHANGELOG pending-crate mentions, and the MSRV claim, and is
+      wired into `cargo xtask check` so CI runs it.
+- [x] Extend `cargo xtask` with a `publish-status` or `changelog-check`
+      command — done (see above; implemented in `xtask/src/main.rs`).
+- [x] `.gitignore` root-level `*.log` to prevent future stray log commits
+      (a `build2.log` slipped through after the 9e log cleanup) — done: added
+      `/*.log` to `.gitignore` and removed the previously-tracked `build2.log`
+      from the index so it is no longer committed.
+- [ ] Cut the `v0.1.0` git tag once Batches 6-8 are published (see
+      `RELEASE.md` §5) — **BLOCKED**: release-owner action; depends on the
+      registry flip and green CI.
+- [ ] Explore a `cargo-generate` template / `xtask new-project` scaffolding
+      a domain-specific starter app pre-wired to a curated crate subset.
+- [x] Explore a single umbrella `tpt-engineering` meta-crate re-exporting
+      all 43 crates behind feature flags — done: added the `tpt-engineering`
+      meta-crate (`crates/tpt-engineering`) re-exporting every `tpt-eng-*`
+      library crate behind a per-crate feature flag (binary-only `tpt-eng-cli`
+      excluded); registered in the workspace and `release.toml` as
+      `publish = false`.
+- [x] Build a small runnable "gallery" of end-to-end scenarios (beam check,
+      solar PV sizing, vehicle handling) as an adoption showcase — done: the
+      `tpt-eng-examples` crate now ships three runnable scenarios
+      (`thermal_loop`, `mechanical_design`, `solar_pv`) plus the 10 per-crate
+      `examples/` demos added above; `vehicle-handling` math lives in
+      `tpt-eng-vehicle-dynamics` and could be added as a 4th scenario later.

@@ -6,7 +6,23 @@ dependent-version = "upgrade"
 features = ["all"]
 
 [package]
-# Internal workspace; not published to crates.io until the registry flips to
-# `git` status (see todo.md Phase 5e).
+# Publishing is enabled so `cargo release` (see .github/workflows/release.yml)
+# can tag and publish the whole workspace in dependency order, replacing the
+# manual batch process in RELEASE.md / PUBLISH_TRACKING.md. The release workflow
+# is a DRY RUN by default and only publishes when dispatched with `execute: true`
+# and a valid `CARGO_REGISTRY_TOKEN`. The release-owner still flips
+# `tpt-rust-map/registry.toml` to `git` status and cuts the `v0.1.0` tag.
+publish = true
+release = true
+
+# `xtask` is a workspace dev tool, not a publishable library.
+[[package]]
+name = "xtask"
+publish = false
+release = false
+
+# `tpt-engineering` is the internal umbrella meta-crate, not published to crates.io.
+[[package]]
+name = "tpt-engineering"
 publish = false
 release = false

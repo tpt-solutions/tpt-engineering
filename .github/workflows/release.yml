@@ -1,0 +1,61 @@
+name: release
+
+# Automated workspace release via `cargo-release`, replacing the manual
+# batch-by-batch `cargo publish` process documented in RELEASE.md /
+# PUBLISH_TRACKING.md. The whole workspace is versioned and published together,
+# with cargo-release ordering crates by their dependency edges.
+#
+# Runs only on manual dispatch. It is a DRY RUN by default; set `execute: true`
+# (and ensure `CARGO_REGISTRY_TOKEN` + the crates.io registry are ready) to
+# actually tag and publish. The release-owner flips `tpt-rust-map/registry.toml`
+# to `git` status and cuts the `v0.1.0` tag as part of enabling this.
+
+on:
+  workflow_dispatch:
+    inputs:
+      level:
+        description: "Version bump level"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - rc
+          - release
+      execute:
+        description: "Actually tag and publish (needs CARGO_REGISTRY_TOKEN + crates.io)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.repository == 'tpt-solutions/tpt-engineering'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-release
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-release
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Release
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          FLAGS="--workspace --no-confirm"
+          if [ "${{ github.event.inputs.execute }}" = "true" ]; then
+            FLAGS="$FLAGS --execute"
+          fi
+          cargo release "${{ github.event.inputs.level || 'patch' }}" $FLAGS

@@ -1,0 +1,102 @@
+[package]
+name = "tpt-engineering"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Umbrella meta-crate re-exporting the tpt-eng-* engineering primitives behind per-crate feature flags"
+repository.workspace = true
+homepage.workspace = true
+publish = false
+
+[dependencies]
+tpt-eng-props-water = { workspace = true, optional = true }
+tpt-eng-props-air = { workspace = true, optional = true }
+tpt-eng-props-fuels = { workspace = true, optional = true }
+tpt-eng-props = { workspace = true, optional = true }
+tpt-eng-timeseries-core = { workspace = true, optional = true }
+tpt-eng-timeseries-align = { workspace = true, optional = true }
+tpt-eng-timeseries-gap = { workspace = true, optional = true }
+tpt-eng-timeseries = { workspace = true, optional = true }
+tpt-eng-geo-asset = { workspace = true, optional = true }
+tpt-eng-geo-topology = { workspace = true, optional = true }
+tpt-eng-network-matrix = { workspace = true, optional = true }
+tpt-eng-controls = { workspace = true, optional = true }
+tpt-eng-structural = { workspace = true, optional = true }
+tpt-eng-materials = { workspace = true, optional = true }
+tpt-eng-sections = { workspace = true, optional = true }
+tpt-eng-standards = { workspace = true, optional = true }
+tpt-eng-geometry = { workspace = true, optional = true }
+tpt-eng-mesh = { workspace = true, optional = true }
+tpt-eng-nurbs = { workspace = true, optional = true }
+tpt-eng-gdt = { workspace = true, optional = true }
+tpt-eng-cad = { workspace = true, optional = true }
+tpt-eng-tolerance = { workspace = true, optional = true }
+tpt-eng-reliability = { workspace = true, optional = true }
+tpt-eng-safety = { workspace = true, optional = true }
+tpt-eng-io = { workspace = true, optional = true }
+tpt-eng-report = { workspace = true, optional = true }
+tpt-eng-plot = { workspace = true, optional = true }
+tpt-eng-examples = { workspace = true, optional = true }
+tpt-eng-electrical = { workspace = true, optional = true }
+tpt-eng-heat-transfer = { workspace = true, optional = true }
+tpt-eng-props-mixture = { workspace = true, optional = true }
+tpt-eng-pcb = { workspace = true, optional = true }
+tpt-eng-thermal-mgmt = { workspace = true, optional = true }
+tpt-eng-power-components = { workspace = true, optional = true }
+tpt-eng-renewables = { workspace = true, optional = true }
+tpt-eng-vehicle-dynamics = { workspace = true, optional = true }
+tpt-eng-biomech = { workspace = true, optional = true }
+tpt-eng-unit-ops = { workspace = true, optional = true }
+tpt-eng-crystallography = { workspace = true, optional = true }
+tpt-eng-geotech = { workspace = true, optional = true }
+tpt-eng-building-sys = { workspace = true, optional = true }
+tpt-eng-schedule = { workspace = true, optional = true }
+
+[features]
+default = []
+props-water = ["tpt-eng-props-water"]
+props-air = ["tpt-eng-props-air"]
+props-fuels = ["tpt-eng-props-fuels"]
+props = ["tpt-eng-props"]
+timeseries-core = ["tpt-eng-timeseries-core"]
+timeseries-align = ["tpt-eng-timeseries-align"]
+timeseries-gap = ["tpt-eng-timeseries-gap"]
+timeseries = ["tpt-eng-timeseries"]
+geo-asset = ["tpt-eng-geo-asset"]
+geo-topology = ["tpt-eng-geo-topology"]
+network-matrix = ["tpt-eng-network-matrix"]
+controls = ["tpt-eng-controls"]
+structural = ["tpt-eng-structural"]
+materials = ["tpt-eng-materials"]
+sections = ["tpt-eng-sections"]
+standards = ["tpt-eng-standards"]
+geometry = ["tpt-eng-geometry"]
+mesh = ["tpt-eng-mesh"]
+nurbs = ["tpt-eng-nurbs"]
+gdt = ["tpt-eng-gdt"]
+cad = ["tpt-eng-cad"]
+tolerance = ["tpt-eng-tolerance"]
+reliability = ["tpt-eng-reliability"]
+safety = ["tpt-eng-safety"]
+io = ["tpt-eng-io"]
+report = ["tpt-eng-report"]
+plot = ["tpt-eng-plot"]
+examples = ["tpt-eng-examples"]
+electrical = ["tpt-eng-electrical"]
+heat-transfer = ["tpt-eng-heat-transfer"]
+props-mixture = ["tpt-eng-props-mixture"]
+pcb = ["tpt-eng-pcb"]
+thermal-mgmt = ["tpt-eng-thermal-mgmt"]
+power-components = ["tpt-eng-power-components"]
+renewables = ["tpt-eng-renewables"]
+vehicle-dynamics = ["tpt-eng-vehicle-dynamics"]
+biomech = ["tpt-eng-biomech"]
+unit-ops = ["tpt-eng-unit-ops"]
+crystallography = ["tpt-eng-crystallography"]
+geotech = ["tpt-eng-geotech"]
+building-sys = ["tpt-eng-building-sys"]
+schedule = ["tpt-eng-schedule"]
+
+[lints]
+workspace = true

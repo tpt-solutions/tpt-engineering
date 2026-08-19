@@ -8,11 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- 14 new domain crates (Phase 9, `spec2.txt`): `tpt-eng-props-mixture`,
+  `tpt-eng-electrical`, `tpt-eng-schedule`, `tpt-eng-biomech`,
+  `tpt-eng-crystallography`, `tpt-eng-geotech`, `tpt-eng-heat-transfer`,
+  `tpt-eng-vehicle-dynamics`, `tpt-eng-power-components`, `tpt-eng-pcb`,
+  `tpt-eng-renewables`, `tpt-eng-building-sys`, `tpt-eng-thermal-mgmt`,
+  `tpt-eng-unit-ops`. Not yet published to crates.io — see
+  `PUBLISH_TRACKING.md` (Batches 6-8).
+
 ### Changed
 - `tpt-eng-tolerance` dropped the `rand_distr` dependency in favour of the
   `Uniform` distribution now provided by `rand::distributions`.
 
 ## [0.1.0] - 2026-08-16
+
+### Published (2026-08-15)
+- All 29 `tpt-eng-*` crates from the initial workspace (13-crate Phase-0
+  scope plus the structural/mechanical and geometry/CAD crates added
+  post-Phase-4) released to crates.io at `0.1.0` — see `RELEASE.md` Batches
+  1-5. No `v0.1.0` git tag has been cut yet.
 
 ### Added
 - `tpt-eng-examples`: cross-crate integration scenario (`thermal_loop`)

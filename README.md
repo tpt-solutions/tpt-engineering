@@ -8,10 +8,13 @@ physical-systems verticals.
 
 Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE).
 
-> **Not yet published to [crates.io](https://crates.io).** These crates are
-> consumed as workspace/path dependencies (`publish = false` in
-> `release.toml`); there is no `v0.1.0` tag yet. APIs are unstable until the
-> first tagged release.
+> **29 of 43 crates are published on [crates.io](https://crates.io)** at
+> `0.1.0` (Batches 1-5, released 2026-08-15 — see `RELEASE.md`). The 14
+> newest domain crates (`props-mixture`, `electrical`, `schedule`, `biomech`,
+> `crystallography`, `geotech`, `heat-transfer`, `vehicle-dynamics`,
+> `power-components`, `pcb`, `renewables`, `building-sys`, `thermal-mgmt`,
+> `unit-ops`) are not yet published — see `PUBLISH_TRACKING.md`. There is no
+> `v0.1.0` git tag yet. APIs are unstable until the first tagged release.
 
 ## Scope
 
@@ -30,6 +33,27 @@ All crates are new implementations built from scratch (the spec's claimed
 consolidation source `tpt-rust2` does not exist on this machine, and the
 external vertical repos were not available for audit from this build
 environment).
+
+## Release & publish status
+
+29 of the 43 `tpt-eng-*` crates are published on
+[crates.io](https://crates.io) at `0.1.0` (Batches 1–5, 2026-08-15); the
+remaining 14 newest domain crates are tracked for release in
+[`PUBLISH_TRACKING.md`](PUBLISH_TRACKING.md) (Batches 6–8). The full batch plan
+lives in [`RELEASE.md`](RELEASE.md).
+
+Per-crate publish state is kept consistent with those tracking docs by
+`cargo xtask publish-status` (also run as part of `cargo xtask check` in CI),
+which asserts the README/CHANGELOG counts and the pending-crate set against
+`Cargo.toml` / `RELEASE.md` / `PUBLISH_TRACKING.md`.
+
+| Status | Crates | Source |
+|--------|--------|--------|
+| Published (`0.1.0`) | 29 | `RELEASE.md` Batches 1–5 |
+| Pending (Batches 6–8) | 14 | `PUBLISH_TRACKING.md` |
+
+> There is no `v0.1.0` git tag yet. APIs are unstable until the first tagged
+> release.
 
 ## Crate inventory
 
@@ -93,9 +117,8 @@ cargo test --workspace
 ```
 
 - **Edition:** `2024`.
-- **MSRV:** none pinned (no `rust-version` in `[workspace.package]`). Build with a
-  current stable toolchain; the toolchain version is fixed by
-  `rust-toolchain.toml` via `rustup`.
+- **MSRV:** `1.85` (`rust-version` in `[workspace.package]`). The toolchain
+  version is additionally fixed by `rust-toolchain.toml` via `rustup`.
 
 The `tpt-eng-props-*` family is `no_std`; it builds for bare-metal targets
 with the default features disabled.

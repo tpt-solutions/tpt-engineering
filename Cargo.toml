@@ -45,6 +45,7 @@ members = [
     "crates/tpt-eng-geotech",
     "crates/tpt-eng-building-sys",
     "crates/tpt-eng-schedule",
+    "crates/tpt-engineering",
 ]
 exclude = []
 
@@ -123,6 +124,7 @@ tpt-eng-crystallography = { version = "0.1.0", path = "crates/tpt-eng-crystallog
 tpt-eng-geotech = { version = "0.1.0", path = "crates/tpt-eng-geotech" }
 tpt-eng-building-sys = { version = "0.1.0", path = "crates/tpt-eng-building-sys" }
 tpt-eng-schedule = { version = "0.1.0", path = "crates/tpt-eng-schedule" }
+tpt-engineering = { version = "0.1.0", path = "crates/tpt-engineering" }
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "warn"
 # No crate here is allowed to introduce `unsafe`; the math substrate we wrap is
