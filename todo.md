@@ -602,7 +602,7 @@ foundational crates above are registered):
       (Underwood quadratic solve, McCabe–Thiele stepping, ε-NTU inverse, Fenske
       and relative-volatility test expectations) which were fixed and covered
       with new tests. Verified 2026-08-19.
-- [ ] Update `CRATE_AUDIT.md` and root `README.md` crate tables once the new
+- [x] Update `CRATE_AUDIT.md` and root `README.md` crate tables once the new
       crates exist. (Re-opened 2026-08-19: `README.md` reflects the 14 new
       crates, but `CRATE_AUDIT.md`'s status column still marks all 14 as
       "stub / implementation deferred" — see 9e below.)
@@ -611,17 +611,17 @@ foundational crates above are registered):
       registered.
 
 ### 9e. Post-review follow-ups (2026-08-19)
-- [ ] Regenerate `CRATE_AUDIT.md`'s status column for the 14 Phase-9 crates
+- [x] Regenerate `CRATE_AUDIT.md`'s status column for the 14 Phase-9 crates
       (`electrical`, `heat-transfer`, `props-mixture`, `pcb`, `thermal-mgmt`,
       `power-components`, `renewables`, `vehicle-dynamics`, `biomech`,
       `unit-ops`, `crystallography`, `geotech`, `building-sys`, `schedule`)
       from "stub" to reflect their real Phase 9 implementations
       (`CRATE_AUDIT.md` lines 70-83 are currently stale).
-- [ ] Delete or regenerate the stale root-level log files (`build.log`,
+- [x] Delete or regenerate the stale root-level log files (`build.log`,
       `clippy.log`, `meta.log`, `propserr.log`, `pw.log`, `t7a.log`,
       `t7b.log`, `t7c.log`, `t7d.log`) — they reference a defunct repo path
       and errors that no longer reproduce against current `master`.
-- [ ] Extend `tpt-eng-geotech` with bearing-capacity methods (Terzaghi/
+- [x] Extend `tpt-eng-geotech` with bearing-capacity methods (Terzaghi/
       Meyerhof), settlement/consolidation time-rate analysis, lateral earth
       pressure (Rankine/Coulomb), and Atterberg-limit/index-property
       classification — currently only Mohr-Coulomb failure envelope, a

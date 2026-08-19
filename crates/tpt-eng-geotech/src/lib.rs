@@ -1,7 +1,11 @@
 //! # tpt-eng-geotech
 //!
 //! Soil mechanics primitives for the TPT engineering ecosystem: shear-strength
-//! failure criteria, a reduced critical-state (Cam-Clay) model, and borehole
+//! failure criteria ([`mohr_coulomb`]), a reduced critical-state (Cam-Clay)
+//! model ([`cam_clay`]), shallow-foundation bearing capacity
+//! ([`bearing_capacity`]), 1-D consolidation settlement and time-rate
+//! ([`consolidation`]), lateral earth pressure ([`lateral_earth_pressure`]),
+//! Atterberg limits and USCS classification ([`atterberg`]), and borehole
 //! stratigraphy with provenance tracking.
 //!
 //! ## Units
@@ -221,3 +225,340 @@ pub mod cam_clay {
 
 pub use cam_clay::{ConsolidationMode, cam_clay_yield, void_ratio_update};
 pub use mohr_coulomb::{factor_of_safety, shear_strength};
+
+/// Shallow-foundation ultimate bearing capacity (Terzaghi / Meyerhof).
+pub mod bearing_capacity {
+    /// Foundation plan-shape used for bearing-capacity shape factors.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum FoundationShape {
+        /// Continuous (strip) footing: length ≫ width, no end effects.
+        Strip,
+        /// Square footing: length == width.
+        Square,
+        /// Circular footing (treated as `B == L`): 1-D end-bearing.
+        Circular,
+        /// Rectangular footing: explicit length `L` (uses `B / L`).
+        Rectangle,
+    }
+
+    /// Terzaghi / Meyerhof bearing-capacity factors `(Nc, Nq, Nγ)` for a
+    /// friction angle `φ` (degrees).
+    ///
+    /// Uses the standard forms `Nq = e^{π·tanφ}·tan²(45° + φ/2)`,
+    /// `Nc = (Nq − 1)/tanφ`, `Nγ = 2·(Nq + 1)·tanφ` (the common Vesic/Meyerhof
+    /// `Nγ`). For `φ = 0` (pure clay) it returns `(5.14, 1.0, 0.0)`.
+    #[must_use]
+    pub fn bearing_capacity_factors(friction_angle_deg: f64) -> (f64, f64, f64) {
+        if friction_angle_deg <= 0.0 {
+            return (5.14, 1.0, 0.0);
+        }
+        let phi = friction_angle_deg.to_radians();
+        let sin_phi = phi.sin();
+        let nq = ((1.0 + sin_phi) / (1.0 - sin_phi)) * (std::f64::consts::PI * phi.tan()).exp();
+        let nc = (nq - 1.0) / phi.tan();
+        let ngamma = 2.0 * (nq + 1.0) * phi.tan();
+        (nc, nq, ngamma)
+    }
+
+    /// Terzaghi shape factors `(sc, sq, sγ)` for the given footing shape.
+    ///
+    /// `b_over_l` is the width/length ratio (ignored for `Strip`, `Square`,
+    /// `Circular`). Strip uses `1.0` for all three; square/circular use the
+    /// classic Terzaghi values `(1.3, 1.2, 0.8)` / `(1.3, 1.2, 0.6)`; rectangle
+    /// interpolates with the `B / L` ratio.
+    #[must_use]
+    pub fn terzaghi_shape_factors(shape: FoundationShape, b_over_l: f64) -> (f64, f64, f64) {
+        match shape {
+            FoundationShape::Strip => (1.0, 1.0, 1.0),
+            FoundationShape::Square => (1.3, 1.2, 0.8),
+            FoundationShape::Circular => (1.3, 1.2, 0.6),
+            FoundationShape::Rectangle => {
+                let r = b_over_l.clamp(0.0, 1.0);
+                (1.0 + 0.2 * r, 1.0 + 0.1 * r, (1.0 - 0.2 * r).max(0.0))
+            }
+        }
+    }
+
+    /// Terzaghi ultimate bearing capacity `q_ult` (Pa) for a shallow footing.
+    ///
+    /// `q_ult = c·Nc·sc + q'·Nq·sq + ½·γ·B·Nγ·sγ` where the effective
+    /// overburden at the base is `q' = γ·depth` (water table assumed deep),
+    /// `B` is `width`, `γ` is `unit_weight`, and `c`/`φ` are `cohesion` /
+    /// `friction_angle_deg`. `length` is only used for the rectangular shape
+    /// factor (pass `width` for square/circular).
+    #[must_use]
+    pub fn terzaghi_ultimate_bearing_capacity(
+        cohesion: f64,
+        friction_angle_deg: f64,
+        unit_weight: f64,
+        width: f64,
+        depth: f64,
+        shape: FoundationShape,
+        length: f64,
+    ) -> f64 {
+        let (nc, nq, ngamma) = bearing_capacity_factors(friction_angle_deg);
+        let (sc, sq, sgamma) =
+            terzaghi_shape_factors(shape, if length > 0.0 { width / length } else { 1.0 });
+        let q_prime = unit_weight * depth;
+        cohesion * nc * sc + q_prime * nq * sq + 0.5 * unit_weight * width * ngamma * sgamma
+    }
+
+    /// Net ultimate bearing capacity: `q_ult − γ·depth` (the stress in excess of
+    /// the removed overburden).
+    #[must_use]
+    pub fn net_ultimate_bearing_capacity(q_ult: f64, unit_weight: f64, depth: f64) -> f64 {
+        q_ult - unit_weight * depth
+    }
+
+    /// Allowable bearing capacity for a given factor of safety `fs`.
+    #[must_use]
+    pub fn allowable_bearing_capacity(q_ult: f64, fs: f64) -> f64 {
+        q_ult / fs
+    }
+
+    /// Meyerhof ultimate bearing capacity `q_ult` (Pa) with explicit shape and
+    /// depth factors (`depth / width ≤ 1`).
+    ///
+    /// Uses Meyerhof's shape factors `F_qs = 1 + (B/L)(Nq/Nc)·tanφ`,
+    /// `F_cs = (F_qs·Nq − 1)/(Nq − 1)`, `F_γs = 1 − 0.4·(B/L)` and depth factors
+    /// `F_qd = 1 + 0.1(D/B)(Nq/Nc)·tanφ`, `F_cd = 1 + 0.2(D/B)(Nc/Nq)·tanφ`
+    /// (the `Nγ` term uses no depth factor). For `depth / width > 1` the depth
+    /// factors are held at their `D/B = 1` value.
+    #[must_use]
+    pub fn meyerhof_ultimate_bearing_capacity(
+        cohesion: f64,
+        friction_angle_deg: f64,
+        unit_weight: f64,
+        width: f64,
+        depth: f64,
+        length: f64,
+    ) -> f64 {
+        let (nc, nq, ngamma) = bearing_capacity_factors(friction_angle_deg);
+        let phi = friction_angle_deg.to_radians();
+        let b_over_l = if length > 0.0 { width / length } else { 1.0 }.clamp(0.0, 1.0);
+        let d_over_b = if width > 0.0 {
+            (depth / width).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+
+        let fqs = 1.0 + b_over_l * (nq / nc) * phi.tan();
+        let fcs = if (nq - 1.0).abs() > 1e-9 {
+            (fqs * nq - 1.0) / (nq - 1.0)
+        } else {
+            1.0 + 0.2 * b_over_l
+        };
+        let fgs = (1.0 - 0.4 * b_over_l).max(0.0);
+        let fqd = 1.0 + 0.1 * d_over_b * (nq / nc) * phi.tan();
+        let fcd = 1.0 + 0.2 * d_over_b * (nc / nq) * phi.tan();
+
+        let q_prime = unit_weight * depth;
+        cohesion * nc * fcs * fcd
+            + q_prime * nq * fqs * fqd
+            + 0.5 * unit_weight * width * ngamma * fgs
+    }
+}
+
+/// One-dimensional primary consolidation: settlement and time-rate (Terzaghi).
+pub mod consolidation {
+    /// Coefficient of consolidation `c_v = k·(1 + e)/(a_v·γ_w)` (m²/s), from
+    /// permeability `k` (m/s), void ratio `e`, compressibility `a_v` (1/Pa) and
+    /// water unit weight `γ_w` (N/m³).
+    #[must_use]
+    pub fn coeff_consolidation(
+        permeability: f64,
+        void_ratio: f64,
+        av: f64,
+        gamma_water: f64,
+    ) -> f64 {
+        permeability * (1.0 + void_ratio) / (av * gamma_water)
+    }
+
+    /// 1-D primary consolidation settlement `S = (Cc/(1 + e₀))·H·log₁₀((σ₀ + Δσ)/σ₀)`
+    /// (metres), for compression index `Cc`, initial void ratio `e0`, layer
+    /// thickness `H` and effective stress change `σ₀ → σ₀ + Δσ`.
+    #[must_use]
+    pub fn consolidation_settlement(
+        cc: f64,
+        e0: f64,
+        h: f64,
+        sigma0: f64,
+        delta_sigma: f64,
+    ) -> f64 {
+        (cc / (1.0 + e0)) * h * ((sigma0 + delta_sigma) / sigma0).log10()
+    }
+
+    /// Time factor `T_v` from the average degree of consolidation `U` (percent,
+    /// `0…100`). Uses the closed-form small-strain relation for `U < 60%` and
+    /// Taylor's logarithmic relation for `U ≥ 60%`.
+    #[must_use]
+    pub fn time_factor_from_degree(u_percent: f64) -> f64 {
+        let u = (u_percent / 100.0).clamp(0.0, 0.9999);
+        if u_percent < 60.0 {
+            std::f64::consts::FRAC_PI_4 * u * u
+        } else {
+            -0.933 * (1.0 - u).log10() - 0.085
+        }
+    }
+
+    /// Average degree of consolidation (percent, `0…100`) from the time factor
+    /// `T_v`. Inverse of [`time_factor_from_degree`].
+    #[must_use]
+    pub fn degree_from_time_factor(tv: f64) -> f64 {
+        if tv <= 0.2827 {
+            100.0 * (4.0 * tv / std::f64::consts::PI).sqrt()
+        } else {
+            100.0 * (1.0 - 10f64.powf(-(tv + 0.085) / 0.933))
+        }
+    }
+
+    /// Time `t = T_v·H_dr² / c_v` (seconds) to reach `u_percent` consolidation,
+    /// for coefficient of consolidation `c_v` and drainage half-height `H_dr`
+    /// (full layer thickness for double drainage, half thickness for single).
+    #[must_use]
+    pub fn consolidation_time(cv: f64, drain_half_height: f64, u_percent: f64) -> f64 {
+        time_factor_from_degree(u_percent) * drain_half_height * drain_half_height / cv
+    }
+}
+
+/// Lateral earth-pressure coefficients and resultants (Rankine / Coulomb).
+pub mod lateral_earth_pressure {
+    /// Rankine active earth-pressure coefficient `K_a = tan²(45° − φ/2)`.
+    #[must_use]
+    pub fn rankine_ka(friction_angle_deg: f64) -> f64 {
+        let a = (45.0 - friction_angle_deg / 2.0).to_radians();
+        a.tan() * a.tan()
+    }
+
+    /// Rankine passive earth-pressure coefficient `K_p = tan²(45° + φ/2)`.
+    #[must_use]
+    pub fn rankine_kp(friction_angle_deg: f64) -> f64 {
+        let a = (45.0 + friction_angle_deg / 2.0).to_radians();
+        a.tan() * a.tan()
+    }
+
+    /// Rankine active resultant force per unit wall length (N/m), dry backfill
+    /// with uniform surcharge `q` (Pa): `K_a·(q·H + ½·γ·H²)`.
+    #[must_use]
+    pub fn rankine_active_force(unit_weight: f64, height: f64, surcharge: f64, ka: f64) -> f64 {
+        ka * (surcharge * height + 0.5 * unit_weight * height * height)
+    }
+
+    /// Rankine passive resultant force per unit wall length (N/m): `K_p·(q·H +
+    /// ½·γ·H²)`.
+    #[must_use]
+    pub fn rankine_passive_force(unit_weight: f64, height: f64, surcharge: f64, kp: f64) -> f64 {
+        kp * (surcharge * height + 0.5 * unit_weight * height * height)
+    }
+
+    /// Coulomb active earth-pressure coefficient `K_a`.
+    ///
+    /// Angles (degrees): `phi` soil friction, `delta` wall friction, `beta`
+    /// backfill inclination from horizontal, `omega` wall-face inclination from
+    /// vertical (0 for a vertical wall). Uses the standard Coulomb expression.
+    #[must_use]
+    pub fn coulomb_ka(phi_deg: f64, delta_deg: f64, beta_deg: f64, omega_deg: f64) -> f64 {
+        let phi = phi_deg.to_radians();
+        let delta = delta_deg.to_radians();
+        let beta = beta_deg.to_radians();
+        let omega = omega_deg.to_radians();
+        let num = (phi - omega).cos() * (phi - omega).cos();
+        let den = omega.cos()
+            * omega.cos()
+            * (delta + omega).cos()
+            * (1.0
+                + ((delta + phi).sin() * (phi - beta).sin()
+                    / ((delta + omega).cos() * (beta - omega).cos()))
+                .sqrt())
+            .powi(2);
+        num / den
+    }
+}
+
+/// Atterberg limits and USCS index-property classification for fine-grained
+/// soils.
+pub mod atterberg {
+    /// Consistency state of a fine-grained soil from its liquidity index.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum ConsistencyState {
+        /// Liquid (liquidity index > 1.0).
+        Liquid,
+        /// Plastic (0.0 ≤ liquidity index ≤ 1.0).
+        Plastic,
+        /// Semi-solid (−0.25 < liquidity index < 0.0).
+        SemiSolid,
+        /// Solid (liquidity index ≤ −0.25).
+        Solid,
+    }
+
+    /// Plasticity index `PI = max(0, LL − PL)`.
+    #[must_use]
+    pub fn plasticity_index(liquid_limit: f64, plastic_limit: f64) -> f64 {
+        (liquid_limit - plastic_limit).max(0.0)
+    }
+
+    /// Liquidity index `LI = (w − PL)/(LL − PL)` for water content `w`.
+    #[must_use]
+    pub fn liquidity_index(water_content: f64, liquid_limit: f64, plastic_limit: f64) -> f64 {
+        (water_content - plastic_limit) / (liquid_limit - plastic_limit)
+    }
+
+    /// Consistency state from a liquidity index `LI`.
+    #[must_use]
+    pub fn consistency_state(liquid_index: f64) -> ConsistencyState {
+        if liquid_index > 1.0 {
+            ConsistencyState::Liquid
+        } else if liquid_index >= 0.0 {
+            ConsistencyState::Plastic
+        } else if liquid_index > -0.25 {
+            ConsistencyState::SemiSolid
+        } else {
+            ConsistencyState::Solid
+        }
+    }
+
+    /// USCS fine-grained group symbol from the liquid limit `LL` and plastic
+    /// limit `PL`. Returns `"CL"`, `"CH"` (clays), `"ML"`, `"MH"` (silts), or
+    /// `"ML"` for a non-plastic (PI ≤ 0) fine-grained soil. Uses the A-line
+    /// `PI = 0.73·(LL − 20)` to split clay vs. silt, and `LL = 50` to split
+    /// low (`L`) vs. high (`H`) plasticity.
+    #[must_use]
+    pub fn uscs_fine_grained(liquid_limit: f64, plastic_limit: f64) -> &'static str {
+        let pi = plasticity_index(liquid_limit, plastic_limit);
+        if pi <= 0.0 {
+            return "ML";
+        }
+        let a_line = 0.73 * (liquid_limit - 20.0);
+        let is_clay = pi > a_line;
+        if liquid_limit < 50.0 {
+            if is_clay { "CL" } else { "ML" }
+        } else if is_clay {
+            "CH"
+        } else {
+            "MH"
+        }
+    }
+
+    /// Soil activity `A = PI / (clay fraction, % passing 75 µm)`.
+    #[must_use]
+    pub fn activity(pi: f64, clay_fraction_pct: f64) -> f64 {
+        pi / clay_fraction_pct
+    }
+}
+
+pub use atterberg::{
+    ConsistencyState, activity, consistency_state, liquidity_index, plasticity_index,
+    uscs_fine_grained,
+};
+pub use bearing_capacity::{
+    FoundationShape, allowable_bearing_capacity, bearing_capacity_factors,
+    meyerhof_ultimate_bearing_capacity, net_ultimate_bearing_capacity, terzaghi_shape_factors,
+    terzaghi_ultimate_bearing_capacity,
+};
+pub use consolidation::{
+    coeff_consolidation, consolidation_settlement, consolidation_time, degree_from_time_factor,
+    time_factor_from_degree,
+};
+pub use lateral_earth_pressure::{
+    coulomb_ka, rankine_active_force, rankine_ka, rankine_kp, rankine_passive_force,
+};

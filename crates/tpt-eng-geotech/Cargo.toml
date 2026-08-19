@@ -13,7 +13,6 @@ categories = ["science", "algorithms"]
 
 [dependencies]
 tpt-eng-materials = { workspace = true }
-tpt-math-linalg = { workspace = true }
 
 [lints]
 workspace = true

@@ -783,7 +783,6 @@ name = "tpt-eng-geotech"
 version = "0.1.0"
 dependencies = [
  "tpt-eng-materials",
- "tpt-math-linalg",
 ]
 
 [[package]]
