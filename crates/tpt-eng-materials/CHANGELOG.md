@@ -4,6 +4,12 @@ All notable changes to the `tpt-eng-materials` crate are documented here.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- Example code formatted with `cargo fmt` (no functional change).
+
 ## [0.1.0] - 2026-08-16
 
 ### Added

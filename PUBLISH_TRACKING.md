@@ -61,6 +61,25 @@ Batch 6 is fully done.
 
 ---
 
+## Batch 9 — patch republish for new examples (2026-08-20)
+
+Six crates already published in Batches 1-4 gained brand-new `examples/`
+directories (they previously had none): `tpt-eng-cad`, `tpt-eng-gdt`,
+`tpt-eng-safety`, `tpt-eng-standards`, `tpt-eng-structural`,
+`tpt-eng-tolerance`. Per-crate `CHANGELOG.md`s are updated under
+`[Unreleased]`. Since examples ship inside the published crate tarball and
+are what docs.rs/crates.io show consumers, these won't be visible until a
+version bump + republish:
+
+- [ ] Bump these 6 crates to `0.1.1` (`Cargo.toml` + `CHANGELOG.md` date)
+      and `cargo publish -p <crate>` each once approved.
+
+A further 29 crates (see each crate's `CHANGELOG.md` `[Unreleased] > Changed`
+entry) only had their existing examples reformatted with `cargo fmt` — no
+functional or public-API change, so **no version bump or republish is
+needed** for those; the `[Unreleased]` note exists purely for the audit
+trail.
+
 ## Post-publish
 
 - [ ] Flip the `[ ]` → `[x]` checkboxes for Batches 6–8 in `RELEASE.md`, matching
