@@ -9,7 +9,7 @@ readme = "README.md"
 repository.workspace = true
 homepage.workspace = true
 keywords = ["engineering", "heat-transfer", "convection", "conduction", "thermal"]
-categories = ["science", "algorithms", "physics"]
+categories = ["science", "algorithms"]
 
 [dependencies]
 tpt-math-units = { workspace = true }
