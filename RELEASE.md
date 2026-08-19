@@ -147,6 +147,34 @@ Legend: `[ ]` = not yet released · `[x]` = released to crates.io.
 
 ---
 
+### Batch 6 — New domain crates, foundation (deps satisfied by Batches 1–5 + `tpt-math-*` only)
+- [ ] `tpt-eng-props-mixture`  (→ tpt-math-units, tpt-math-numeric)
+- [ ] `tpt-eng-electrical`     (→ tpt-math-units, tpt-math-numeric)
+- [ ] `tpt-eng-schedule`       (→ tpt-math-numeric)
+- [ ] `tpt-eng-biomech`        (→ materials, geometry)
+- [ ] `tpt-eng-crystallography`(→ geometry)
+
+### Batch 7 — New domain crates, level 1 (depend on Batches 1–6)
+- [ ] `tpt-eng-geotech`        (→ materials)
+- [ ] `tpt-eng-heat-transfer`  (→ props-air, props-water)
+- [ ] `tpt-eng-vehicle-dynamics` (→ geometry, structural, tpt-math-linalg)
+- [ ] `tpt-eng-power-components` (→ electrical)
+- [ ] `tpt-eng-props` **republish at 0.1.1** (→ props-mixture; adds the `mixture`
+      re-export — must come after `tpt-eng-props-mixture` is live)
+
+### Batch 8 — New domain crates, level 2 (depend on Batches 1–7)
+- [ ] `tpt-eng-pcb`            (→ electrical, materials)
+- [ ] `tpt-eng-renewables`     (→ electrical, props-air, reliability)
+- [ ] `tpt-eng-building-sys`   (→ heat-transfer, electrical, props-air)
+- [ ] `tpt-eng-thermal-mgmt`   (→ heat-transfer, props-air)
+- [ ] `tpt-eng-unit-ops`       (→ tpt-eng-props 0.1.1, heat-transfer)
+
+> See `PUBLISH_TRACKING.md` for the working checklist with exact `cargo publish`
+> commands for this round (Batches 6–8 were added 2026-08-19, after the workspace
+> grew from 29 to 43 `tpt-eng-*` crates).
+
+---
+
 ## 5. Post-release checklist
 
 - [x] All 29 `tpt-eng-*` crates show as published `0.1.0` on crates.io.
