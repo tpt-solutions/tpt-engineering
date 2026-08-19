@@ -4,9 +4,9 @@
 //! system conversions, balanced three-phase power, and a small lookup table of
 //! conductor/insulator base properties with data-source provenance.
 //!
-//! All scalar quantities are plain `f64` in SI units ([ohm](`Self::OHM`),
-//! [volt](`Self::VOLT`), [ampere](`Self::AMPERE`), [watt](`Self::WATT`)) unless
-//! noted; angular frequency is in [rad/s](`Self::RAD_PER_S`). This keeps the
+//! All scalar quantities are plain `f64` in SI units ([ohm](`OHM`),
+//! [volt](`VOLT`), [ampere](`AMPERE`), [watt](`WATT`)) unless
+//! noted; angular frequency is in [rad/s](`RAD_PER_S`). This keeps the
 //! crate dependency-light (only `tpt-math-units` / `tpt-math-numeric`) and
 //! numeric rather than unit-typed.
 //!
