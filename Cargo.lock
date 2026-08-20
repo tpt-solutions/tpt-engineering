@@ -671,7 +671,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-cad"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "glam",
  "serde",
@@ -750,7 +750,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-gdt"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "glam",
  "serde",
@@ -941,7 +941,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-safety"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "approx",
  "rand",
@@ -965,7 +965,7 @@ version = "0.1.0"
 
 [[package]]
 name = "tpt-eng-standards"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -974,7 +974,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-structural"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "tpt-eng-safety",
  "tpt-math-units",
@@ -1020,7 +1020,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-tolerance"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "approx",
  "rand",

@@ -4,7 +4,7 @@ All notable changes to the `tpt-eng-standards` crate are documented here.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.1] - 2026-08-20
 
 ### Added
 
