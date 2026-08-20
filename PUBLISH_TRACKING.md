@@ -34,12 +34,12 @@ already-published 29 crates, so they can go in any order within the batch.
 
 ## Batch 7 — depends on Batch 6
 
-- [ ] `tpt-eng-geotech` — `cargo publish -p tpt-eng-geotech`
-- [ ] `tpt-eng-heat-transfer` — `cargo publish -p tpt-eng-heat-transfer`
-- [ ] `tpt-eng-vehicle-dynamics` — `cargo publish -p tpt-eng-vehicle-dynamics`
-- [ ] `tpt-eng-power-components` — `cargo publish -p tpt-eng-power-components`
+- [x] `tpt-eng-geotech` — `cargo publish -p tpt-eng-geotech`
+- [x] `tpt-eng-heat-transfer` — `cargo publish -p tpt-eng-heat-transfer`
+- [x] `tpt-eng-vehicle-dynamics` — `cargo publish -p tpt-eng-vehicle-dynamics`
+- [x] `tpt-eng-power-components` — `cargo publish -p tpt-eng-power-components`
   (needs `tpt-eng-electrical` from Batch 6)
-- [ ] `tpt-eng-props` **0.1.0 → 0.1.1** — `cargo publish -p tpt-eng-props`
+- [x] `tpt-eng-props` **0.1.0 → 0.1.1** — `cargo publish -p tpt-eng-props`
   (needs `tpt-eng-props-mixture` from Batch 6 — do this one *last* in the batch)
 
 Why this order: `geotech`, `heat-transfer`, and `vehicle-dynamics` only need
@@ -50,13 +50,13 @@ Batch 6 is fully done.
 
 ## Batch 8 — depends on Batch 7
 
-- [ ] `tpt-eng-pcb` — `cargo publish -p tpt-eng-pcb`
-- [ ] `tpt-eng-renewables` — `cargo publish -p tpt-eng-renewables`
-- [ ] `tpt-eng-building-sys` — `cargo publish -p tpt-eng-building-sys`
+- [x] `tpt-eng-pcb` — `cargo publish -p tpt-eng-pcb`
+- [x] `tpt-eng-renewables` — `cargo publish -p tpt-eng-renewables`
+- [x] `tpt-eng-building-sys` — `cargo publish -p tpt-eng-building-sys`
   (needs `heat-transfer` + `electrical`)
-- [ ] `tpt-eng-thermal-mgmt` — `cargo publish -p tpt-eng-thermal-mgmt`
+- [x] `tpt-eng-thermal-mgmt` — `cargo publish -p tpt-eng-thermal-mgmt`
   (needs `heat-transfer`)
-- [ ] `tpt-eng-unit-ops` — `cargo publish -p tpt-eng-unit-ops`
+- [x] `tpt-eng-unit-ops` — `cargo publish -p tpt-eng-unit-ops`
   (needs `tpt-eng-props` 0.1.1 + `heat-transfer` — do this one *last*)
 
 ---
