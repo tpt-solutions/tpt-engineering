@@ -71,7 +71,7 @@ directories (they previously had none): `tpt-eng-cad`, `tpt-eng-gdt`,
 are what docs.rs/crates.io show consumers, these won't be visible until a
 version bump + republish:
 
-- [ ] Bump these 6 crates to `0.1.1` (`Cargo.toml` + `CHANGELOG.md` date)
+- [x] Bump these 6 crates to `0.1.1` (`Cargo.toml` + `CHANGELOG.md` date)
       and `cargo publish -p <crate>` each once approved.
 
 A further 29 crates (see each crate's `CHANGELOG.md` `[Unreleased] > Changed`

@@ -1,7 +1,7 @@
 # tpt-engineering — crates.io Release Plan (v0.1.0)
 
-Last updated: 2026-08-15
-Workspace: `tpt-engineering` (29 `tpt-eng-*` crates + `xtask`)
+Last updated: 2026-08-20
+Workspace: `tpt-engineering` (43 `tpt-eng-*` crates + `xtask`)
 Tool used for the dry run: `cargo publish --dry-run` (cargo 1.97.1)
 
 ---
@@ -147,39 +147,67 @@ Legend: `[ ]` = not yet released · `[x]` = released to crates.io.
 
 ---
 
-### Batch 6 — New domain crates, foundation (deps satisfied by Batches 1–5 + `tpt-math-*` only)
-- [ ] `tpt-eng-props-mixture`  (→ tpt-math-units, tpt-math-numeric)
-- [ ] `tpt-eng-electrical`     (→ tpt-math-units, tpt-math-numeric)
-- [ ] `tpt-eng-schedule`       (→ tpt-math-numeric)
-- [ ] `tpt-eng-biomech`        (→ materials, geometry)
-- [ ] `tpt-eng-crystallography`(→ geometry)
+### Batch 6 — New domain crates, foundation (deps satisfied by Batches 1–5 + `tpt-math-*` only) — RELEASED 2026-08-20
+- [x] `tpt-eng-props-mixture`  (→ tpt-math-units, tpt-math-numeric)
+- [x] `tpt-eng-electrical`     (→ tpt-math-units, tpt-math-numeric)
+- [x] `tpt-eng-schedule`       (→ tpt-math-numeric)
+- [x] `tpt-eng-biomech`        (→ materials, geometry)
+- [x] `tpt-eng-crystallography`(→ geometry)
 
-### Batch 7 — New domain crates, level 1 (depend on Batches 1–6)
-- [ ] `tpt-eng-geotech`        (→ materials)
-- [ ] `tpt-eng-heat-transfer`  (→ props-air, props-water)
-- [ ] `tpt-eng-vehicle-dynamics` (→ geometry, structural, tpt-math-linalg)
-- [ ] `tpt-eng-power-components` (→ electrical)
-- [ ] `tpt-eng-props` **republish at 0.1.1** (→ props-mixture; adds the `mixture`
-      re-export — must come after `tpt-eng-props-mixture` is live)
+### Batch 7 — New domain crates, level 1 (depend on Batches 1–6) — RELEASED 2026-08-20
+- [x] `tpt-eng-geotech`        (→ materials)
+- [x] `tpt-eng-heat-transfer`  (→ props-air, props-water)
+- [x] `tpt-eng-vehicle-dynamics` (→ geometry, structural, tpt-math-linalg)
+- [x] `tpt-eng-power-components` (→ electrical)
+- [x] `tpt-eng-props` **republished at 0.1.1** (→ props-mixture; adds the `mixture`
+      re-export — published after `tpt-eng-props-mixture` went live)
 
-### Batch 8 — New domain crates, level 2 (depend on Batches 1–7)
-- [ ] `tpt-eng-pcb`            (→ electrical, materials)
-- [ ] `tpt-eng-renewables`     (→ electrical, props-air, reliability)
-- [ ] `tpt-eng-building-sys`   (→ heat-transfer, electrical, props-air)
-- [ ] `tpt-eng-thermal-mgmt`   (→ heat-transfer, props-air)
-- [ ] `tpt-eng-unit-ops`       (→ tpt-eng-props 0.1.1, heat-transfer)
+> `tpt-eng-heat-transfer`'s `Cargo.toml` originally listed `categories =
+> ["science", "algorithms", "physics"]`; crates.io rejected the publish with
+> `400 Bad Request: category slugs ... physics` (not a supported slug). Fixed
+> by dropping `"physics"` (commit `72c8cd6`) and republishing.
+>
+> `tpt-eng-power-components` hit the new-crate `429` throttle after 4
+> back-to-back publishes in this batch; published on retry ~8 minutes later.
+
+### Batch 8 — New domain crates, level 2 (depend on Batches 1–7) — RELEASED 2026-08-20
+- [x] `tpt-eng-pcb`            (→ electrical, materials)
+- [x] `tpt-eng-renewables`     (→ electrical, props-air, reliability)
+- [x] `tpt-eng-building-sys`   (→ heat-transfer, electrical, props-air)
+- [x] `tpt-eng-thermal-mgmt`   (→ heat-transfer, props-air)
+- [x] `tpt-eng-unit-ops`       (→ tpt-eng-props 0.1.1, heat-transfer)
+
+> No `429` throttling hit in this batch.
+
+### Batch 9 — Patch republish for new examples (Batches 1–4 crates) — RELEASED 2026-08-20
+Six crates already published in Batches 1–4 gained brand-new `examples/`
+directories they previously lacked. Since examples ship inside the published
+crate tarball (what docs.rs/crates.io show consumers), they weren't visible
+until a version bump + republish. Published in dependency order:
+- [x] `tpt-eng-safety` **0.1.0 → 0.1.1**
+- [x] `tpt-eng-tolerance` **0.1.0 → 0.1.1**
+- [x] `tpt-eng-gdt` **0.1.0 → 0.1.1** (→ tolerance)
+- [x] `tpt-eng-structural` **0.1.0 → 0.1.1** (→ safety)
+- [x] `tpt-eng-standards` **0.1.0 → 0.1.1** (→ safety)
+- [x] `tpt-eng-cad` **0.1.0 → 0.1.1** (→ gdt)
+
+> Since `version.workspace = true` is shared by many unrelated crates,
+> versions were overridden explicitly per-crate (`version = "0.1.1"`) rather
+> than bumping `[workspace.package].version`, to avoid dragging every other
+> crate's version along.
 
 > See `PUBLISH_TRACKING.md` for the working checklist with exact `cargo publish`
-> commands for this round (Batches 6–8 were added 2026-08-19, after the workspace
-> grew from 29 to 43 `tpt-eng-*` crates).
+> commands for this round (Batches 6–9 were added 2026-08-19/20, after the
+> workspace grew from 29 to 43 `tpt-eng-*` crates).
 
 ---
 
 ## 5. Post-release checklist
 
-- [x] All 29 `tpt-eng-*` crates show as published `0.1.0` on crates.io.
+- [x] All 43 `tpt-eng-*` crates show as published on crates.io.
       (Verified per-crate via the crates.io API at the end of each batch; all
-      `0.1.0`, none yanked.)
+      Batch 1–8 crates at `0.1.0` except the six Batch 9 crates and
+      `tpt-eng-props`, which are at `0.1.1`; none yanked.)
 - [x] `cargo add tpt-eng-<name>` resolves for a fresh consumer (confirms the
       dependency graph is satisfiable end-to-end).
       (Verified: a throwaway crate `cargo add tpt-eng-cli tpt-eng-examples` +
