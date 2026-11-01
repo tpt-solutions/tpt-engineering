@@ -17,7 +17,7 @@ categories = ["science", "algorithms", "no-std"]
 # override an inherited default-features), which would break this no_std-capable
 # crate. See Phase 7.2 / todo.md 7.2.
 tpt-math-units = { version = "0.1.0", default-features = false }
-tpt-math-numeric = { version = "0.1.0", default-features = false, features = ["libm"] }
+tpt-math-numeric = { version = "0.2.0", default-features = false, features = ["libm"] }
 
 [features]
 default = ["std"]
