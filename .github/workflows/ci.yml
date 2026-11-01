@@ -47,6 +47,19 @@ jobs:
       - run: cargo test --doc --workspace --all-features
       - run: cargo doc --workspace --no-deps --all-features
 
+  # Python bindings (crates/tpt-eng-py): build the wheel with maturin and run
+  # the pytest suite against the installed package.
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "./crates/tpt-eng-py[test]"
+      - run: pytest crates/tpt-eng-py/tests
+
   # Per ADR 0001 (tpt-rust-map/docs/adr/0001-no-std-via-features-not-forks.md),
   # a blind `cargo build --workspace --target thumbv6m-none-eabi` breaks the
   # moment any std-only crate joins this repo. `xtask no-std-matrix` builds
