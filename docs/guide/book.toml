@@ -1,0 +1,8 @@
+[book]
+title = "tpt-engineering cookbook"
+authors = ["TPT Solutions"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "../../target/mdbook"
