@@ -117,9 +117,9 @@ checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
 name = "chacha20"
-version = "0.10.1"
+version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d524456ba66e72eb8b115ff89e01e497f8e6d11d78b70b1aa13c0fbd97540a81"
+checksum = "65c35e4b699c7e15ccbe7ee35c005e4fc0a278d22238a2857e6ce2dadeda1b06"
 dependencies = [
  "cfg-if",
  "cpufeatures",
@@ -721,7 +721,7 @@ dependencies = [
 name = "tpt-eng-electrical"
 version = "0.1.0"
 dependencies = [
- "tpt-math-numeric 0.1.0",
+ "tpt-math-numeric 0.2.0",
  "tpt-math-units",
 ]
 
@@ -883,7 +883,7 @@ dependencies = [
 name = "tpt-eng-props-air"
 version = "0.1.0"
 dependencies = [
- "tpt-math-numeric 0.1.0",
+ "tpt-math-numeric 0.2.0",
  "tpt-math-units",
 ]
 
@@ -891,7 +891,7 @@ dependencies = [
 name = "tpt-eng-props-fuels"
 version = "0.1.0"
 dependencies = [
- "tpt-math-numeric 0.1.0",
+ "tpt-math-numeric 0.2.0",
  "tpt-math-units",
 ]
 
@@ -899,7 +899,7 @@ dependencies = [
 name = "tpt-eng-props-mixture"
 version = "0.1.0"
 dependencies = [
- "tpt-math-numeric 0.1.0",
+ "tpt-math-numeric 0.2.0",
  "tpt-math-units",
 ]
 
@@ -907,7 +907,7 @@ dependencies = [
 name = "tpt-eng-props-water"
 version = "0.1.0"
 dependencies = [
- "tpt-math-numeric 0.1.0",
+ "tpt-math-numeric 0.2.0",
  "tpt-math-units",
 ]
 
@@ -956,7 +956,7 @@ dependencies = [
 name = "tpt-eng-schedule"
 version = "0.1.0"
 dependencies = [
- "tpt-math-numeric 0.1.0",
+ "tpt-math-numeric 0.2.0",
 ]
 
 [[package]]
@@ -1008,7 +1008,7 @@ dependencies = [
 name = "tpt-eng-timeseries-core"
 version = "0.1.0"
 dependencies = [
- "tpt-math-numeric 0.1.0",
+ "tpt-math-numeric 0.2.0",
 ]
 
 [[package]]
@@ -1129,7 +1129,6 @@ version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3cf48d7c841b2a882d06426b67f732a79e0b248d103ff8c1f6d2fdf1ab3df87b"
 dependencies = [
- "libm",
  "num-traits",
 ]
 
@@ -1139,6 +1138,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e42627c65528723b285122c09289d849aaf44611c92112c817ca57ed39afddb3"
 dependencies = [
+ "libm",
  "num-traits",
 ]
 

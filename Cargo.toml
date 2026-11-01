@@ -62,7 +62,7 @@ repository = "https://github.com/tpt-solutions/tpt-engineering"
 [workspace.dependencies]
 # Cross-repo dependencies (tpt-math substrate), published on crates.io.
 tpt-math-units = "0.1.0"
-tpt-math-numeric = "0.1.0"
+tpt-math-numeric = "0.2.0"
 tpt-math-linalg = "0.1.0"
 tpt-math-stats = "0.2.0"
 
