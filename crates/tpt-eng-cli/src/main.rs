@@ -20,6 +20,9 @@ use units::convert as convert_units;
 #[derive(Parser)]
 #[command(name = "tpt-eng", version, about = "TPT engineering CLI", long_about = None)]
 struct Cli {
+    /// Emit machine-readable JSON instead of text (supported by `props`).
+    #[arg(long, global = true)]
+    json: bool,
     #[command(subcommand)]
     command: Command,
 }
@@ -44,6 +47,11 @@ enum Command {
     Pid(controls::PidArgs),
     /// Dimensional tolerance stack-up analysis.
     Tolerance(tolerance::ToleranceArgs),
+    /// Print a shell completion script to stdout.
+    Completions {
+        /// Target shell: bash | zsh | fish | powershell | elvish.
+        shell: clap_complete::Shell,
+    },
 }
 
 #[derive(Args)]
@@ -172,6 +180,7 @@ fn shape_from_cmd(cmd: &ShapeCmd) -> Section {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
+    let json = cli.json;
     match cli.command {
         Command::Validate { path } => cmd_validate(&path),
         Command::Report(args) => cmd_report(args),
@@ -179,9 +188,19 @@ fn main() -> Result<()> {
         Command::Materials(args) => cmd_materials(args),
         Command::Sections(args) => cmd_sections(args),
         Command::Calc(args) => cmd_calc(args),
-        Command::Props(args) => props::run(args),
+        Command::Props(args) => props::run(args, json),
         Command::Pid(args) => controls::run(args),
         Command::Tolerance(args) => tolerance::run(args),
+        Command::Completions { shell } => {
+            use clap::CommandFactory;
+            clap_complete::generate(
+                shell,
+                &mut Cli::command(),
+                "tpt-eng",
+                &mut std::io::stdout(),
+            );
+            Ok(())
+        }
     }
 }
 

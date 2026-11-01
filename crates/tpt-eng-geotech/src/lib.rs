@@ -20,6 +20,17 @@
 //! Soil layers record where their data came from via the
 //! [`tpt_eng_materials::DataSource`] type, shared with the materials crate so
 //! that geotechnical records can participate in the same data-policy checks.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_geotech::mohr_coulomb::shear_strength;
+//!
+//! // c = 10 kPa, φ = 30°, σ_n = 100 kPa: τ_f = c + σ_n·tan φ.
+//! let tau = shear_strength(10.0, 30.0, 100.0);
+//! let expected = 10.0 + 100.0 * 30f64.to_radians().tan();
+//! assert!((tau - expected).abs() < 1e-9);
+//! ```
 #![forbid(unsafe_code)]
 
 use tpt_eng_materials::DataSource;
@@ -311,8 +322,13 @@ pub mod bearing_capacity {
     }
 
     /// Allowable bearing capacity for a given factor of safety `fs`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `fs` is not positive.
     #[must_use]
     pub fn allowable_bearing_capacity(q_ult: f64, fs: f64) -> f64 {
+        assert!(fs > 0.0, "factor of safety must be positive");
         q_ult / fs
     }
 
@@ -364,6 +380,10 @@ pub mod consolidation {
     /// Coefficient of consolidation `c_v = k·(1 + e)/(a_v·γ_w)` (m²/s), from
     /// permeability `k` (m/s), void ratio `e`, compressibility `a_v` (1/Pa) and
     /// water unit weight `γ_w` (N/m³).
+    ///
+    /// # Panics
+    ///
+    /// Panics if `av` (coefficient of compressibility) is not positive.
     #[must_use]
     pub fn coeff_consolidation(
         permeability: f64,
@@ -371,12 +391,17 @@ pub mod consolidation {
         av: f64,
         gamma_water: f64,
     ) -> f64 {
+        assert!(av > 0.0, "coefficient of compressibility must be positive");
         permeability * (1.0 + void_ratio) / (av * gamma_water)
     }
 
     /// 1-D primary consolidation settlement `S = (Cc/(1 + e₀))·H·log₁₀((σ₀ + Δσ)/σ₀)`
     /// (metres), for compression index `Cc`, initial void ratio `e0`, layer
     /// thickness `H` and effective stress change `σ₀ → σ₀ + Δσ`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `sigma0` (initial effective stress) is not positive.
     #[must_use]
     pub fn consolidation_settlement(
         cc: f64,
@@ -385,6 +410,7 @@ pub mod consolidation {
         sigma0: f64,
         delta_sigma: f64,
     ) -> f64 {
+        assert!(sigma0 > 0.0, "initial effective stress must be positive");
         (cc / (1.0 + e0)) * h * ((sigma0 + delta_sigma) / sigma0).log10()
     }
 
@@ -415,8 +441,13 @@ pub mod consolidation {
     /// Time `t = T_v·H_dr² / c_v` (seconds) to reach `u_percent` consolidation,
     /// for coefficient of consolidation `c_v` and drainage half-height `H_dr`
     /// (full layer thickness for double drainage, half thickness for single).
+    ///
+    /// # Panics
+    ///
+    /// Panics if `cv` (coefficient of consolidation) is not positive.
     #[must_use]
     pub fn consolidation_time(cv: f64, drain_half_height: f64, u_percent: f64) -> f64 {
+        assert!(cv > 0.0, "coefficient of consolidation must be positive");
         time_factor_from_degree(u_percent) * drain_half_height * drain_half_height / cv
     }
 }
@@ -456,12 +487,21 @@ pub mod lateral_earth_pressure {
     /// Angles (degrees): `phi` soil friction, `delta` wall friction, `beta`
     /// backfill inclination from horizontal, `omega` wall-face inclination from
     /// vertical (0 for a vertical wall). Uses the standard Coulomb expression.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `beta_deg ≥ phi_deg`: a backfill at or steeper than the friction
+    /// angle has no valid Coulomb wedge, and the square root would be imaginary.
     #[must_use]
     pub fn coulomb_ka(phi_deg: f64, delta_deg: f64, beta_deg: f64, omega_deg: f64) -> f64 {
         let phi = phi_deg.to_radians();
         let delta = delta_deg.to_radians();
         let beta = beta_deg.to_radians();
         let omega = omega_deg.to_radians();
+        assert!(
+            beta_deg < phi_deg,
+            "backfill slope must be shallower than the friction angle"
+        );
         let num = (phi - omega).cos() * (phi - omega).cos();
         let den = omega.cos()
             * omega.cos()
@@ -498,8 +538,16 @@ pub mod atterberg {
     }
 
     /// Liquidity index `LI = (w − PL)/(LL − PL)` for water content `w`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `liquid_limit` does not exceed `plastic_limit`.
     #[must_use]
     pub fn liquidity_index(water_content: f64, liquid_limit: f64, plastic_limit: f64) -> f64 {
+        assert!(
+            liquid_limit > plastic_limit,
+            "liquid limit must exceed plastic limit"
+        );
         (water_content - plastic_limit) / (liquid_limit - plastic_limit)
     }
 
@@ -540,8 +588,13 @@ pub mod atterberg {
     }
 
     /// Soil activity `A = PI / (clay fraction, % passing 75 µm)`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `clay_fraction_pct` is not positive.
     #[must_use]
     pub fn activity(pi: f64, clay_fraction_pct: f64) -> f64 {
+        assert!(clay_fraction_pct > 0.0, "clay fraction must be positive");
         pi / clay_fraction_pct
     }
 }

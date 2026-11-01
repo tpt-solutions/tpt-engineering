@@ -80,30 +80,52 @@ fn parse_pressure(value: f64, unit: &str) -> Result<f64> {
     Ok(value * factor)
 }
 
-pub fn run(args: PropsArgs) -> Result<()> {
+pub fn run(args: PropsArgs, json: bool) -> Result<()> {
     match args.cmd {
         PropsCmd::Water {
             temp,
             pressure,
             temp_unit,
             pressure_unit,
-        } => run_water(temp, pressure, &temp_unit, &pressure_unit),
+        } => run_water(temp, pressure, &temp_unit, &pressure_unit, json),
         PropsCmd::Air {
             temp,
             rh,
             pressure,
             temp_unit,
             pressure_unit,
-        } => run_air(temp, rh, pressure, &temp_unit, &pressure_unit),
+        } => run_air(temp, rh, pressure, &temp_unit, &pressure_unit, json),
         PropsCmd::Fuel { name, h2 } => run_fuel(&name, h2),
     }
 }
 
-fn run_water(temp: f64, pressure: f64, temp_unit: &str, pressure_unit: &str) -> Result<()> {
+fn run_water(temp: f64, pressure: f64, temp_unit: &str, pressure_unit: &str, json: bool) -> Result<()> {
     let t = ThermodynamicTemperature::new::<kelvin>(to_kelvin(temp, temp_unit));
     let p = Pressure::new::<pascal>(parse_pressure(pressure, pressure_unit)?);
     let s = tpt_eng_props_water::state(t, p)
         .map_err(|e: WaterError| anyhow::anyhow!("water: {e:?}"))?;
+
+    if json {
+        let v = serde_json::json!({
+            "fluid": "water",
+            "region": format!("{:?}", s.region),
+            "temperature_k": s.temperature.get::<kelvin>(),
+            "pressure_kpa": s.pressure.get::<pascal>() / 1e3,
+            "specific_volume_m3_per_kg": s.specific_volume
+                .get::<tpt_math_units::uom::si::specific_volume::cubic_meter_per_kilogram>(),
+            "density_kg_per_m3": s.density.get::<kilogram_per_cubic_meter>(),
+            "enthalpy_kj_per_kg": s.enthalpy,
+            "entropy_kj_per_kg_k": s.entropy
+                .get::<tpt_math_units::uom::si::specific_heat_capacity::kilojoule_per_kilogram_kelvin>(),
+            "internal_energy_kj_per_kg": s.internal_energy,
+            "cp_kj_per_kg_k": s.isobaric_heat_capacity
+                .get::<tpt_math_units::uom::si::specific_heat_capacity::kilojoule_per_kilogram_kelvin>(),
+            "cv_kj_per_kg_k": s.isochoric_heat_capacity
+                .get::<tpt_math_units::uom::si::specific_heat_capacity::kilojoule_per_kilogram_kelvin>(),
+        });
+        println!("{v}");
+        return Ok(());
+    }
 
     println!("Water/steam state (IAPWS-IF97, region {:?})", s.region);
     println!(
@@ -142,7 +164,14 @@ fn run_water(temp: f64, pressure: f64, temp_unit: &str, pressure_unit: &str) -> 
     Ok(())
 }
 
-fn run_air(temp: f64, rh: f64, pressure: f64, temp_unit: &str, pressure_unit: &str) -> Result<()> {
+fn run_air(
+    temp: f64,
+    rh: f64,
+    pressure: f64,
+    temp_unit: &str,
+    pressure_unit: &str,
+    json: bool,
+) -> Result<()> {
     if !(0.0..=100.0).contains(&rh) {
         bail!("relative humidity must be within 0-100 percent (got {rh})");
     }
@@ -161,6 +190,21 @@ fn run_air(temp: f64, rh: f64, pressure: f64, temp_unit: &str, pressure_unit: &s
     let dp =
         tpt_eng_props_air::dew_point(p_w).map_err(|e: AirError| anyhow::anyhow!("air: {e:?}"))?;
     let h = tpt_eng_props_air::moist_air_enthalpy(t, w);
+
+    if json {
+        let v = serde_json::json!({
+            "fluid": "moist-air",
+            "dry_bulb_c": t.get::<degree_celsius>(),
+            "relative_humidity_pct": rh,
+            "saturation_pressure_pa": psat_pa,
+            "vapour_pressure_pa": pw,
+            "humidity_ratio_kg_per_kg": w,
+            "dew_point_c": dp.get::<degree_celsius>(),
+            "enthalpy_kj_per_kg_dry_air": h,
+        });
+        println!("{v}");
+        return Ok(());
+    }
 
     println!("Moist-air state (ASHRAE)");
     println!("  dry-bulb         = {:.3} °C", t.get::<degree_celsius>());

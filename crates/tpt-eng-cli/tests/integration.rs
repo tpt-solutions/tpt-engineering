@@ -294,3 +294,36 @@ fn test_tolerance_bad_dim_fails() {
         .unwrap();
     assert!(!out.status.success());
 }
+
+#[test]
+fn test_props_water_json_is_parseable() {
+    let out = bin()
+        .args(["--json", "props", "water", "300", "3"])
+        .output()
+        .unwrap();
+    assert!(out.status.success());
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).expect("valid JSON");
+    assert_eq!(v["fluid"], "water");
+    let rho = v["density_kg_per_m3"].as_f64().unwrap();
+    assert!(rho > 900.0 && rho < 1050.0, "rho = {rho}");
+}
+
+#[test]
+fn test_props_air_json_keys() {
+    let out = bin()
+        .args(["--json", "props", "air", "25", "50"])
+        .output()
+        .unwrap();
+    assert!(out.status.success());
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).expect("valid JSON");
+    assert_eq!(v["fluid"], "moist-air");
+    assert!((v["dry_bulb_c"].as_f64().unwrap() - 25.0).abs() < 1e-9);
+}
+
+#[test]
+fn test_completions_emit_script() {
+    let out = bin().args(["completions", "bash"]).output().unwrap();
+    assert!(out.status.success());
+    let stdout = String::from_utf8(out.stdout).unwrap();
+    assert!(stdout.contains("tpt-eng"), "script should name the binary");
+}

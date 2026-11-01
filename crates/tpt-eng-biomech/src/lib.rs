@@ -25,6 +25,18 @@
 //! each item.
 //!
 //! #![forbid(unsafe_code)]
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_biomech::constitutive::neo_hookean_stress;
+//!
+//! // Uniaxial stretch λ = 1.2 with shear modulus μ = 1 MPa.
+//! let sigma = neo_hookean_stress(1.2, 1.0);
+//! assert!(sigma > 0.0 && sigma.is_finite());
+//! // No deformation, no stress.
+//! assert!(neo_hookean_stress(1.0, 1.0).abs() < 1e-12);
+//! ```
 #![warn(missing_docs)]
 
 pub use tpt_eng_geometry::frame::Frame3;
