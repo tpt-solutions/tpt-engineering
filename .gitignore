@@ -26,3 +26,8 @@ _agent_*/
 # Local cargo config overrides (but keep the workspace xtask alias tracked)
 .cargo/*
 !.cargo/config.toml
+
+# Python bytecode and tooling caches
+__pycache__/
+*.pyc
+.pytest_cache/
