@@ -45,6 +45,7 @@ members = [
     "crates/tpt-eng-geotech",
     "crates/tpt-eng-building-sys",
     "crates/tpt-eng-schedule",
+    "crates/tpt-eng-py",
     "crates/tpt-engineering",
 ]
 exclude = []
@@ -100,6 +101,8 @@ tpt-eng-examples = { version = "0.1.0", path = "crates/tpt-eng-examples" }
 # External dependencies shared by the newly merged crates.
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+clap_complete = "4.6"
+proptest = "1.12"
 csv = "1"
 thiserror = "2"
 glam = { version = "0.33", features = ["serde"] }

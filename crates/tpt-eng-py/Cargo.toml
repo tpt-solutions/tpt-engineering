@@ -1,0 +1,32 @@
+[package]
+name = "tpt-eng-py"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Python bindings (PyO3) for the tpt-engineering primitives."
+keywords = ["engineering", "python", "bindings"]
+categories = ["science", "api-bindings"]
+repository.workspace = true
+homepage.workspace = true
+# Built into a Python wheel with maturin (see pyproject.toml), not published
+# to crates.io.
+publish = false
+
+[lib]
+# Python imports this module as `tpt_eng` (see `#[pymodule]` in src/lib.rs).
+name = "tpt_eng"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# abi3 gives one wheel that works on every CPython >= 3.10.
+pyo3 = { version = "0.30", features = ["abi3-py310"] }
+tpt-math-units = "0.1.0"
+tpt-eng-props-water = { workspace = true }
+
+# `extension-module` is deliberately NOT a feature of this crate. Enabling it
+# breaks `cargo test` linking, and CI runs `--all-features`. maturin enables it
+# via `pyproject.toml` instead.
+
+[lints]
+workspace = true
