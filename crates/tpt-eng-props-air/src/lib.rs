@@ -74,20 +74,34 @@ const H_FG0: f64 = 2501.0;
 /// Specific heat of water vapour, kJ/(kg·K).
 const C_PV: f64 = 1.86;
 
-/// Saturation vapour pressure of water over **liquid water** (Hyland–Wexler),
-/// in pascals, for `t` in kelvin (valid ~273.15–473.15 K).
+/// Saturation vapour pressure of water (Hyland–Wexler), in pascals, for `t` in
+/// kelvin.
 ///
-/// This is the ASHRAE Fundamentals formulation used for moist-air
-/// psychrometrics.
+/// Uses the **liquid-water** form for `t ≥ 273.15 K` (valid to 473.15 K) and the
+/// **over-ice** form below the triple point (valid 173.15–273.15 K). This is the
+/// ASHRAE Fundamentals formulation used for moist-air psychrometrics.
 pub fn saturation_pressure_water(t: ThermodynamicTemperature) -> Pressure {
     let tk = t.get::<tpt_math_units::uom::si::thermodynamic_temperature::kelvin>();
-    let c8 = -5.800_220_6e3;
-    let c9 = 1.391_499_3;
-    let c10 = -4.864_023_9e-2;
-    let c11 = 4.176_476_8e-5;
-    let c12 = -1.445_209_3e-8;
-    let c13 = 6.545_967_3;
-    let ln_ps = c8 / tk + c9 + c10 * tk + c11 * tk * tk + c12 * tk.powi(3) + c13 * ln(tk);
+    let ln_ps = if tk < 273.15 {
+        // Over ice (ASHRAE Eq. 5).
+        let c1 = -5.674_535_9e3;
+        let c2 = 6.392_524_7;
+        let c3 = -9.677_843e-3;
+        let c4 = 6.221_570_1e-7;
+        let c5 = 2.074_782_5e-9;
+        let c6 = -9.484_024e-13;
+        let c7 = 4.163_501_9;
+        c1 / tk + c2 + c3 * tk + c4 * tk * tk + c5 * tk.powi(3) + c6 * tk.powi(4) + c7 * ln(tk)
+    } else {
+        // Over liquid water (ASHRAE Eq. 6).
+        let c8 = -5.800_220_6e3;
+        let c9 = 1.391_499_3;
+        let c10 = -4.864_023_9e-2;
+        let c11 = 4.176_476_8e-5;
+        let c12 = -1.445_209_3e-8;
+        let c13 = 6.545_967_3;
+        c8 / tk + c9 + c10 * tk + c11 * tk * tk + c12 * tk.powi(3) + c13 * ln(tk)
+    };
     Pressure::new::<tpt_math_units::uom::si::pressure::pascal>(exp(ln_ps))
 }
 
@@ -165,13 +179,25 @@ pub fn moist_air_enthalpy(t: ThermodynamicTemperature, w: f64) -> f64 {
 /// # Errors
 ///
 /// Returns [`Error::VapourPressureExceedsTotal`] if `p_w ≤ 0` or is
-/// non-finite, since no physical dew point exists.
+/// non-finite, since no physical dew point exists. Returns
+/// [`Error::TemperatureOutOfRange`] if `p_w` lies outside the saturation
+/// pressure over the 173.15–373.15 K search range, rather than clamping to a
+/// bound.
 pub fn dew_point(p_w: Pressure) -> Result<ThermodynamicTemperature, Error> {
     let pw = p_w.get::<tpt_math_units::uom::si::pressure::pascal>();
     if !pw.is_finite() || pw <= 0.0 {
         return Err(Error::VapourPressureExceedsTotal);
     }
-    let (mut lo, mut hi) = (173.0_f64, 373.0_f64);
+    let (mut lo, mut hi) = (173.15_f64, 373.15_f64);
+    let psat_at = |t: f64| {
+        saturation_pressure_water(ThermodynamicTemperature::new::<
+            tpt_math_units::uom::si::thermodynamic_temperature::kelvin,
+        >(t))
+        .get::<tpt_math_units::uom::si::pressure::pascal>()
+    };
+    if pw < psat_at(lo) || pw > psat_at(hi) {
+        return Err(Error::TemperatureOutOfRange);
+    }
     for _ in 0..100 {
         let mid = 0.5 * (lo + hi);
         let psat = saturation_pressure_water(ThermodynamicTemperature::new::<
@@ -231,6 +257,30 @@ mod tests {
         assert!(approx(psat.get::<pascal>(), pw.get::<pascal>(), 1.0));
         // 2 kPa vapour ≈ dew point around 17 °C.
         assert!(tdp.get::<kelvin>() > 273.0 && tdp.get::<kelvin>() < 295.0);
+    }
+
+    #[test]
+    fn over_ice_branch_below_triple_point() {
+        // ASHRAE over-ice saturation at −10 °C ≈ 259.9 Pa; the liquid form would
+        // give ≈ 286 Pa, so this pins the ice branch.
+        let p = saturation_pressure_water(ThermodynamicTemperature::new::<kelvin>(263.15));
+        assert!(
+            approx(p.get::<pascal>(), 259.9, 1.0),
+            "p = {}",
+            p.get::<pascal>()
+        );
+        // Ice and liquid forms meet at the triple point to within ~0.2 %.
+        let liq = saturation_pressure_water(ThermodynamicTemperature::new::<kelvin>(273.16));
+        let ice = saturation_pressure_water(ThermodynamicTemperature::new::<kelvin>(273.149));
+        let rel = (liq.get::<pascal>() - ice.get::<pascal>()).abs() / liq.get::<pascal>();
+        assert!(rel < 0.002, "rel = {rel}");
+    }
+
+    #[test]
+    fn dew_point_out_of_range_is_error() {
+        // Far above the 373.15 K search bound: no clamped answer.
+        let too_wet = Pressure::new::<kilopascal>(1000.0);
+        assert_eq!(dew_point(too_wet), Err(Error::TemperatureOutOfRange));
     }
 
     #[test]

@@ -34,32 +34,33 @@
 
 const PI: f64 = core::f64::consts::PI;
 
-#[cfg(not(feature = "std"))]
-use tpt_math_numeric::libm::{acos, cos, ln, powf, sqrt};
-#[cfg(feature = "std")]
+// Transcendental functions go through `libm` so the crate is identical with and
+// without `std` (core's `f64` methods such as `sqrt`/`exp` need std).
+use tpt_math_numeric::libm;
+
 #[inline]
 fn sqrt(x: f64) -> f64 {
-    x.sqrt()
+    libm::sqrt(x)
 }
-#[cfg(feature = "std")]
+#[inline]
+fn exp(x: f64) -> f64 {
+    libm::exp(x)
+}
 #[inline]
 fn powf(x: f64, y: f64) -> f64 {
-    x.powf(y)
+    libm::pow(x, y)
 }
-#[cfg(feature = "std")]
 #[inline]
 fn ln(x: f64) -> f64 {
-    x.ln()
+    libm::log(x)
 }
-#[cfg(feature = "std")]
 #[inline]
 fn cos(x: f64) -> f64 {
-    x.cos()
+    libm::cos(x)
 }
-#[cfg(feature = "std")]
 #[inline]
 fn acos(x: f64) -> f64 {
-    x.acos()
+    libm::acos(x)
 }
 
 /// Universal gas constant, J/(mol·K).
@@ -83,8 +84,16 @@ pub struct Component {
 impl Component {
     /// Look up a component by (case-insensitive) name or symbol.
     pub fn from_name(name: &str) -> Option<Component> {
-        let n = name.to_ascii_lowercase();
-        Some(match n.as_str() {
+        // Lowercase into a fixed buffer so this stays allocation-free (no_std).
+        let mut buf = [0u8; 32];
+        if name.len() > buf.len() {
+            return None;
+        }
+        for (dst, src) in buf.iter_mut().zip(name.bytes()) {
+            *dst = src.to_ascii_lowercase();
+        }
+        let n = core::str::from_utf8(&buf[..name.len()]).ok()?;
+        Some(match n {
             "water" | "h2o" => Component {
                 name: "water",
                 tc: 647.096,
@@ -245,7 +254,7 @@ impl Mixture {
             for j in 0..n {
                 let cj = self.components[j];
                 let aj = pr_a(cj, t);
-                let aij = (ai * aj).sqrt() * (1.0 - kij(ci, cj));
+                let aij = sqrt(ai * aj) * (1.0 - kij(ci, cj));
                 a_mix += self.mole_fractions[i] * self.mole_fractions[j] * aij;
             }
         }
@@ -270,13 +279,13 @@ impl Mixture {
             for j in 0..n {
                 let aj = pr_a(self.components[j], t);
                 let aij =
-                    (ai_vec[i] * aj).sqrt() * (1.0 - kij(self.components[i], self.components[j]));
+                    sqrt(ai_vec[i] * aj) * (1.0 - kij(self.components[i], self.components[j]));
                 sum += self.mole_fractions[j] * aij;
             }
             let ratio = ((z + (1.0 + sqrt(2.0)) * bb) / (z + (1.0 - sqrt(2.0)) * bb)).max(1e-12);
             let log_phi = (bi / b_mix) * (z - 1.0)
                 - (aa / (2.0 * sqrt(2.0) * bb)) * (2.0 * sum / a_mix - bi / b_mix) * ln(ratio);
-            phi.push(log_phi.exp());
+            phi.push(exp(log_phi));
         }
         phi
     }
@@ -294,7 +303,10 @@ impl Mixture {
 fn pr_a(c: Component, t: f64) -> f64 {
     let tr = t / c.tc;
     let kappa = 0.37464 + 1.54226 * c.omega - 0.26992 * c.omega * c.omega;
-    let alpha = (1.0 + kappa * (1.0 - sqrt(tr))).powi(2);
+    let alpha = {
+        let t = 1.0 + kappa * (1.0 - sqrt(tr));
+        t * t
+    };
     0.45724 * R * R * c.tc * c.tc / c.pc * alpha
 }
 
@@ -424,7 +436,7 @@ pub fn pr_saturation_pressure(t: f64, c: Component) -> f64 {
             (Some(zl), Some(zv)) => {
                 let phl = mix.fugacity_coefficients(t, mid, zl)[0];
                 let phv = mix.fugacity_coefficients(t, mid, zv)[0];
-                let g = phl.ln() - phv.ln();
+                let g = ln(phl) - ln(phv);
                 // Below saturation the liquid-phase fugacity is lower than the
                 // vapour-phase one (g < 0); at saturation they are equal. Move
                 // `lo` up when g ≤ 0, otherwise pull `hi` down.

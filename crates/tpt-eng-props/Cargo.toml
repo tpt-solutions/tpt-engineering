@@ -18,10 +18,10 @@ homepage.workspace = true
 # crate. See Phase 7.2 / todo.md 7.2.
 tpt-math-units = { version = "0.1.0", default-features = false }
 
-tpt-eng-props-water = { workspace = true }
-tpt-eng-props-air = { workspace = true }
-tpt-eng-props-fuels = { workspace = true }
-tpt-eng-props-mixture = { workspace = true }
+tpt-eng-props-water = { workspace = true, default-features = false }
+tpt-eng-props-air = { workspace = true, default-features = false }
+tpt-eng-props-fuels = { workspace = true, default-features = false }
+tpt-eng-props-mixture = { workspace = true, default-features = false }
 
 [features]
 default = ["std"]
