@@ -18,7 +18,7 @@
 //! * `publish-status` (`changelog-check`) — assert the workspace's
 //!   human-facing release claims (root `README.md` / `CHANGELOG.md`) stay
 //!   consistent with ground truth in `Cargo.toml`, `RELEASE.md`, and
-//!   `PUBLISH_TRACKING.md` (MSRV, published/unpublished crate counts, and the
+//!   `docs/PUBLISH_TRACKING.md` (MSRV, published/unpublished crate counts, and the
 //!   pending-crate name set). Wired into `check` so CI catches this class of
 //!   staleness.
 //!
@@ -43,6 +43,8 @@ const NO_STD_CRATES: &[&str] = &[
     "tpt-eng-props-water",
     "tpt-eng-props-air",
     "tpt-eng-props-fuels",
+    "tpt-eng-props-mixture",
+    "tpt-eng-props",
 ];
 
 const NO_STD_TARGET: &str = "thumbv6m-none-eabi";
@@ -89,10 +91,12 @@ fn run(args: &[String]) -> Result<(), String> {
                 ])?;
                 cargo_deny(&["check"])?;
                 changelog_check()?;
+                doctest_check()?;
                 Ok(())
             }
             "new-crate" => new_crate(rest),
             "publish-status" | "changelog-check" => changelog_check(),
+            "doctest-check" => doctest_check(),
             other => Err(format!(
                 "unknown command `{other}`; run `cargo xtask` with no args for usage"
             )),
@@ -402,7 +406,7 @@ fn render_crate_example_basic(name: &str) -> String {
 
 /// Assert that the workspace's human-facing release claims (root `README.md`
 /// and `CHANGELOG.md`) stay consistent with ground truth in `Cargo.toml`,
-/// `RELEASE.md`, and `PUBLISH_TRACKING.md`. This is the guard described in
+/// `RELEASE.md`, and `docs/PUBLISH_TRACKING.md`. This is the guard described in
 /// `todo.md` Phase 10: it prevents the publish-status / MSRV claims from
 /// drifting out of sync with reality (the exact staleness class that
 /// previously slipped through). Doubles as the `publish-status` report.
@@ -413,7 +417,7 @@ fn changelog_check() -> Result<(), String> {
     let readme = read_text(&root.join("README.md"))?;
     let changelog = read_text(&root.join("CHANGELOG.md"))?;
     let release = read_text(&root.join("RELEASE.md"))?;
-    let publish_tracking = read_text(&root.join("PUBLISH_TRACKING.md"))?;
+    let publish_tracking = read_text(&root.join("docs/PUBLISH_TRACKING.md"))?;
 
     let mut errors: Vec<String> = Vec::new();
 
@@ -469,13 +473,13 @@ fn changelog_check() -> Result<(), String> {
         }
     }
 
-    // --- PUBLISH_TRACKING.md covers every pending crate --------------------
+    // --- docs/PUBLISH_TRACKING.md covers every pending crate --------------------
     let tracked = parse_publish_tracking_crates(&publish_tracking);
     let tracked_set: std::collections::HashSet<&str> = tracked.iter().map(|s| s.as_str()).collect();
     for c in &unpublished_new {
         if !tracked_set.contains(c.as_str()) {
             errors.push(format!(
-                "PUBLISH_TRACKING.md does not list pending crate `{c}`"
+                "docs/PUBLISH_TRACKING.md does not list pending crate `{c}`"
             ));
         }
     }
@@ -706,7 +710,7 @@ fn first_number(s: &str) -> Option<usize> {
 }
 
 /// A plausible crate-name token (used to ignore non-crate backtick spans such
-/// as `PUBLISH_TRACKING.md` that share the README unpublished-claim line).
+/// as `docs/PUBLISH_TRACKING.md` that share the README unpublished-claim line).
 fn is_crate_name(s: &str) -> bool {
     !s.is_empty()
         && !s.contains('.')
@@ -771,4 +775,43 @@ fn workspace_root() -> PathBuf {
 
 fn write_file(path: &std::path::Path, contents: &str) -> Result<(), String> {
     fs::write(path, contents).map_err(|e| format!("write {}: {e}", path.display()))
+}
+
+/// Every library `tpt-eng-*` crate must carry at least one fenced doc example
+/// in its crate-level docs (`//!` block), so the API stays exercised by
+/// `cargo test --doc`. Binary-only crates (no `src/lib.rs`) are skipped.
+fn doctest_check() -> Result<(), String> {
+    let crates_dir = workspace_root().join("crates");
+    let mut missing: Vec<String> = Vec::new();
+    let entries = std::fs::read_dir(&crates_dir)
+        .map_err(|e| format!("cannot read {}: {e}", crates_dir.display()))?;
+    let mut checked = 0usize;
+    for entry in entries {
+        let entry = entry.map_err(|e| e.to_string())?;
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if !name.starts_with("tpt-eng-") {
+            continue;
+        }
+        let lib = entry.path().join("src").join("lib.rs");
+        if !lib.exists() {
+            continue;
+        }
+        checked += 1;
+        let src = read_text(&lib)?;
+        let has_example = src
+            .lines()
+            .any(|l| l.trim_start().starts_with("//!") && l.contains("```"));
+        if !has_example {
+            missing.push(name);
+        }
+    }
+    if missing.is_empty() {
+        println!("doctest-check: all {checked} library crates have a crate-level example");
+        Ok(())
+    } else {
+        Err(format!(
+            "doctest-check: crates without a crate-level example: {}",
+            missing.join(", ")
+        ))
+    }
 }

@@ -2,7 +2,7 @@ name: release
 
 # Automated workspace release via `cargo-release`, replacing the manual
 # batch-by-batch `cargo publish` process documented in RELEASE.md /
-# PUBLISH_TRACKING.md. The whole workspace is versioned and published together,
+# docs/PUBLISH_TRACKING.md. The whole workspace is versioned and published together,
 # with cargo-release ordering crates by their dependency edges.
 #
 # Runs only on manual dispatch. It is a DRY RUN by default; set `execute: true`

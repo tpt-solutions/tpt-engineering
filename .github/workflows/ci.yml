@@ -72,7 +72,7 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
       - run: |
-          for c in tpt-eng-props-water tpt-eng-props-air tpt-eng-props-fuels tpt-eng-props; do
+          for c in tpt-eng-props-water tpt-eng-props-air tpt-eng-props-fuels tpt-eng-props-mixture tpt-eng-props; do
             cargo build -p "$c" --no-default-features --target wasm32-unknown-unknown
           done
 
@@ -97,3 +97,57 @@ jobs:
       - name: Install cargo-deny
         run: cargo install --locked cargo-deny
       - run: cargo deny --all-features --log-level warn --manifest-path ./Cargo.toml check
+
+  # Each runnable scenario must keep building and running end to end.
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: |
+          for e in thermal_loop solar_pv mechanical_design; do
+            cargo run -p tpt-eng-examples --example "$e"
+          done
+
+  # Every library crate must carry a crate-level example (see docs/CONVENTIONS.md).
+  doctest-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo xtask doctest-check
+
+  # Each feature of every crate with features must compile on its own and in
+  # combination (cargo-hack feature powerset, no dev-deps).
+  feature-powerset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@cargo-hack
+      - run: cargo hack check --workspace --feature-powerset --no-dev-deps --exclude-no-default-features
+
+  # Line coverage report. Uploaded as an artifact only; no third-party upload.
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - run: cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lcov
+          path: lcov.info
+
+  # The cookbook must build; deployment to Pages is a separate, manual step.
+  book:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: latest
+      - run: cd docs/guide && mdbook build

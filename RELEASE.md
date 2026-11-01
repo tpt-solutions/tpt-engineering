@@ -196,7 +196,7 @@ until a version bump + republish. Published in dependency order:
 > than bumping `[workspace.package].version`, to avoid dragging every other
 > crate's version along.
 
-> See `PUBLISH_TRACKING.md` for the working checklist with exact `cargo publish`
+> See `docs/PUBLISH_TRACKING.md` for the working checklist with exact `cargo publish`
 > commands for this round (Batches 6–9 were added 2026-08-19/20, after the
 > workspace grew from 29 to 43 `tpt-eng-*` crates).
 
