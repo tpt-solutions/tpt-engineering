@@ -5,6 +5,8 @@ Python bindings for [tpt-engineering](../../README.md), built with PyO3 and matu
 | Module | Contents |
 | --- | --- |
 | `tpt_eng` | IAPWS-IF97 water and steam properties |
+| `tpt_eng.air` | Moist-air psychrometrics: saturation pressure, humidity ratio, relative humidity, enthalpy, dew point |
+| `tpt_eng.fuels` | `Fuel` and `BlendedFuel`: heating values, density, air–fuel ratio, CO₂ factor |
 | `tpt_eng.controls` | `Pid` discrete-time controller |
 | `tpt_eng.structural` | `SimplySupportedBeam` statics and `section_utilization` |
 

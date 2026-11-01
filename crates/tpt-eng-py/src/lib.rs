@@ -1,7 +1,8 @@
 //! Python bindings for tpt-engineering (PyO3).
 //!
 //! The top-level `tpt_eng` module holds IAPWS-IF97 water and steam properties.
-//! `tpt_eng.controls` and `tpt_eng.structural` are submodules.
+//! `tpt_eng.air`, `tpt_eng.fuels`, `tpt_eng.controls` and `tpt_eng.structural`
+//! are submodules.
 //!
 //! Conventions for every binding:
 //!
@@ -12,7 +13,9 @@
 //! * Panics in the core are avoided by validating inputs here first, so Python
 //!   never sees a `PanicException`.
 
+mod air;
 mod controls;
+mod fuels;
 mod structural;
 mod water;
 
@@ -44,6 +47,8 @@ fn add_submodule(
 #[pymodule]
 fn tpt_eng(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     water::register(m)?;
+    add_submodule(py, m, "air", air::register)?;
+    add_submodule(py, m, "fuels", fuels::register)?;
     add_submodule(py, m, "controls", controls::register)?;
     add_submodule(py, m, "structural", structural::register)?;
     Ok(())
