@@ -17,7 +17,7 @@ saturation pressure or state without a separate dependency.
 ## Features
 
 - **Convection** — `nusselt_flat_plate`, `nusselt_cylinder`
-  (Churchill–Bernstein), `nusselt_sphere` (Whitaker), `nusselt_internal_pipe`
+  (Churchill–Bernstein), `nusselt_sphere(re, pr, viscosity_ratio)` (Whitaker), `nusselt_internal_pipe`
   (Dittus–Boelter), `convection_coefficient`.
 - **Conduction** — `plane_wall_heat_rate`, `plane_wall_resistance`,
   `cylindrical_shell_resistance`, `critical_insulation_radius`.

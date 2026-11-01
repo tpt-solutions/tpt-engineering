@@ -6,7 +6,7 @@
 //!
 //! All three are `std`-only numerical building blocks that wrap the
 //! [`tpt_math_linalg`] dense matrix types for the state-space representation and
-//! otherwise operate on plain `f64`. The TODO in `spec.txt` asks for an audit of
+//! otherwise operate on plain `f64`. The TODO in `docs/spec.txt` asks for an audit of
 //! the external vertical repos (`tpt-flight-control` / `tpt-chassis` /
 //! `tpt-dynamo` / `tpt-servo`) before writing this crate; those repos are not
 //! available from this build environment, so this is a from-scratch
@@ -51,8 +51,9 @@ impl PidGains {
 /// A discrete-time PID controller.
 ///
 /// Uses derivative-on-measurement (so a step change in setpoint does not
-/// produce a derivative "kick") and clamps the integral term to the configured
-/// output limits for anti-windup.
+/// produce a derivative "kick"). Anti-windup is conditional integration: while
+/// the output is saturated, the integral is frozen unless the error would move
+/// the output back inside its limits, so it does not wind up past saturation.
 #[derive(Debug, Clone)]
 pub struct Pid {
     gains: PidGains,
@@ -134,12 +135,15 @@ impl Pid {
 
         let clamped = self.clamp(raw);
 
-        // Anti-windup: only accumulate the integral if the raw output is within
-        // limits or the new integral would push the error back toward zero.
-        let unsaturated = self
-            .clamp(proportional + self.gains.ki * (self.integral + error * dt) + derivative)
-            == proportional + self.gains.ki * (self.integral + error * dt) + derivative;
-        if unsaturated || (clamped - raw).abs() < f64::EPSILON {
+        // Anti-windup (conditional integration): accumulate only if the output
+        // with the updated integral stays within limits, or if the error drives
+        // a saturated output back off its limit.
+        let lo = self.output_min.unwrap_or(f64::NEG_INFINITY);
+        let hi = self.output_max.unwrap_or(f64::INFINITY);
+        let candidate = proportional + self.gains.ki * (self.integral + error * dt) + derivative;
+        let within = (lo..=hi).contains(&candidate);
+        let recovering = (raw > hi && error < 0.0) || (raw < lo && error > 0.0);
+        if within || recovering {
             self.integral += error * dt;
         }
 
@@ -177,7 +181,16 @@ pub struct TransferFunction {
 impl TransferFunction {
     /// Build from numerator `b` and denominator `a` coefficient vectors (both
     /// starting at lag 0). `a[0]` is normalised to 1 internally.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `a` is empty or its leading coefficient `a[0]` is zero or
+    /// non-finite, since the difference equation cannot be normalised.
     pub fn new(b: &[f64], a: &[f64]) -> Self {
+        assert!(
+            a.first().is_some_and(|a0| a0.is_finite() && *a0 != 0.0),
+            "denominator must be non-empty with a non-zero, finite leading coefficient"
+        );
         let a0 = a[0];
         let a: Vec<f64> = a.iter().map(|x| x / a0).collect();
         let b: Vec<f64> = b.iter().map(|x| x / a0).collect();
@@ -309,6 +322,30 @@ mod tests {
             let u = pid.update(0.0, 0.01);
             assert!(u.abs() <= 1.0 + 1e-9);
         }
+    }
+
+    #[test]
+    fn pid_anti_windup_recovers_after_saturation() {
+        // Pure integral action saturates at the limit; with conditional
+        // integration the accumulator must stop near the limit, not wind up.
+        let mut pid = Pid::new(PidGains::new(0.0, 1.0, 0.0)).with_output_limit(1.0);
+        pid.set_setpoint(10.0);
+        for _ in 0..1000 {
+            pid.update(0.0, 0.01);
+        }
+        assert!(pid.integral() <= 1.0 + 1e-9, "wound up: {}", pid.integral());
+        // Reversing the error must bring the output off the limit within a few
+        // steps, rather than waiting out a large wound-up integral.
+        pid.set_setpoint(-10.0);
+        pid.update(0.0, 0.01);
+        let u = pid.update(0.0, 0.01);
+        assert!(u < 1.0 - 1e-6, "still saturated: {u}");
+    }
+
+    #[test]
+    #[should_panic(expected = "leading coefficient")]
+    fn transfer_function_rejects_zero_leading_denominator() {
+        let _ = TransferFunction::new(&[1.0], &[0.0, 1.0]);
     }
 
     #[test]

@@ -45,26 +45,54 @@ pub fn trace_area_mil2(width_m: f64, thickness_m: f64) -> f64 {
 /// * `relative_permittivity` — substrate relative permittivity `εᵣ` (dimensionless).
 /// * `trace_thickness_m` — conductor thickness (m).
 ///
+/// Uses the Hammerstad–Jensen closed form with Wheeler's finite-thickness
+/// width correction. The two branches (`w/h ≤ 1` and `w/h > 1`) agree at
+/// `w/h = 1`, so the impedance is continuous across the boundary.
+///
 /// # Panics
 ///
-/// Panics if any geometric argument is non-positive (logarithm / division by
-/// zero).
+/// Panics if `width_m`, `height_m` or `relative_permittivity` is not finite and
+/// strictly positive, or if `trace_thickness_m` is negative or non-finite.
 pub fn microstrip_impedance(
     width_m: f64,
     height_m: f64,
     relative_permittivity: f64,
     trace_thickness_m: f64,
 ) -> f64 {
-    let er = relative_permittivity + 1.41;
-    let root = er.sqrt();
-    let w_over_h = width_m / height_m;
+    assert!(
+        width_m.is_finite() && width_m > 0.0,
+        "trace width must be positive"
+    );
+    assert!(
+        height_m.is_finite() && height_m > 0.0,
+        "substrate height must be positive"
+    );
+    assert!(
+        relative_permittivity.is_finite() && relative_permittivity > 0.0,
+        "relative permittivity must be positive"
+    );
+    assert!(
+        trace_thickness_m.is_finite() && trace_thickness_m >= 0.0,
+        "trace thickness must be non-negative"
+    );
 
-    if w_over_h <= 1.0 {
-        let ratio = 5.98 * height_m / (0.8 * width_m + trace_thickness_m);
-        (87.0 / root) * ratio.ln()
+    // Wheeler's thickness correction widens the effective strip: Δw = (t/π)(1 + ln(2h/t)).
+    let dw_over_h = if trace_thickness_m > 0.0 {
+        trace_thickness_m / (std::f64::consts::PI * height_m)
+            * (1.0 + (2.0 * height_m / trace_thickness_m).ln())
     } else {
-        let ratio = 8.0 * height_m / width_m + 0.25 * width_m / height_m;
-        (60.0 / root) * ratio.ln()
+        0.0
+    };
+    let u = width_m / height_m + dw_over_h;
+
+    let er = relative_permittivity;
+    let er_eff = (er + 1.0) / 2.0 + (er - 1.0) / 2.0 / (1.0 + 12.0 / u).sqrt();
+
+    if u <= 1.0 {
+        60.0 / er_eff.sqrt() * (8.0 / u + u / 4.0).ln()
+    } else {
+        let z_free = 120.0 * std::f64::consts::PI / (u + 1.393 + 0.667 * (u + 1.444).ln());
+        z_free / er_eff.sqrt()
     }
 }
 
