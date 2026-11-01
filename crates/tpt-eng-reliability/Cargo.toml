@@ -5,6 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
 authors.workspace = true
 description = "Reliability and life analysis: fatigue, life prediction, failure rates, FMEA, probabilistic design."
 keywords = ["engineering", "reliability", "maintenance", "weibull", "life-analysis"]
