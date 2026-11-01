@@ -4,6 +4,17 @@
 //! NURBS surfaces, all evaluated with the Cox–de Boor basis functions and the
 //! de Boor algorithm. No external NURBS dependency is used; the spline
 //! mathematics are implemented here directly.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_nurbs::KnotVector;
+//!
+//! // Clamped knot vector for a cubic curve with four control points.
+//! let knots = KnotVector::new(vec![0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]).unwrap();
+//! assert_eq!(knots.domain(), (0.0, 1.0));
+//! assert!(knots.is_valid(3, 4));
+//! ```
 
 use tpt_eng_geometry::{EPSILON, Point3, Vector3};
 

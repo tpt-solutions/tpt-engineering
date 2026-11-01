@@ -17,6 +17,18 @@
 //!
 //! All solid modeling and boolean operations are implemented in-house using
 //! SDFs; no external solid-modeling or geometry-kernel bindings are used.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_cad::{Box, Solid};
+//! use tpt_eng_geometry::{Point3, Vector3};
+//!
+//! // A 2 × 2 × 2 box centred at the origin.
+//! let b = Box { center: Point3::ZERO, half_extents: Vector3::new(1.0, 1.0, 1.0) };
+//! assert!(b.sdf(Point3::ZERO) < 0.0);
+//! assert!(b.sdf(Point3::new(3.0, 0.0, 0.0)) > 0.0);
+//! ```
 
 use std::boxed::Box as StdBox;
 use std::collections::HashMap;

@@ -5,6 +5,17 @@
 //! tolerance zones, datum reference frames, symbolic tolerance frames, fits and
 //! allowances, and tolerance stack-up inputs. It is intentionally a data model
 //! only and does not prescribe any particular inspection method.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_gdt::size_limits;
+//!
+//! // A 10.00 mm feature with a 0.05 mm size tolerance.
+//! let limits = size_limits(10.0, 0.05, true);
+//! assert!((limits.nominal() - 10.0).abs() < 1e-6);
+//! assert!((limits.tolerance() - 0.05).abs() < 1e-6);
+//! ```
 
 use tpt_eng_geometry::frame::Frame3;
 use tpt_eng_geometry::{EPSILON, Point3, Vector3};
