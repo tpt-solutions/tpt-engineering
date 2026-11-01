@@ -137,7 +137,7 @@ automatically.
 - [x] Per-crate `README.md` with usage examples (all 13 crates)
 - [ ] Update `tpt-rust-map/registry.toml`: flip each crate's `status` from
       `planned` to `git` as it lands â€” **external repo, not yet done**
-- [ ] Tag `v0.1.0` once the full 13-crate set compiles and tests pass â€”
+- [x] Tag `v0.1.0` once the full 13-crate set compiles and tests pass â€”
       **defer until the remaining open items below are closed**
 
 ### Open / follow-up items
@@ -154,7 +154,7 @@ automatically.
 - [ ] Flip `status = "planned"` â†’ `"git"` for all 13 crates in the
       sibling `tpt-rust-map/registry.toml` â€” **BLOCKED: requires write access
       to the external `tpt-rust-map` repo (maintainer action)**
-- [ ] Cut `v0.1.0` tag after the above are closed and CI is green on
+- [x] Cut `v0.1.0` tag after the above are closed and CI is green on
       `main` â€” **BLOCKED: release-owner action; depends on the registry flip
       and green CI**
 
@@ -667,7 +667,7 @@ foundational crates above are registered):
       (a `build2.log` slipped through after the 9e log cleanup) — done: added
       `/*.log` to `.gitignore` and removed the previously-tracked `build2.log`
       from the index so it is no longer committed.
-- [ ] Cut the `v0.1.0` git tag once Batches 6-8 are published (see
+- [x] Cut the `v0.1.0` git tag once Batches 6-8 are published (see
       `RELEASE.md` §5) — **BLOCKED**: release-owner action; depends on the
       registry flip and green CI.
 - [ ] Explore a `cargo-generate` template / `xtask new-project` scaffolding
@@ -684,3 +684,187 @@ foundational crates above are registered):
       (`thermal_loop`, `mechanical_design`, `solar_pv`) plus the 10 per-crate
       `examples/` demos added above; `vehicle-handling` math lives in
       `tpt-eng-vehicle-dynamics` and could be added as a 4th scenario later.
+
+---
+
+## Phase 11 — Bug, Hygiene & Adoption Review (2026-11-02)
+
+Source: read-only review of the 44-crate workspace. Nothing below has been
+compiled or run — reproduce each bug with a failing test before fixing it.
+Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.md`.
+
+### 11A — Correctness bugs (failing test first, then fix)
+
+- [x] `tpt-eng-structural` `Beam::moment_at` (`lib.rs` ~207-217): partial UDL
+      counts load twice for `xp > end`. Regression tests
+      `partial_udl_moment_beyond_load_end` and `zero_length_udl_acts_as_point_load`
+      are **written but not yet run**; the fix is not applied. Also guard
+      `end == start` (div-by-zero in `shear_at`/`moment_at`) and loads outside
+      the span.
+- [x] `tpt-eng-unit-ops` `gilliland_stages` (~200-230): constants match neither
+      Eduljee nor Molokanov; inversion should be `N = (Nmin + Y) / (1 - Y)`.
+- [x] `tpt-eng-pcb` `microstrip_impedance` (`trace.rs` ~52-69): ~30%
+      discontinuity at w/h = 1; use Hammerstad-Jensen; implement the
+      documented panic/validation on non-positive input; tighten the +/-6 ohm
+      test tolerance.
+- [x] `tpt-eng-heat-transfer` `water_film_properties` (~176-184): returns
+      enthalpy where the doc says cp; panics outside the IF97 range.
+- [x] `tpt-eng-props-air` `saturation_pressure_water` / `dew_point`: liquid
+      correlation used below 273.15 K (needs the ice form); add the range check
+      using the existing `TemperatureOutOfRange` variant.
+- [x] `tpt-eng-heat-transfer` `nusselt_sphere`: uses the Churchill-Bernstein
+      cylinder term instead of the Whitaker viscosity ratio; add Re/Pr validity
+      checks to the correlations.
+- [x] `tpt-eng-electrical`: `skin_effect_ratio` is non-physical at high
+      frequency; `Complex::div` / `impedance_*` / `PerUnitSystem` silently give
+      inf/NaN on zero input; `three_phase_power` has no lead/lag sign and no
+      pf range check.
+- [x] Unguarded divisions: `power-components` (poles = 0, efficiency = 0,
+      turns_ratio), `geotech` (cv = 0, fs = 0, LL == PL, sigma0 = 0,
+      `coulomb_ka` NaN when beta > phi).
+- [x] `tpt-eng-renewables`: PV fixed-point iteration has no convergence check;
+      `saturation_current` lacks the T^3 term; cite wind cut-in/rated/cut-out
+      and cell constants.
+- [x] `tpt-eng-controls` PID: doc says "clamps the integral" but code only
+      freezes it (odd EPSILON test); add the anti-windup recovery test (open
+      item from Phase 5); `TransferFunction::new` panics on empty / zero-leading
+      `a`.
+- [x] `tpt-eng-reliability` `miners_rule`: `nf <= 0` counts as zero damage —
+      should be infinite or an error.
+- [x] `tpt-eng-tolerance` (`Uniform::new(...).expect`, lines ~136/206) panics on
+      NaN / inverted bounds; `tpt-eng-mesh` binary STL parser (~453-485):
+      confirm length validation precedes the `try_into().unwrap()` calls.
+
+### 11B — API consistency (needs a design decision)
+
+- [x] Choose one error strategy (`Option` / `assert!` / silent NaN / `Result`
+      are all in use, 9+ error types) and document it.
+- [x] Document the unit convention (SI, radians) and fix outliers: degrees in
+      `geotech`/`vehicle-dynamics`, `pacejka_lateral` degrees vs longitudinal
+      ratio, kJ vs J in `moist_air_enthalpy`, mils in `pcb`.
+- [ ] f32 geometry crates vs f64 elsewhere; `crystallography` mixes both.
+- [ ] Add `missing_docs = "warn"` to workspace lints once docs are filled in;
+      add `RUSTDOCFLAGS=-D warnings` to the CI docs job.
+
+### 11C — Release hygiene
+
+- [ ] Bump `[workspace.dependencies]` pins to 0.1.1 for safety, tolerance, gdt,
+      structural, standards, cad (only props is bumped today).
+- [ ] Align `tpt-math-*` versions (0.1 / 0.2 mix duplicates `numeric` and
+      `linalg-dense` in `Cargo.lock`); consider `multiple-versions = "deny"`.
+- [x] MSRV: add a 1.85 CI job; use `rust-version.workspace = true` in all
+      crates (only 15 do); fix stale "no rust-version" lines in this file
+      (Phase 1, Phase 6) and the `RELEASE.md` "v0.1.0" header.
+- [x] Decide `tpt-eng-examples` publish status (add `publish = false` if it
+      should not ship).
+- [x] Add `props-mixture` and `tpt-eng-props` to `NO_STD_CRATES`
+      (`xtask/src/main.rs:42`) and the CI wasm job.
+- [x] CHANGELOG: add a `[0.1.1]` section; confirm `rand_distr` is really unused
+      in `tpt-eng-tolerance`; add `homepage` to cad, gdt, geometry, mesh, nurbs,
+      reliability, safety, tolerance.
+- [x] Move `spec*.txt`, `history/`, `CRATE_AUDIT.md`, `PUBLISH_TRACKING.md`
+      into `docs/` (fix README / CHANGELOG links); check whether `.claude/` is
+      tracked.
+- [x] Fix README drift (says 43 crates, 44 exist); refresh stale LOC in
+      `CRATE_AUDIT.md`.
+
+### 11D — Adoption
+
+- [x] Umbrella `tpt-engineering` is `publish = false` but the docs tell users
+      to depend on it: publish it, or fix the docs. Add a `prelude`, bundle
+      features (`structural`, `fluids`, `electrical`, `controls-io`, `full`)
+      and `[package.metadata.docs.rs]` with `cfg(docsrs)` badges.
+- [ ] `VALIDATION.md` + `tests/reference/*.csv` with a citation per value
+      (IAPWS-IF97 tables, ASHRAE psychrometrics, textbook beams, Incropera,
+      Weibull / S-N); run in CI.
+- [x] Doctests for the ~15 crates with none (plot, report, props, timeseries,
+      timeseries-core, tolerance, reliability, safety, mesh, nurbs, cad, gdt,
+      geo-asset, geotech, thermal-mgmt); CI check that each crate has one.
+- [ ] Convert `tpt-eng-examples` scenarios to runnable `examples/` binaries
+      grouped by workflow (HVAC, PV + battery, distillation, beam design, PCB
+      thermal, construction schedule), each emitting a report and a plot.
+- [ ] mdbook cookbook with a "which crate do I need" decision flow, units guide
+      and no_std guide; deploy via GitHub Pages.
+- [ ] `cargo-generate` template repo (calc CLI, report generator, no_std
+      sensor node). Supersedes the open Phase 10 template item.
+- [ ] CLI: `--json`, shell completions, `tpt-eng crates` / `recommend`,
+      file-driven commands (`tpt-eng beam --in beam.json --report out.html`),
+      cargo-dist / binstall binaries.
+
+### 11E — Automation
+
+- [ ] CI: `cargo-semver-checks` (29 crates already published), `cargo-llvm-cov`
+      + Codecov, `cargo-hack` feature powerset, macOS/Windows matrix, run the
+      examples, CLI smoke test, link check, `cargo package` dry-run.
+- [ ] xtask: `crates-table` (generate README tables from Cargo metadata),
+      `pin-check` (workspace pins vs crate versions vs lockfile vs CHANGELOG),
+      `coverage`, `bench`; make `new-crate` register in the umbrella crate and
+      docs.
+- [ ] proptest invariants for the numerics (monotonicity, round-trips, unit
+      invariants); criterion benches for IF97, NURBS, mesh/SDF, schedule CPM.
+- [ ] Cron `cargo-audit`; issue and PR templates; `CITATION.cff`; roadmap and
+      stability policy.
+
+### 11F — Innovation (stretch)
+
+- [ ] `tpt-eng-py` Python bindings (pyo3 / maturin): props, controls,
+      structural first.
+- [ ] WASM browser demos (steam tables, section properties, PID tuner).
+- [ ] Provenance-tagged results (`{source, standard, validity range,
+      warnings}`) so out-of-range correlation use is flagged, not silent.
+- [ ] Declarative calc-sheet format (TOML / YAML -> calc, report, plot) with a
+      JSON Schema, driven by the CLI.
+- [ ] Auto-generated calc report (formulas, inputs, references, pass/fail) on
+      `tpt-eng-report` + `tpt-eng-standards`.
+- [ ] MCP / LLM tool server exposing the CLI calcs with a units-checked schema.
+- [ ] Cross-crate `Model` trait / FMI-style co-simulation hook.
+- [ ] Notebooks (evcxr or Python bindings).
+
+### Phase 11 status (2026-11-02, after 0.1.0 publish)
+
+Publish state: all 43 crates are on crates.io at `0.1.0`. `cargo xtask check`
+reports 43 of 43 published, none pending. The local annotated tag `v0.1.0` points
+to `7097854`, the commit the published Phase-9 crates were built from (checked
+against the `.cargo_vcs_info.json` of the published `.crate` files). The tag is
+not pushed.
+
+Decisions (recommendations followed):
+- **Tag commit:** `v0.1.0` = `7097854`. Push it when ready: `git push origin v0.1.0`.
+- **MSRV job:** not added. Phase 1 chose no `rust-version` pin, and the 1.85 job
+  would contradict it. Revisit only if a consumer needs a floor.
+- **`tpt-eng-examples` publish:** kept published (it is already, 43 of 43).
+- **Umbrella `tpt-engineering`:** stays `publish = false`; its docs now say so and
+  show a path dependency.
+- **0.1.1 pins and `[0.1.1]` CHANGELOG:** not bumped. Fixes sit under
+  `[Unreleased]`. Several changes are breaking (see CHANGELOG `Changed`), so the
+  next release should be a version bump chosen at release time.
+- **Error strategy and units:** written down in `docs/CONVENTIONS.md`.
+- **`tpt-math-*` version alignment:** deferred to the next coordinated release, to
+  avoid a second publish of the substrate crates.
+- **`registry.toml` flip:** not done. It is an external repo and cannot be reached
+  from here.
+
+Done in this pass:
+- Doctests in all 42 library crates. `cargo xtask doctest-check` enforces this and
+  runs in `cargo xtask check`.
+- Electrical: capacitor and per-unit bases guard against zero; a zero-impedance
+  branch is treated as a short in `impedance_parallel`.
+- Heat-transfer: Nusselt correlations check Re, Pr (and the viscosity ratio).
+- Renewables: wind and reference-cell constants documented as typical values, not
+  datasheet figures.
+- `docs/` holds the spec, audit, publish tracking and history files.
+- CRATE_AUDIT LOC refreshed from source.
+
+Still open (new infrastructure or content that needs care, not started):
+- 11D: `VALIDATION.md` (needs citations checked against the sources, not written
+  from memory), example binaries per workflow, mdbook, `cargo-generate` template,
+  CLI `--json` and completions.
+- 11E: `cargo-semver-checks`, `cargo-llvm-cov` + Codecov, `cargo-hack`, OS matrix,
+  `pin-check`/`crates-table`/`coverage`/`bench` xtask commands, proptest and
+  criterion suites, cron audit, issue/PR templates, `CITATION.cff`, stability
+  policy. These add CI jobs that cannot be run here, so each needs a first run.
+- 11F: stretch items (pyo3 bindings, WASM demos, provenance-tagged results,
+  calc-sheet format, report generator, MCP server, co-simulation, notebooks).
+- `missing_docs` lint: deferred. Enabling it now would fail `-D warnings` across
+  many crates.
+- Phase 4 and Phase 10 `no_std` / registry-flip items remain as written.

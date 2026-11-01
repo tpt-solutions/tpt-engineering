@@ -8,12 +8,8 @@ physical-systems verticals.
 
 Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE).
 
-> **29 of 43 crates are published on [crates.io](https://crates.io)** at
-> `0.1.0` (Batches 1-5, released 2026-08-15 — see `RELEASE.md`). The 14
-> newest domain crates (`props-mixture`, `electrical`, `schedule`, `biomech`,
-> `crystallography`, `geotech`, `heat-transfer`, `vehicle-dynamics`,
-> `power-components`, `pcb`, `renewables`, `building-sys`, `thermal-mgmt`,
-> `unit-ops`) are not yet published — see `PUBLISH_TRACKING.md`. There is no
+> **43 of 43 crates are published on [crates.io](https://crates.io)** at
+> `0.1.0` (Batches 1–8 — see `RELEASE.md`). None are pending. There is no
 > `v0.1.0` git tag yet. APIs are unstable until the first tagged release.
 
 ## Scope
@@ -24,10 +20,10 @@ infrastructure topology, controls, structural/mechanical analysis,
 geometry/CAD primitives, and domain-specific component models — drawn out of
 the product verticals as foundation-pillar building blocks rather than
 product-shaped packages. The workspace has grown from the original 14-crate
-Phase-0 scope (see `spec.txt`) to 43 crates: structural/mechanical and
+Phase-0 scope (see `docs/spec.txt`) to 43 crates: structural/mechanical and
 geometry/CAD domains were added post-Phase-4, and a further 14
 electronics/energy/transport/medical/process/earth/construction
-component-model crates were added per `spec2.txt` (Phase 9).
+component-model crates were added per `docs/spec2.txt` (Phase 9).
 
 All crates are new implementations built from scratch (the spec's claimed
 consolidation source `tpt-rust2` does not exist on this machine, and the
@@ -36,21 +32,20 @@ environment).
 
 ## Release & publish status
 
-29 of the 43 `tpt-eng-*` crates are published on
-[crates.io](https://crates.io) at `0.1.0` (Batches 1–5, 2026-08-15); the
-remaining 14 newest domain crates are tracked for release in
-[`PUBLISH_TRACKING.md`](PUBLISH_TRACKING.md) (Batches 6–8). The full batch plan
-lives in [`RELEASE.md`](RELEASE.md).
+All 43 `tpt-eng-*` crates are published on [crates.io](https://crates.io) at
+`0.1.0`. Batches 1–5 covered the original 29 crates; Batches 6–8 covered the 14
+Phase-9 domain crates. The batch plan and per-crate state live in
+[`RELEASE.md`](RELEASE.md) and [`docs/PUBLISH_TRACKING.md`](docs/PUBLISH_TRACKING.md).
 
 Per-crate publish state is kept consistent with those tracking docs by
 `cargo xtask publish-status` (also run as part of `cargo xtask check` in CI),
 which asserts the README/CHANGELOG counts and the pending-crate set against
-`Cargo.toml` / `RELEASE.md` / `PUBLISH_TRACKING.md`.
+`Cargo.toml` / `RELEASE.md` / `docs/PUBLISH_TRACKING.md`.
 
 | Status | Crates | Source |
 |--------|--------|--------|
-| Published (`0.1.0`) | 29 | `RELEASE.md` Batches 1–5 |
-| Pending (Batches 6–8) | 14 | `PUBLISH_TRACKING.md` |
+| Published (`0.1.0`) | 43 | `RELEASE.md` Batches 1–8 |
+| Pending | 0 | — |
 
 > There is no `v0.1.0` git tag yet. APIs are unstable until the first tagged
 > release.

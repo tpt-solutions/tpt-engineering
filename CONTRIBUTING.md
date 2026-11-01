@@ -34,3 +34,8 @@ cargo xtask no-std-matrix   # bare-metal build of the no_std props crates
 ```
 
 A root `justfile` mirrors these (`just check`, `just test`, `just ci`).
+
+## Conventions
+
+Error handling, units and numeric precision are set out in
+[`docs/CONVENTIONS.md`](docs/CONVENTIONS.md). New code should follow them.

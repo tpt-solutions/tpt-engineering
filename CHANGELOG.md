@@ -9,17 +9,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- 14 new domain crates (Phase 9, `spec2.txt`): `tpt-eng-props-mixture`,
+- 14 new domain crates (Phase 9, `docs/spec2.txt`): `tpt-eng-props-mixture`,
   `tpt-eng-electrical`, `tpt-eng-schedule`, `tpt-eng-biomech`,
   `tpt-eng-crystallography`, `tpt-eng-geotech`, `tpt-eng-heat-transfer`,
   `tpt-eng-vehicle-dynamics`, `tpt-eng-power-components`, `tpt-eng-pcb`,
   `tpt-eng-renewables`, `tpt-eng-building-sys`, `tpt-eng-thermal-mgmt`,
-  `tpt-eng-unit-ops`. Not yet published to crates.io — see
-  `PUBLISH_TRACKING.md` (Batches 6-8).
+  `tpt-eng-unit-ops`. Published to crates.io at `0.1.0` in Batches 6-8 — see
+  `docs/PUBLISH_TRACKING.md`.
 
 ### Changed
-- `tpt-eng-tolerance` dropped the `rand_distr` dependency in favour of the
-  `Uniform` distribution now provided by `rand::distributions`.
+- `tpt-eng-electrical::three_phase_power` now returns `Option` and takes a
+  signed power factor (negative = leading); `tpt-eng-building-sys`,
+  `tpt-eng-examples`, and `tpt-eng-power-components` updated to match.
+- `tpt-eng-heat-transfer::nusselt_sphere` takes a `viscosity_ratio` argument
+  (Whitaker `(μ/μ_s)^¼` term); `water_film_properties` returns `Option` and
+  reports cp rather than enthalpy.
+- `tpt-eng-props-mixture` and the `tpt-eng-props` umbrella are now no_std-clean
+  (`libm` math, no allocation) and are in the no_std / wasm CI matrix.
+- `tpt-eng-structural::Beam::try_add` added; `Beam::add` panics on loads outside
+  the span.
+
+### Documentation
+- Crate-level examples added to all 42 library crates; `cargo xtask doctest-check`
+  (run by `cargo xtask check`) fails if one is missing.
+- `docs/CONVENTIONS.md` records the error strategy, unit convention and numeric
+  precision rules.
+- Planning and reference files moved to `docs/` (`spec.txt`, `spec2.txt`,
+  `CRATE_AUDIT.md`, `PUBLISH_TRACKING.md`, `history/`).
+- `tpt-engineering` umbrella docs now state it is not published.
+
+### Fixed
+- `tpt-eng-structural`: partial UDL moment double-counted the load for points
+  beyond its end; zero-length UDLs produced NaN shear.
+- `tpt-eng-unit-ops::gilliland_stages` now uses the Eduljee correlation and the
+  `N = (N_min + Y)/(1 − Y)` inversion.
+- `tpt-eng-pcb::microstrip_impedance` now uses Hammerstad–Jensen (continuous at
+  `w/h = 1`); the previous closed form was ~30 % off there.
+- `tpt-eng-props-air`: saturation pressure uses the over-ice form below 273.15 K;
+  `dew_point` returns an error outside the search range instead of clamping.
+- `tpt-eng-controls`: PID anti-windup integrated one extra step at the limit;
+  `TransferFunction::new` rejects a zero leading denominator coefficient.
+- `tpt-eng-renewables`: single-diode solve uses Newton iteration with a
+  convergence check (was an unchecked fixed-point loop); `I_0` includes the T³
+  term.
+- `tpt-eng-reliability::miners_rule`: a block at or beyond failure now yields
+  infinite damage instead of zero.
+- `tpt-eng-tolerance::monte_carlo`: zero-tolerance dimensions no longer panic.
+- `tpt-eng-electrical::skin_effect_ratio` no longer grows as `f` at high
+  frequency.
+- Guards for zero divisors and invalid domains in `tpt-eng-geotech`,
+  `tpt-eng-power-components`, `tpt-eng-electrical` (capacitor, per-unit bases),
+  and `tpt-eng-heat-transfer` (Re/Pr preconditions).
+- `tpt-eng-electrical::impedance_parallel` treats a zero-impedance branch as a
+  short (returns 0) instead of NaN.
 
 ## [0.1.0] - 2026-08-16
 
