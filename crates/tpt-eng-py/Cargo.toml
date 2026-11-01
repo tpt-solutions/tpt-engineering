@@ -23,6 +23,8 @@ crate-type = ["cdylib", "rlib"]
 pyo3 = { version = "0.30", features = ["abi3-py310"] }
 tpt-math-units = "0.1.0"
 tpt-eng-props-water = { workspace = true }
+tpt-eng-controls = { workspace = true }
+tpt-eng-structural = { workspace = true }
 
 # `extension-module` is deliberately NOT a feature of this crate. Enabling it
 # breaks `cargo test` linking, and CI runs `--all-features`. maturin enables it

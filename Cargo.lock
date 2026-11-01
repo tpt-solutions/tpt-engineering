@@ -1176,7 +1176,9 @@ name = "tpt-eng-py"
 version = "0.1.0"
 dependencies = [
  "pyo3",
+ "tpt-eng-controls",
  "tpt-eng-props-water",
+ "tpt-eng-structural",
  "tpt-math-units",
 ]
 
