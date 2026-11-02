@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tpt-engineering demos</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #1d2330;
+      --muted: #5b6474;
+      --accent: #2a6fdb;
+      --ok: #1f7a3d;
+      --warn: #a15c00;
+      --border: #d9dde5;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #14171d;
+        --panel: #1d222b;
+        --text: #e6e9ef;
+        --muted: #9aa3b2;
+        --accent: #6aa3ff;
+        --ok: #5fd08a;
+        --warn: #f0b35a;
+        --border: #313947;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #14171d;
+      --panel: #1d222b;
+      --text: #e6e9ef;
+      --muted: #9aa3b2;
+      --accent: #6aa3ff;
+      --ok: #5fd08a;
+      --warn: #f0b35a;
+      --border: #313947;
+    }
+    [hidden] { display: none !important; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.5 system-ui, sans-serif;
+    }
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    h1 { font-size: 1.5rem; margin: 8px 0 4px; }
+    p.lead { color: var(--muted); margin: 0 0 16px; }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    h2 { font-size: 1.15rem; margin: 0 0 8px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+    label { display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 0.9rem; }
+    input, select {
+      font: inherit;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 8px;
+      min-width: 0;
+    }
+    input[type="range"] { padding: 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    td, th { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
+    td.num { font-variant-numeric: tabular-nums; text-align: right; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.85rem; }
+    .badge.ok { color: var(--ok); border: 1px solid var(--ok); }
+    .badge.warn { color: var(--warn); border: 1px solid var(--warn); }
+    .error { color: var(--warn); margin-top: 8px; min-height: 1.2em; }
+    canvas {
+      width: 100%;
+      height: 260px;
+      display: block;
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .note { color: var(--muted); font-size: 0.85rem; margin: 8px 0 0; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>tpt-engineering browser demos</h1>
+  <p class="lead">
+    Calculations run in WebAssembly, using the same Rust crates as the CLI and
+    Python bindings. Nothing is sent to a server.
+  </p>
+
+  <section aria-labelledby="steam-title">
+    <h2 id="steam-title">Steam tables (IAPWS-IF97)</h2>
+    <div class="grid">
+      <label>Temperature (°C)
+        <input id="steam-t" type="number" step="any" value="300">
+      </label>
+      <label>Pressure (kPa)
+        <input id="steam-p" type="number" step="any" value="3000">
+      </label>
+    </div>
+    <div id="steam-out"></div>
+    <p class="note">The range check uses the IF97 envelope: 0 °C to 800 °C and up to 100 MPa. Values outside it are still computed and flagged.</p>
+  </section>
+
+  <section aria-labelledby="section-title">
+    <h2 id="section-title">Section properties</h2>
+    <div class="grid">
+      <label>Shape
+        <select id="sec-shape">
+          <option value="rectangle">Rectangle</option>
+          <option value="circle">Circle</option>
+          <option value="i">I-section</option>
+        </select>
+      </label>
+      <label>Width / diameter (mm)
+        <input id="sec-w" type="number" step="any" value="100">
+      </label>
+      <label>Height / depth (mm)
+        <input id="sec-h" type="number" step="any" value="200">
+      </label>
+      <label data-i-only>Flange thickness (mm)
+        <input id="sec-tf" type="number" step="any" value="10">
+      </label>
+      <label data-i-only>Web thickness (mm)
+        <input id="sec-tw" type="number" step="any" value="6">
+      </label>
+    </div>
+    <div id="section-out"></div>
+  </section>
+
+  <section aria-labelledby="pid-title">
+    <h2 id="pid-title">PID step-response tuner</h2>
+    <div class="grid">
+      <label>Kp <span id="pid-kp-v"></span>
+        <input id="pid-kp" type="range" min="0" max="10" step="0.05" value="2">
+      </label>
+      <label>Ki <span id="pid-ki-v"></span>
+        <input id="pid-ki" type="range" min="0" max="5" step="0.05" value="1">
+      </label>
+      <label>Kd <span id="pid-kd-v"></span>
+        <input id="pid-kd" type="range" min="0" max="2" step="0.01" value="0">
+      </label>
+      <label>Plant time constant τ (s)
+        <input id="pid-tau" type="number" step="any" min="0.01" value="1">
+      </label>
+      <label>Setpoint
+        <input id="pid-sp" type="number" step="any" value="1">
+      </label>
+      <label>Output limit (±, blank for none)
+        <input id="pid-lim" type="number" step="any" min="0.01" value="">
+      </label>
+    </div>
+    <canvas id="pid-plot" width="900" height="360" role="img"
+            aria-label="Step response of the PID loop with the setpoint"></canvas>
+    <div id="pid-out" class="note"></div>
+    <div id="pid-error" class="error" role="alert"></div>
+  </section>
+</main>
+
+<script type="module" src="./main.js"></script>
+</body>
+</html>
