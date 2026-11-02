@@ -8,7 +8,7 @@
 //! * `new-crate <tpt-eng-name>` — scaffold a new `tpt-eng-*` crate and register
 //!   it in the workspace (`members` + `[workspace.dependencies]`) and the README
 //!   inventory. It generates `Cargo.toml`, `src/lib.rs`, `README.md`,
-//!   `tests/basic.rs`, and `examples/basic.rs` (matching the
+//!   `tests/basic.rs`, and `examples/<name>-basic.rs` (matching the
 //!   `tpt-eng-examples` runnable-example pattern). Add `--dry-run` to print the
 //!   generated files instead of writing.
 //! * `no-std-matrix` — build every `no_std`-capable crate for
@@ -119,7 +119,7 @@ fn print_usage() {
          \n\
          commands:\n\
            new-crate <tpt-eng-name> [--desc \"...\"] [--domain \"...\"] [--no-std yes|no] [--dry-run]\n\
-           \x20\x20\x20\x20scaffolds Cargo.toml, src/lib.rs, README.md, tests/basic.rs, examples/basic.rs\n\
+           \x20\x20\x20\x20scaffolds Cargo.toml, src/lib.rs, README.md, tests/basic.rs, examples/<name>-basic.rs\n\
            no-std-matrix   build the no_std crates for {NO_STD_TARGET}\n\
            publish-status  verify README/CHANGELOG release claims match reality\n\
            versions        write docs/CRATE_VERSIONS.md (add --offline to skip the registry)\n\
@@ -222,7 +222,7 @@ fn new_crate(args: &[String]) -> Result<(), String> {
         println!("=== would write crates/{name}/src/lib.rs ===\n{lib_rs}");
         println!("=== would write crates/{name}/README.md ===\n{readme}");
         println!("=== would write crates/{name}/tests/basic.rs ===\n{tests_basic}");
-        println!("=== would write crates/{name}/examples/basic.rs ===\n{example_basic}");
+        println!("=== would write crates/{name}/examples/{name}-basic.rs ===\n{example_basic}");
         println!("=== Cargo.toml: member + workspace dependency added ===");
         println!("=== README.md: inventory row added ===");
         return Ok(());
@@ -237,14 +237,17 @@ fn new_crate(args: &[String]) -> Result<(), String> {
     write_file(&crate_dir.join("src").join("lib.rs"), &lib_rs)?;
     write_file(&crate_dir.join("README.md"), &readme)?;
     write_file(&crate_dir.join("tests").join("basic.rs"), &tests_basic)?;
-    write_file(&crate_dir.join("examples").join("basic.rs"), &example_basic)?;
+    write_file(
+        &crate_dir.join("examples").join(format!("{name}-basic.rs")),
+        &example_basic,
+    )?;
     write_file(&root_cargo_path, &new_root_cargo)?;
     write_file(&root_readme_path, &new_root_readme)?;
 
     println!("created crate `{name}`.");
     println!(
         "next: add dependencies to crates/{name}/Cargo.toml, implement src/lib.rs,\n\
-         then run `cargo test -p {name}` and `cargo run -p {name} --example basic`,\n\
+         then run `cargo test -p {name}` and `cargo run -p {name} --example {name}-basic`,\n\
          and finally `cargo xtask check`."
     );
     Ok(())
