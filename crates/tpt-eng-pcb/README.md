@@ -66,7 +66,7 @@ assert!((z0 - 50.0).abs() < 6.0);
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.1` uses the Hammerstad–Jensen microstrip formula and validates inputs. Impedances near w/h = 1 change. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

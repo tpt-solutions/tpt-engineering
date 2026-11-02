@@ -38,4 +38,8 @@ assert!(q_ult > tau_f);
 
 Run the bundled example with `cargo run -p tpt-eng-geotech --example tpt-eng-geotech-basic`.
 
+## Status
+
+`0.1.1` adds guards for `cv = 0`, `fs = 0`, `LL == PL`, `sigma0 = 0`, and for `coulomb_ka` when the slope angle is not less than the friction angle. See [CHANGELOG.md](CHANGELOG.md).
+
 Dual-licensed under MIT OR Apache-2.0.

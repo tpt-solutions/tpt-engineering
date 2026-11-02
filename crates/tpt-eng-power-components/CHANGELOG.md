@@ -7,6 +7,8 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-03
+
 ### Fixed
 
 - Guards for zero poles, zero efficiency and zero `turns_ratio`, which previously divided by zero.

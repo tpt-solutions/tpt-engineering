@@ -50,7 +50,7 @@ assert!(damage < 1.0);
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.1` fixes `miners_rule` for a life of zero or less, which now counts as infinite damage. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

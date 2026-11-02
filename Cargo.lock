@@ -1058,7 +1058,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-controls"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "tpt-math-linalg",
 ]
@@ -1149,7 +1149,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-geotech"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "tpt-eng-materials",
 ]
@@ -1228,7 +1228,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-pcb"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "tpt-eng-electrical",
  "tpt-eng-materials",
@@ -1244,7 +1244,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-power-components"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "tpt-eng-electrical",
 ]
@@ -1316,7 +1316,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-reliability"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "approx",
  "proptest",
@@ -1327,7 +1327,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-renewables"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "tpt-eng-electrical",
  "tpt-eng-props-air",
@@ -1396,7 +1396,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-structural"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "thiserror",
  "tpt-eng-safety",
@@ -1443,7 +1443,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-tolerance"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "approx",
  "proptest",
@@ -1455,7 +1455,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-unit-ops"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proptest",
  "tpt-eng-heat-transfer",

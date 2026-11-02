@@ -7,6 +7,8 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-03
+
 ### Fixed
 
 - PID anti-windup has a recovery test. The integral is frozen while the output is saturated, as the documentation says.

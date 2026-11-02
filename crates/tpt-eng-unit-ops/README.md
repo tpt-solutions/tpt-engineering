@@ -76,7 +76,7 @@ assert!(eps > 0.5 && eps < 0.8);
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.1` corrects the `gilliland_stages` constants and inversion, so stage counts change. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

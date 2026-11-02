@@ -7,6 +7,8 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-03
+
 ### Fixed
 
 - `microstrip_impedance` uses the Hammerstad–Jensen formula. The former jump of about 30 % at w/h = 1 is gone, so impedances near that ratio change.

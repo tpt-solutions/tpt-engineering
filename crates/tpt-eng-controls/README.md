@@ -87,7 +87,7 @@ The crate is flat (no submodules). Key items:
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.1` fixes PID anti-windup recovery and documents the `TransferFunction::new` panic. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

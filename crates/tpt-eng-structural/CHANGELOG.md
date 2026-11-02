@@ -7,6 +7,12 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-03
+
+### Added
+
+- `Beam::try_add` adds a load and returns an error for one outside the span.
+
 ### Fixed
 
 - `Beam::moment_at` counted a partial uniform load twice at positions beyond its end. Moments there change, and now match statics.

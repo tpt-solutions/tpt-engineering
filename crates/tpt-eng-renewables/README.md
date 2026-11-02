@@ -73,7 +73,7 @@ assert!(p <= betz_limit_power(rho, area, v));
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.1` checks PV fixed-point convergence, adds the T³ term to saturation current (PV outputs change), and cites the wind-turbine speeds. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

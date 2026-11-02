@@ -77,7 +77,7 @@ assert!((check.utilization(Torque::new::<kilonewton_meter>(25.0)) - 1.0).abs() <
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.2` fixes `Beam::moment_at` for partial loads beyond the span, handles zero-length uniform loads, and adds `try_add`. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

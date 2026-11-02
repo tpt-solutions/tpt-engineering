@@ -49,7 +49,7 @@ assert!((result.mean - 35.0).abs() < 0.05);
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.2` lets `monte_carlo` accept zero-width tolerances, and documents the panic on non-finite input. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

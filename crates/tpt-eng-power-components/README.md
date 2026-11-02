@@ -78,7 +78,7 @@ assert!(induction_slip(1500.0, 1500.0).abs() < 1e-15);
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.1` adds guards for zero poles, zero efficiency and zero `turns_ratio`. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

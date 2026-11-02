@@ -86,8 +86,8 @@ tpt-eng-timeseries = { version = "0.1.0", path = "crates/tpt-eng-timeseries" }
 tpt-eng-geo-asset = { version = "0.1.0", path = "crates/tpt-eng-geo-asset" }
 tpt-eng-geo-topology = { version = "0.1.0", path = "crates/tpt-eng-geo-topology" }
 tpt-eng-network-matrix = { version = "0.1.0", path = "crates/tpt-eng-network-matrix" }
-tpt-eng-controls = { version = "0.1.0", path = "crates/tpt-eng-controls" }
-tpt-eng-structural = { version = "0.1.1", path = "crates/tpt-eng-structural" }
+tpt-eng-controls = { version = "0.1.1", path = "crates/tpt-eng-controls" }
+tpt-eng-structural = { version = "0.1.2", path = "crates/tpt-eng-structural" }
 tpt-eng-materials = { version = "0.1.0", path = "crates/tpt-eng-materials" }
 tpt-eng-sections = { version = "0.1.0", path = "crates/tpt-eng-sections" }
 tpt-eng-standards = { version = "0.1.1", path = "crates/tpt-eng-standards" }
@@ -96,8 +96,8 @@ tpt-eng-mesh = { version = "0.1.0", path = "crates/tpt-eng-mesh" }
 tpt-eng-nurbs = { version = "0.1.0", path = "crates/tpt-eng-nurbs" }
 tpt-eng-gdt = { version = "0.1.1", path = "crates/tpt-eng-gdt" }
 tpt-eng-cad = { version = "0.1.1", path = "crates/tpt-eng-cad" }
-tpt-eng-tolerance = { version = "0.1.1", path = "crates/tpt-eng-tolerance" }
-tpt-eng-reliability = { version = "0.1.0", path = "crates/tpt-eng-reliability" }
+tpt-eng-tolerance = { version = "0.1.2", path = "crates/tpt-eng-tolerance" }
+tpt-eng-reliability = { version = "0.1.1", path = "crates/tpt-eng-reliability" }
 tpt-eng-safety = { version = "0.1.1", path = "crates/tpt-eng-safety" }
 tpt-eng-io = { version = "0.1.0", path = "crates/tpt-eng-io" }
 tpt-eng-report = { version = "0.1.1", path = "crates/tpt-eng-report" }
@@ -123,16 +123,16 @@ anyhow = "1.0"
 tpt-eng-electrical = { version = "0.2.0", path = "crates/tpt-eng-electrical" }
 tpt-eng-heat-transfer = { version = "0.2.0", path = "crates/tpt-eng-heat-transfer" }
 tpt-eng-props-mixture = { version = "0.1.1", path = "crates/tpt-eng-props-mixture" }
-tpt-eng-pcb = { version = "0.1.0", path = "crates/tpt-eng-pcb" }
+tpt-eng-pcb = { version = "0.1.1", path = "crates/tpt-eng-pcb" }
 tpt-eng-thermal-mgmt = { version = "0.1.0", path = "crates/tpt-eng-thermal-mgmt" }
-tpt-eng-power-components = { version = "0.1.0", path = "crates/tpt-eng-power-components" }
-tpt-eng-renewables = { version = "0.1.0", path = "crates/tpt-eng-renewables" }
+tpt-eng-power-components = { version = "0.1.1", path = "crates/tpt-eng-power-components" }
+tpt-eng-renewables = { version = "0.1.1", path = "crates/tpt-eng-renewables" }
 tpt-eng-vehicle-dynamics = { version = "0.1.0", path = "crates/tpt-eng-vehicle-dynamics" }
 tpt-eng-biomech = { version = "0.1.0", path = "crates/tpt-eng-biomech" }
-tpt-eng-unit-ops = { version = "0.1.0", path = "crates/tpt-eng-unit-ops" }
+tpt-eng-unit-ops = { version = "0.1.1", path = "crates/tpt-eng-unit-ops" }
 tpt-eng-crystallography = { version = "0.1.0", path = "crates/tpt-eng-crystallography" }
-tpt-eng-geotech = { version = "0.1.0", path = "crates/tpt-eng-geotech" }
-tpt-eng-building-sys = { version = "0.1.0", path = "crates/tpt-eng-building-sys" }
+tpt-eng-geotech = { version = "0.1.1", path = "crates/tpt-eng-geotech" }
+tpt-eng-building-sys = { version = "0.2.0", path = "crates/tpt-eng-building-sys" }
 tpt-eng-schedule = { version = "0.1.0", path = "crates/tpt-eng-schedule" }
 tpt-engineering = { version = "0.1.0", path = "crates/tpt-engineering" }
 [workspace.lints.rust]

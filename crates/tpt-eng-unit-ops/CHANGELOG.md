@@ -7,6 +7,8 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-03
+
 ### Fixed
 
 - `gilliland_stages` now uses the corrected constants and inverts the correlation as N = (Nmin + Y) / (1 − Y). Stage counts change for inputs where the old constants mattered.
