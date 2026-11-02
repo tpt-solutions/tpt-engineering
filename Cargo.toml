@@ -9,6 +9,7 @@ members = [
     "crates/tpt-eng-wasm",
     "crates/tpt-eng-sheet",
     "crates/tpt-eng-mcp",
+    "crates/tpt-eng-cosim",
     "crates/tpt-eng-timeseries-core",
     "crates/tpt-eng-timeseries-align",
     "crates/tpt-eng-timeseries-gap",
