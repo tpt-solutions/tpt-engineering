@@ -828,7 +828,10 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
       `Calculation` builder, and the sheet calcs use `tpt-eng-standards`
       `DemandCapacity` for pass/fail. Still to do: the generic calc report for
       other crates (the checks in `tpt-eng-standards` are not yet wired in).
-- [ ] MCP / LLM tool server exposing the CLI calcs with a units-checked schema.
+- [~] MCP / LLM tool server exposing the CLI calcs with a units-checked schema.
+      v1 done in `tpt-eng-mcp`: a stdio MCP server with `run_sheet` (input schema
+      from `tpt-eng-sheet`) and `sheet_schema`. Still to do: the other CLI
+      calculations (beam file, tolerance, props lookups) as tools.
 - [ ] Cross-crate `Model` trait / FMI-style co-simulation hook.
 - [ ] Notebooks (evcxr or Python bindings).
 

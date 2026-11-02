@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (inputs, formula table, results with overall status, references, notes) from
   the existing section types, so the renderers are unchanged.
 - `tpt-eng-cli`: `sheet run <file>` and `sheet schema` subcommands.
+- `tpt-eng-mcp` (not published): a Model Context Protocol server over stdio.
+  It offers `run_sheet`, which returns a sheet's report as Markdown, and
+  `sheet_schema`. Sheet errors come back as tool errors, so a client can fix them.
 - `tpt-eng-provenance` (new, pending publication — Batch 10): `Tagged<T>`,
   `Provenance`, `Validity`, `Source` and a `Warnings` bitset, for results that
   carry their source and validity range. `no_std`, no dependencies.
