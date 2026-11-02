@@ -57,14 +57,13 @@ Order matters. Each line depends on the lines above it.
       saturation). Published 2026-11-03.
 - [x] `tpt-eng-sheet` 0.1.0 (new crate; needs `report` 0.1.1, `props-water`
       0.1.1, `standards`, `structural`, `controls`, `sections`). Published 2026-11-03.
-- [ ] `tpt-eng-cli` **0.1.1** — **blocked**. Its verify build fails:
-      `Beam::try_add` (from Phase 11A, commit `d900916`) is not in the published
-      `tpt-eng-structural` 0.1.1. Publish after `structural` 0.1.2 (wave, row 10).
-      The `cli` manifest still says `version.workspace = true`, and its CHANGELOG
-      entry is under `[Unreleased]`. — **not in `RELEASE.md` yet**. The published
-      0.1.0 has no `sheet run` / `sheet schema`. Needs its own version
-      override, because `cli` uses `version.workspace = true`. Publish after
-      `sheet`.
+- [ ] `tpt-eng-cli` **0.1.1** — **blocked until `structural` 0.1.2 is published**.
+      Its verify build fails against the published `tpt-eng-structural` 0.1.1,
+      because `Beam::try_add` (from Phase 11A, commit `d900916`) is not in it.
+      The version bump is committed (`ea1dff9`): the manifest pins `version = "0.1.1"`
+      and the CHANGELOG entry is under `[0.1.1]`. Publish after `structural` 0.1.2
+      and `sheet`. The published 0.1.0 has no `sheet run` / `sheet schema`.
+      — **not in `RELEASE.md` yet**.
 
 Pre-publish checks for each line:
 
