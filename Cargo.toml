@@ -112,7 +112,7 @@ clap_complete = "4.6"
 proptest = "1.12"
 csv = "1"
 thiserror = "2"
-glam = { version = "0.33", features = ["serde"] }
+glam = { version = "0.34", features = ["serde"] }
 rand = "0.10"
 rand_distr = "0.6"
 approx = "0.5"
