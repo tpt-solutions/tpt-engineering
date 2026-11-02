@@ -129,8 +129,7 @@ where
         value,
         source: provenance.source.label(),
         validity: provenance
-            .validity
-            .iter()
+            .ranges()
             .map(|v| (v.input, v.unit, v.min, v.max))
             .collect(),
         warnings,

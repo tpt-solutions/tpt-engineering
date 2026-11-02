@@ -47,20 +47,38 @@ impl<T> Tagged<T> {
     }
 }
 
+/// The most validity ranges one result can carry. The property functions use
+/// one or two. A fixed size keeps this type `no_std` and allocation-free, and
+/// lets a range be built at call time, such as a critical-temperature bound.
+pub const MAX_VALIDITY: usize = 4;
+
 /// Source, validity and warnings for one result.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Provenance {
     /// The published source of the correlation.
     pub source: Source,
-    /// The validity range of each input the value depends on.
-    pub validity: &'static [Validity],
+    /// The validity range of each input the value depends on. Unused slots are `None`.
+    pub validity: [Option<Validity>; MAX_VALIDITY],
     /// Warnings raised by this particular call.
     pub warnings: Warnings,
 }
 
 impl Provenance {
-    /// Provenance with no warnings raised.
-    pub const fn new(source: Source, validity: &'static [Validity]) -> Self {
+    /// Provenance with the given validity ranges and no warnings raised.
+    ///
+    /// # Panics
+    ///
+    /// Panics if more than [`MAX_VALIDITY`] ranges are given. That is a
+    /// programming error: each function's ranges are fixed by its design.
+    pub fn new(source: Source, ranges: &[Validity]) -> Self {
+        assert!(
+            ranges.len() <= MAX_VALIDITY,
+            "a result can carry at most {MAX_VALIDITY} validity ranges"
+        );
+        let mut validity = [None; MAX_VALIDITY];
+        for (slot, range) in validity.iter_mut().zip(ranges) {
+            *slot = Some(*range);
+        }
         Self {
             source,
             validity,
@@ -76,7 +94,12 @@ impl Provenance {
 
     /// The validity range recorded for the named input, if any.
     pub fn validity_of(&self, input: &str) -> Option<&Validity> {
-        self.validity.iter().find(|v| v.input == input)
+        self.ranges().find(|v| v.input == input)
+    }
+
+    /// Every validity range recorded, in the order they were given.
+    pub fn ranges(&self) -> impl Iterator<Item = &Validity> {
+        self.validity.iter().flatten()
     }
 }
 
