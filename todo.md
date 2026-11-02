@@ -268,7 +268,7 @@ settings) beyond a normal code change.
       `license-not-encountered` deny warnings); `cargo xtask new-crate
       tpt-eng-scratch-test --dry-run` previews the new files; a real
       (throwaway) `new-crate` run builds/tests/runs via `cargo test -p`
-      and `cargo run -p ... --example basic`, then is removed; `cargo
+      and `cargo run -p ... --example <name>-basic`, then is removed; `cargo
       test --workspace --all-features` + `cargo test --doc --workspace`
       still pass.
 

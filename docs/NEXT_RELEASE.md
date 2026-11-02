@@ -34,15 +34,11 @@ has `publish = false`. It builds with `cargo check -p tpt-engineering
 versions of `props-water`, `props-air` and others, so it can only go out after
 the wave (section 4).
 
-### Working-tree caution
+### Example renames
 
-The working tree has uncommitted example renames (`examples/basic.rs` →
-`examples/tpt-eng-<name>-basic.rs`) in 15 crates: biomech, building-sys, cad,
-controls, crystallography, electrical, gdt, geo-asset, geo-topology, geotech,
-heat-transfer, io, materials, network-matrix, pcb. `cargo publish` packages
-examples, so **commit or revert these before publishing any crate in sections
-2–3**, or the tarball will not match the commit. Batch 10 crates are not in
-this list.
+The `examples/basic.rs` → `examples/<crate>-basic.rs` renames are committed
+(`1a30598`, with follow-up doc and scaffold commits), so no crate's packaged
+examples differ from its commit. Nothing to do before publishing.
 
 ---
 
