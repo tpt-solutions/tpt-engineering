@@ -5,6 +5,10 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  # Weekly re-scan: a new RUSTSEC advisory for an already-merged dependency
+  # is caught without waiting for the next push.
+  schedule:
+    - cron: "17 5 * * 1"
 
 env:
   CARGO_TERM_COLOR: always
@@ -30,11 +34,25 @@ jobs:
       - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
   test:
-    runs-on: ubuntu-latest
+    # Linux, Windows and macOS. Windows is the primary development platform
+    # for this repository; macOS is not exercised locally.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --workspace --all-features
+
+  # Every publishable crate must package (manifest, files, metadata).
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo xtask package-check
 
   # Doc tests + docs build for every crate (including the integration examples).
   docs:
@@ -118,7 +136,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: |
-          for e in thermal_loop solar_pv mechanical_design; do
+          for e in thermal_loop solar_pv mechanical_design distillation construction_schedule hvac_load pcb_thermal; do
             cargo run -p tpt-eng-examples --example "$e"
           done
 
@@ -130,15 +148,16 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo xtask doctest-check
 
-  # Each feature of every crate with features must compile on its own and in
-  # combination (cargo-hack feature powerset, no dev-deps).
-  feature-powerset:
+  # Each feature of every crate must compile on its own. The full powerset is
+  # too large for the workspace, so combinations are not covered here.
+  # Avoid `--no-dev-deps`: cargo-hack rewrites manifests with it.
+  each-feature:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: taiki-e/install-action@cargo-hack
-      - run: cargo hack check --workspace --feature-powerset --no-dev-deps --exclude-no-default-features
+      - run: cargo hack check --workspace --each-feature
 
   # Line coverage report. Uploaded as an artifact only; no third-party upload.
   coverage:

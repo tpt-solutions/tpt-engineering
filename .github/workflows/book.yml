@@ -1,0 +1,44 @@
+name: Deploy cookbook
+
+# Publishes the mdbook cookbook (docs/guide) to GitHub Pages on every push to
+# master. Requires Pages to be enabled in the repository settings with the
+# source set to "GitHub Actions".
+
+on:
+  push:
+    branches: [master]
+    paths: ["docs/guide/**", ".github/workflows/book.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: latest
+      - run: cd docs/guide && mdbook build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/mdbook
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
