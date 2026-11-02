@@ -39,10 +39,27 @@ fn stackup_effective_dielectric_constant_is_weighted_harmonic_mean() {
 
 #[test]
 fn microstrip_fifty_ohm_band() {
-    // A ~50 Ω line on 1.6 mm FR-4 (er = 4.4) needs w ≈ 1.8 mm with this
-    // closed-form approximation.
-    let z0 = microstrip_impedance(1.8e-3, 1.6e-3, 4.4, 35e-6);
-    assert!((z0 - 50.0).abs() < 6.0, "z0 = {z0}");
+    // A ~50 Ω line on 1.6 mm FR-4 (er = 4.4) needs w ≈ 2.9 mm (w/h ≈ 1.8)
+    // under the Hammerstad–Jensen closed form.
+    let z0 = microstrip_impedance(2.9e-3, 1.6e-3, 4.4, 35e-6);
+    assert!((z0 - 50.0).abs() < 2.0, "z0 = {z0}");
+    // The 1.8 mm strip sits well above 50 Ω (≈ 66 Ω).
+    let z_narrow = microstrip_impedance(1.8e-3, 1.6e-3, 4.4, 35e-6);
+    assert!((z_narrow - 66.0).abs() < 2.0, "z_narrow = {z_narrow}");
+}
+
+#[test]
+fn microstrip_continuous_at_unit_aspect_ratio() {
+    // Both closed-form branches must agree at w/h = 1 (no discontinuity).
+    let below = microstrip_impedance(1.6e-3 * 0.999, 1.6e-3, 4.4, 0.0);
+    let above = microstrip_impedance(1.6e-3 * 1.001, 1.6e-3, 4.4, 0.0);
+    assert!((below - above).abs() < 0.5, "below={below} above={above}");
+}
+
+#[test]
+#[should_panic(expected = "trace width must be positive")]
+fn microstrip_rejects_non_positive_width() {
+    let _ = microstrip_impedance(0.0, 1.6e-3, 4.4, 35e-6);
 }
 
 #[test]

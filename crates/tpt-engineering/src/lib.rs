@@ -4,12 +4,15 @@
 //! feature flag, so a consumer can depend on the whole toolkit with one crate
 //! and enable only the domains they need.
 //!
+//! This crate is **not published** to crates.io; depend on it by path or git
+//! from this workspace, or use the individual `tpt-eng-*` crates from crates.io.
+//!
 //! Enable domains via features (named after the crate without the `tpt-eng-`
 //! prefix; hyphens become underscores in the module name):
 //!
 //! ```toml
 //! [dependencies]
-//! tpt-engineering = { version = "0.1", features = ["structural", "props"] }
+//! tpt-engineering = { path = "path/to/tpt-engineering/crates/tpt-engineering", features = ["structural", "props"] }
 //! ```
 //!
 //! ```rust,ignore

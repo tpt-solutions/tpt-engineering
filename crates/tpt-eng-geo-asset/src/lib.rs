@@ -7,6 +7,22 @@
 //! degrees), and the `logical_node` it maps onto in the infrastructure model.
 //! [`AssetRegistry`] supports lookup by id and spatial queries (nearest
 //! asset, assets within a radius) using the haversine great-circle distance.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_geo_asset::{haversine, Asset, AssetKind, AssetRegistry, GeoCoord};
+//!
+//! let mut registry = AssetRegistry::new();
+//! registry.register(Asset::new("s1", AssetKind::Sensor, GeoCoord::new(51.5, -0.12), "node-1"));
+//! registry.register(Asset::new("m1", AssetKind::Meter, GeoCoord::new(51.6, -0.10), "node-2"));
+//!
+//! assert!(registry.get("m1").is_some());
+//! assert!(registry.nearest(GeoCoord::new(51.5, -0.11)).is_some());
+//! // Distance from a point to itself is zero.
+//! let origin = GeoCoord::new(51.5, -0.12);
+//! assert!(haversine(origin, origin).abs() < 1e-9);
+//! ```
 
 use std::collections::HashMap;
 

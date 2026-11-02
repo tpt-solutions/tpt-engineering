@@ -1,0 +1,20 @@
+[package]
+name = "tpt-eng-cosim"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Fixed-step co-simulation of named models connected port to port."
+readme = "README.md"
+keywords = ["engineering", "simulation", "co-simulation", "fmi", "control"]
+categories = ["science", "simulation"]
+repository.workspace = true
+homepage.workspace = true
+# The Model interface is new and will change, so this crate is not published yet.
+publish = false
+
+[dependencies]
+tpt-eng-controls = { workspace = true }
+
+[lints]
+workspace = true

@@ -196,11 +196,24 @@ until a version bump + republish. Published in dependency order:
 > than bumping `[workspace.package].version`, to avoid dragging every other
 > crate's version along.
 
-> See `PUBLISH_TRACKING.md` for the working checklist with exact `cargo publish`
+> See `docs/PUBLISH_TRACKING.md` for the working checklist with exact `cargo publish`
 > commands for this round (Batches 6–9 were added 2026-08-19/20, after the
 > workspace grew from 29 to 43 `tpt-eng-*` crates).
 
 ---
+
+### Batch 10 — tagged results and calc sheets (after Batch 9)
+
+Publish in this order. `tpt-eng-provenance` has no dependencies. `tpt-eng-report`
+0.1.1 adds the `Calculation` builder. `tpt-eng-sheet` depends on both, so it must
+follow them on crates.io.
+
+- [ ] `tpt-eng-report` 0.1.1 (republish) — `cargo publish -p tpt-eng-report`
+- [ ] `tpt-eng-provenance` — `cargo publish -p tpt-eng-provenance`
+- [ ] `tpt-eng-sheet` — `cargo publish -p tpt-eng-sheet` (after the two above)
+
+`tpt-eng-cli` is already published, but its `sheet` subcommand depends on
+`tpt-eng-sheet`. Release a new `tpt-eng-cli` version after `tpt-eng-sheet` is live.
 
 ## 5. Post-release checklist
 

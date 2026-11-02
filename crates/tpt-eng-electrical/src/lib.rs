@@ -94,6 +94,9 @@ impl Mul for Complex {
 
 impl Div for Complex {
     type Output = Self;
+    /// Complex division. A zero denominator yields NaN components (`0/0`), so
+    /// callers must not divide by a zero impedance; `impedance_parallel` treats a
+    /// zero branch as a short explicitly.
     fn div(self, o: Self) -> Self {
         let d = o.re * o.re + o.im * o.im;
         Self::new(
@@ -115,7 +118,16 @@ pub fn impedance_inductor(inductance_h: f64, frequency_hz: f64) -> Complex {
 }
 
 /// Capacitive impedance `Z = 1 / (j·ω·C) = -j / (ω·C)`.
+///
+/// # Panics
+///
+/// Panics if `capacitance_f` or `frequency_hz` is not strictly positive: a
+/// zero-capacitance or DC capacitor is not represented by this formula.
 pub fn impedance_capacitor(capacitance_f: f64, frequency_hz: f64) -> Complex {
+    assert!(
+        capacitance_f > 0.0 && frequency_hz > 0.0,
+        "capacitance and frequency must be positive"
+    );
     let x = 1.0 / (2.0 * std::f64::consts::PI * frequency_hz * capacitance_f);
     Complex::new(0.0, -x)
 }
@@ -134,6 +146,11 @@ pub fn impedance_series(impedances: &[Complex]) -> Complex {
 pub fn impedance_parallel(impedances: &[Complex]) -> Option<Complex> {
     if impedances.is_empty() {
         return None;
+    }
+    // A zero-impedance branch is a short across the parallel group: the
+    // combined impedance is zero (avoids `1/0`, which is NaN in `Complex::div`).
+    if impedances.iter().any(|z| z.re == 0.0 && z.im == 0.0) {
+        return Some(Complex::new(0.0, 0.0));
     }
     let mut sum = Complex::new(0.0, 0.0);
     for &z in impedances {
@@ -164,7 +181,15 @@ pub struct PerUnitSystem {
 
 impl PerUnitSystem {
     /// Construct a per-unit base system.
+    ///
+    /// # Panics
+    ///
+    /// Panics if either base is not strictly positive.
     pub fn new(s_base: f64, v_base_ll: f64) -> Self {
+        assert!(
+            s_base > 0.0 && v_base_ll > 0.0,
+            "per-unit bases must be positive"
+        );
         Self { s_base, v_base_ll }
     }
 
@@ -205,14 +230,29 @@ impl PerUnitSystem {
 }
 
 /// Balanced three-phase complex power `S = √3 · V_ll · I*`, returned as
-/// `(p_w, q_var)` where `p_w` is real power (W) and `q_var` is reactive power
-/// (var). `pf` is the (lagging) power factor in `[0, 1]`, `v_ll` the line-to-
-/// line voltage (V) and `i_line` the line current (A).
-pub fn three_phase_power(v_ll: f64, i_line: f64, pf: f64) -> (f64, f64) {
+/// `Some((p_w, q_var))` where `p_w` is real power (W) and `q_var` is reactive
+/// power (var). `v_ll` is the line-to-line voltage (V) and `i_line` the line
+/// current (A).
+///
+/// `pf` is a signed power factor in `[-1, 1]`: positive means lagging (`q > 0`),
+/// negative means leading (`q < 0`), and `0` is pure reactive power.
+///
+/// Returns `None` if any input is non-finite, `pf` is outside `[-1, 1]`, or the
+/// voltage or current is negative.
+pub fn three_phase_power(v_ll: f64, i_line: f64, pf: f64) -> Option<(f64, f64)> {
+    if !v_ll.is_finite()
+        || !i_line.is_finite()
+        || !pf.is_finite()
+        || v_ll < 0.0
+        || i_line < 0.0
+        || !(-1.0..=1.0).contains(&pf)
+    {
+        return None;
+    }
     let s_mag = 3.0_f64.sqrt() * v_ll * i_line;
-    let p = s_mag * pf;
-    let q = s_mag * (1.0 - pf * pf).max(0.0).sqrt();
-    (p, q)
+    let p = s_mag * pf.abs();
+    let q = s_mag * (1.0 - pf * pf).sqrt() * pf.signum();
+    Some((p, q))
 }
 
 /// Provenance of a property value, mirroring `tpt-eng-materials`' `DataSource`
@@ -272,17 +312,29 @@ pub fn dc_resistance(length_m: f64, area_m2: f64, resistivity_ohm_m: f64) -> f64
 
 /// AC resistance ratio due to skin effect for a round conductor of radius `r`
 /// (m) at frequency `f` (Hz) with resistivity `ρ` (Ω·m) and permeability `μ`
-/// (H/m). Uses the low-frequency asymptotic approximation
-/// `R_ac/R_dc ≈ 1 + (r/2δ)²` with penetration depth `δ = √(ρ / (π·f·μ))`.
+/// (H/m), with penetration depth `δ = √(ρ / (π·f·μ))` and `x = r/δ`.
+///
+/// Uses the engineering interpolation `R_ac/R_dc ≈ 1 + x⁴ / (48 + 2x³)`, which
+/// matches the low-frequency series `1 + x⁴/48` for small `x` and grows linearly
+/// in `x` (∝ √f) at high frequency, as the physical skin-effect resistance does.
+/// The earlier `1 + (r/2δ)²` form grew as `f` and overstated high-frequency loss.
+///
+/// Returns `NaN` for non-positive or non-finite inputs.
 pub fn skin_effect_ratio(
     radius_m: f64,
     frequency_hz: f64,
     resistivity_ohm_m: f64,
     mu_h_per_m: f64,
 ) -> f64 {
+    let valid = [radius_m, frequency_hz, resistivity_ohm_m, mu_h_per_m]
+        .iter()
+        .all(|v| v.is_finite() && *v > 0.0);
+    if !valid {
+        return f64::NAN;
+    }
     let delta = (resistivity_ohm_m / (std::f64::consts::PI * frequency_hz * mu_h_per_m)).sqrt();
-    let x = radius_m / (2.0 * delta);
-    1.0 + x * x
+    let x = radius_m / delta;
+    1.0 + x.powi(4) / (48.0 + 2.0 * x.powi(3))
 }
 
 #[cfg(test)]
@@ -318,6 +370,26 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected = "per-unit bases must be positive")]
+    fn per_unit_rejects_zero_base() {
+        let _ = PerUnitSystem::new(0.0, 11e3);
+    }
+
+    #[test]
+    #[should_panic(expected = "capacitance and frequency must be positive")]
+    fn capacitor_rejects_zero_capacitance() {
+        let _ = impedance_capacitor(0.0, 50.0);
+    }
+
+    #[test]
+    fn short_circuit_admittance_is_infinite() {
+        // A zero-impedance branch is a short: in parallel with a finite branch it
+        // forces the combined impedance to 0.
+        let z = impedance_parallel(&[impedance_resistor(10.0), impedance_resistor(0.0)]).unwrap();
+        assert!(z.re.abs() < 1e-12);
+    }
+
+    #[test]
     fn per_unit_bases() {
         let pu = PerUnitSystem::new(100e6, 230e3);
         assert!((pu.base_impedance() - 529.0).abs() < 1e-6);
@@ -330,13 +402,41 @@ mod tests {
     #[test]
     fn three_phase() {
         // 400 V, 10 A, pf 0.9 → S = √3·400·10 ≈ 6235 W.
-        let (p, q) = three_phase_power(400.0, 10.0, 0.9);
+        let (p, q) = three_phase_power(400.0, 10.0, 0.9).unwrap();
         assert!((p - 3.0_f64.sqrt() * 400.0 * 10.0 * 0.9).abs() < 1e-6);
         assert!(q > 0.0);
         // Unity pf → no reactive power.
-        let (p2, q2) = three_phase_power(400.0, 10.0, 1.0);
+        let (p2, q2) = three_phase_power(400.0, 10.0, 1.0).unwrap();
         assert!(q2.abs() < 1e-9);
         assert!((p2 - 3.0_f64.sqrt() * 400.0 * 10.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn three_phase_lead_lag_and_range() {
+        // Leading (negative signed pf) flips the sign of reactive power.
+        let (p_lag, q_lag) = three_phase_power(400.0, 10.0, 0.8).unwrap();
+        let (p_lead, q_lead) = three_phase_power(400.0, 10.0, -0.8).unwrap();
+        assert!((p_lag - p_lead).abs() < 1e-9);
+        assert!((q_lag + q_lead).abs() < 1e-9 && q_lag > 0.0);
+        // Out-of-range power factor and non-finite inputs are rejected.
+        assert!(three_phase_power(400.0, 10.0, 1.01).is_none());
+        assert!(three_phase_power(400.0, 10.0, -1.01).is_none());
+        assert!(three_phase_power(f64::NAN, 10.0, 0.9).is_none());
+        assert!(three_phase_power(400.0, -1.0, 0.9).is_none());
+    }
+
+    #[test]
+    fn skin_effect_is_bounded_and_monotone() {
+        let mu = 4.0e-7 * std::f64::consts::PI;
+        let rho = 1.68e-8;
+        // Low frequency: ratio stays at 1 (no measurable skin effect).
+        assert!((skin_effect_ratio(0.001, 50.0, rho, mu) - 1.0).abs() < 1e-4);
+        // Rising frequency increases resistance, but sub-quadratically in f:
+        // going up 100x in frequency should raise the ratio by far less than 100x.
+        let low = skin_effect_ratio(0.005, 50.0, rho, mu);
+        let high = skin_effect_ratio(0.005, 5000.0, rho, mu);
+        assert!(high > low && high < 10.0 * low);
+        assert!(skin_effect_ratio(0.0, 50.0, rho, mu).is_nan());
     }
 
     #[test]

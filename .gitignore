@@ -26,3 +26,12 @@ _agent_*/
 # Local cargo config overrides (but keep the workspace xtask alias tracked)
 .cargo/*
 !.cargo/config.toml
+
+# Python bytecode and tooling caches
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# wasm-pack output for the browser demo and the Node smoke test
+crates/tpt-eng-wasm/www/pkg/
+crates/tpt-eng-wasm/pkg-node/

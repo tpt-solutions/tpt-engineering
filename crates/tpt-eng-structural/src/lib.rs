@@ -36,6 +36,19 @@ use tpt_math_units::uom::si::{
     force::newton, length::meter, pressure::pascal, torque::newton_meter, volume::cubic_meter,
 };
 
+/// Spans shorter than this (m) are treated as zero-length to avoid dividing by
+/// a vanishing line-load length.
+const LENGTH_EPSILON: f64 = 1e-12;
+
+/// Errors from building a [`Beam`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
+pub enum Error {
+    /// A load position lies outside `[0, span]`, a uniform load has `end < start`,
+    /// or a value is non-finite.
+    #[error("load lies outside the beam span or has non-finite/inverted bounds")]
+    LoadOutOfSpan,
+}
+
 /// A transverse load on a beam. Downward loads use a positive magnitude.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Load {
@@ -102,8 +115,44 @@ impl Beam {
     }
 
     /// Add a load.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the load lies outside the span or has non-finite values; use
+    /// [`Beam::try_add`] to handle that case without panicking.
     pub fn add(&mut self, load: Load) {
+        if let Err(e) = self.try_add(load) {
+            panic!("invalid beam load: {e}");
+        }
+    }
+
+    /// Add a load, rejecting loads that lie outside `[0, span]` or carry
+    /// non-finite values.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::LoadOutOfSpan`] if the load lies outside `[0, span]`,
+    /// a uniform load has `end < start`, or any value is non-finite.
+    pub fn try_add(&mut self, load: Load) -> Result<(), Error> {
+        let l = self.span.get::<meter>();
+        let within = |x: f64| x.is_finite() && (0.0..=l).contains(&x);
+        let valid = match load {
+            Load::Point { at, magnitude } => {
+                within(at.get::<meter>()) && magnitude.get::<newton>().is_finite()
+            }
+            Load::Uniform { start, end, total } => {
+                let (s, e) = (start.get::<meter>(), end.get::<meter>());
+                within(s) && within(e) && s <= e && total.get::<newton>().is_finite()
+            }
+            Load::Moment { at, magnitude } => {
+                within(at.get::<meter>()) && magnitude.get::<newton_meter>().is_finite()
+            }
+        };
+        if !valid {
+            return Err(Error::LoadOutOfSpan);
+        }
         self.loads.push(load);
+        Ok(())
     }
 
     /// All loads (read-only).
@@ -175,9 +224,15 @@ impl Beam {
                 Load::Uniform { start, end, total } => {
                     let s = start.get::<meter>();
                     let e = end.get::<meter>();
-                    let w = total.get::<newton>() / (e - s);
-                    if xp > s {
-                        let covered = (xp.min(e) - s).max(0.0);
+                    let total = total.get::<newton>();
+                    if e - s < LENGTH_EPSILON {
+                        // Zero-length span: behaves as a point load at `s`.
+                        if xp > s {
+                            v -= total;
+                        }
+                    } else if xp > s {
+                        let w = total / (e - s);
+                        let covered = xp.min(e) - s;
                         v -= w * covered;
                     }
                 }
@@ -203,16 +258,22 @@ impl Beam {
                 Load::Uniform { start, end, total } => {
                     let s = start.get::<meter>();
                     let e = end.get::<meter>();
-                    let w = total.get::<newton>() / (e - s);
-                    if xp > s {
-                        let covered = (xp.min(e) - s).max(0.0);
-                        m -= 0.5 * w * covered * covered;
-                        if xp > e {
-                            // Add the fixed remainder of the UDL acting at its
-                            // centroid beyond `s`.
-                            let rest = w * (e - s);
+                    let total = total.get::<newton>();
+                    if e - s < LENGTH_EPSILON {
+                        // Zero-length span: behaves as a point load at `s`.
+                        if xp > s {
+                            m -= total * (xp - s);
+                        }
+                    } else if xp > s {
+                        let w = total / (e - s);
+                        if xp <= e {
+                            // Only the part of the UDL left of `xp` contributes.
+                            m -= 0.5 * w * (xp - s) * (xp - s);
+                        } else {
+                            // Whole UDL is left of `xp`: its resultant acts at
+                            // the centroid.
                             let centroid = 0.5 * (s + e);
-                            m -= rest * (xp - centroid);
+                            m -= total * (xp - centroid);
                         }
                     }
                 }
@@ -345,6 +406,53 @@ mod tests {
             -5.0,
             1e-9
         ));
+    }
+
+    #[test]
+    fn partial_udl_moment_beyond_load_end() {
+        // 8 kN spread over 0..4 m on a 10 m span: centroid at 2 m,
+        // R_B = 8*2/10 = 1.6 kN, so M(6) = R_B * (10 - 6) = 6.4 kN·m.
+        let mut beam = Beam::new(Length::new::<meter>(10.0));
+        beam.add(Load::uniform(
+            Length::new::<meter>(0.0),
+            Length::new::<meter>(4.0),
+            Force::new::<kilonewton>(8.0),
+        ));
+        assert!(approx(beam.reaction_b().get::<kilonewton>(), 1.6, 1e-9));
+        let m = beam.moment_at(Length::new::<meter>(6.0));
+        assert!(approx(m.get::<kilonewton_meter>(), 6.4, 1e-9));
+        // Moment must vanish at the free support.
+        let m_end = beam.moment_at(Length::new::<meter>(10.0));
+        assert!(approx(m_end.get::<kilonewton_meter>(), 0.0, 1e-9));
+    }
+
+    #[test]
+    fn zero_length_udl_acts_as_point_load() {
+        let mut beam = Beam::new(Length::new::<meter>(10.0));
+        beam.add(Load::uniform(
+            Length::new::<meter>(5.0),
+            Length::new::<meter>(5.0),
+            Force::new::<kilonewton>(10.0),
+        ));
+        let m = beam.moment_at(Length::new::<meter>(5.0));
+        assert!(m.get::<kilonewton_meter>().is_finite());
+        assert!(approx(m.get::<kilonewton_meter>(), 25.0, 1e-9));
+        let v = beam.shear_at(Length::new::<meter>(6.0));
+        assert!(approx(v.get::<kilonewton>(), -5.0, 1e-9));
+    }
+
+    #[test]
+    fn try_add_rejects_loads_outside_span() {
+        let mut beam = Beam::new(Length::new::<meter>(10.0));
+        let beyond = Load::point(Length::new::<meter>(10.5), Force::new::<kilonewton>(1.0));
+        assert_eq!(beam.try_add(beyond), Err(Error::LoadOutOfSpan));
+        let inverted = Load::uniform(
+            Length::new::<meter>(6.0),
+            Length::new::<meter>(4.0),
+            Force::new::<kilonewton>(1.0),
+        );
+        assert_eq!(beam.try_add(inverted), Err(Error::LoadOutOfSpan));
+        assert!(beam.loads().is_empty());
     }
 
     #[test]

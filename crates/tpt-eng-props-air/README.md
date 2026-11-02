@@ -8,7 +8,7 @@ This crate implements the ASHRAE Fundamentals saturation-pressure correlation
 relations: saturation pressure, humidity ratio, relative humidity, specific
 enthalpy, and dew-point temperature.
 
-Temperatures are [`uom`](tpt_math_units)-typed in kelvin; pressures in pascals.
+Temperatures are [`uom`](https://docs.rs/uom)-typed in kelvin; pressures in pascals.
 Dimensionless ratios and per-mass enthalpies are plain `f64`. All functions
 validate their inputs and return a typed [`Error`] rather than panicking on
 non-physical values.

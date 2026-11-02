@@ -35,7 +35,7 @@ fn main() {
     println!("  R-L branch |Z| = {:.4} pu", z_pu);
 
     // Balanced three-phase load.
-    let (p, q) = three_phase_power(400.0, 10.0, 0.9);
+    let (p, q) = three_phase_power(400.0, 10.0, 0.9).unwrap();
     println!(
         "\nThree-phase 400 V, 10 A, pf 0.9: P = {:.0} W, Q = {:.0} var",
         p, q

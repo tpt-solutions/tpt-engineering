@@ -6,6 +6,19 @@
 //! timestamp with a payload; a [`Series`] is an ordered bag of samples. These
 //! are deliberately minimal and `std`-only building blocks that the align/gap
 //! crates layer behaviour on top of.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_timeseries_core::{Sample, Series, Timestamp};
+//!
+//! let series = Series::from_samples([
+//!     Sample::new(Timestamp::from_seconds(0.0), 1.0),
+//!     Sample::new(Timestamp::from_seconds(0.5), 2.0),
+//! ]);
+//! assert_eq!(series.len(), 2);
+//! assert!((Timestamp::from_seconds(0.5).as_seconds() - 0.5).abs() < 1e-12);
+//! ```
 
 use std::fmt;
 

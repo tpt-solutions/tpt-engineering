@@ -1,0 +1,7 @@
+case,quantity,expected,unit,source
+point_mid_10kN_10m,reaction_a,5.0,kN,Equilibrium: P/2 by symmetry
+point_mid_10kN_10m,max_moment,25.0,kN*m,PL/4 for a central point load (Hibbeler; Gere and Goodno)
+point_2p5m_10kN_10m,reaction_a,7.5,kN,P*b/L with b = 7.5 m (Hibbeler; Gere and Goodno)
+point_2p5m_10kN_10m,moment_at_load,18.75,kN*m,P*a*b/L with a = 2.5 m (Hibbeler; Gere and Goodno)
+udl_2kNm_8m,reaction_a,8.0,kN,wL/2 for a uniform load (Hibbeler; Gere and Goodno)
+udl_2kNm_8m,max_moment,16.0,kN*m,wL^2/8 for a uniform load (Hibbeler; Gere and Goodno)

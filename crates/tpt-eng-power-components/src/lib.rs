@@ -147,11 +147,20 @@ pub struct Transformer {
 impl Transformer {
     /// Construct a transformer from its turns ratio, primary-referred leakage
     /// impedance and primary-referred magnetizing admittance.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `turns_ratio` is not finite and non-zero, since the
+    /// secondary-referred quantities divide by `turns_ratio`.
     pub fn new(
         turns_ratio: f64,
         leakage_impedance: Complex,
         magnetizing_admittance: Complex,
     ) -> Self {
+        assert!(
+            turns_ratio.is_finite() && turns_ratio != 0.0,
+            "turns ratio must be finite and non-zero"
+        );
         Self {
             turns_ratio,
             leakage_impedance,
@@ -172,8 +181,11 @@ impl Transformer {
     ///
     /// # Panics
     ///
-    /// Never panics, but a zero `magnetizing_impedance` yields a non-finite
-    /// admittance (a short-circuited core branch is not a physical model).
+    /// # Panics
+    ///
+    /// Panics on an invalid `turns_ratio` (see [`Transformer::new`]). A zero
+    /// `magnetizing_impedance` yields a non-finite admittance, since a
+    /// short-circuited core branch is not a physical model.
     pub fn with_magnetizing_impedance(
         turns_ratio: f64,
         leakage_impedance: Complex,
@@ -302,8 +314,13 @@ pub fn generator_electrical_power(mechanical_power: f64, efficiency: f64) -> f64
 ///
 /// # Panics
 ///
-/// Never panics, but returns a non-finite value for `efficiency = 0`.
+/// Panics if `efficiency` is not in `(0, 1]`, since an efficiency of zero makes
+/// the required shaft power unbounded.
 pub fn generator_mechanical_power(electrical_power: f64, efficiency: f64) -> f64 {
+    assert!(
+        efficiency > 0.0 && efficiency <= 1.0,
+        "efficiency must be in (0, 1]"
+    );
     electrical_power / efficiency
 }
 
@@ -314,11 +331,15 @@ pub fn generator_mechanical_power(electrical_power: f64, efficiency: f64) -> f64
 /// The real terminal power is taken from [`three_phase_power`]
 /// (`P = √3·V_ll·I_line·pf`) and divided by the efficiency.
 ///
+/// Returns `NaN` if the electrical inputs are rejected by
+/// [`three_phase_power`] (non-finite values, negative magnitudes, or `pf`
+/// outside `[-1, 1]`).
+///
 /// # Panics
 ///
-/// Never panics, but returns a non-finite value for `efficiency = 0`.
+/// Panics if `efficiency` is not in `(0, 1]`.
 pub fn generator_shaft_power_for_output(v_ll: f64, i_line: f64, pf: f64, efficiency: f64) -> f64 {
-    let (p, _q) = three_phase_power(v_ll, i_line, pf);
+    let p = three_phase_power(v_ll, i_line, pf).map_or(f64::NAN, |(p, _q)| p);
     generator_mechanical_power(p, efficiency)
 }
 
@@ -327,8 +348,9 @@ pub fn generator_shaft_power_for_output(v_ll: f64, i_line: f64, pf: f64, efficie
 ///
 /// # Panics
 ///
-/// Never panics, but returns a non-finite value when `poles = 0`.
+/// Panics if `poles` is zero.
 pub fn synchronous_speed_rpm(frequency_hz: f64, poles: u32) -> f64 {
+    assert!(poles > 0, "a machine must have at least one pole");
     120.0 * frequency_hz / f64::from(poles)
 }
 

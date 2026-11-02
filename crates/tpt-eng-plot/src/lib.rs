@@ -7,6 +7,18 @@
 //! - [`SectionDrawing`] — 2D cross-section / geometry drawings.
 //!
 //! Each plot can be exported to PNG or SVG via [`Drawing::save_png`] / [`Drawing::save_svg`].
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_plot::chart::plot_result_chart_svg;
+//!
+//! let path = std::env::temp_dir().join("tpt_eng_plot_doctest.svg");
+//! let items = vec![("A".to_string(), 120.0), ("B".to_string(), 95.0)];
+//! plot_result_chart_svg("Stress", items, &path).unwrap();
+//! assert!(std::fs::metadata(&path).unwrap().len() > 0);
+//! let _ = std::fs::remove_file(&path);
+//! ```
 
 pub mod chart;
 pub mod error;

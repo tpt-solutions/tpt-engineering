@@ -17,6 +17,16 @@
 //! (the precision of the shared [`Vector3`] type from [`tpt_eng_geometry`]);
 //! scalar quantities such as lattice constants are taken as `f64` and the
 //! resulting spacing is `f64`. No `unsafe` is used anywhere in this crate.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_crystallography::{d_spacing, Miller};
+//!
+//! // Interplanar spacing of the (111) planes in a cubic lattice a = 0.4 nm.
+//! let d = d_spacing(0.4, Miller::new(1, 1, 1));
+//! assert!((d - 0.4 / 3f64.sqrt()).abs() < 1e-12);
+//! ```
 
 use tpt_eng_geometry::{Mat3, Vector3, Vector3 as V3};
 

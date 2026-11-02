@@ -51,7 +51,7 @@ fn main() {
 
     // Integration with the fluid-property crates.
     let p_sat = water_saturation_pressure(373.15);
-    let (rho, _h) = water_film_properties(300.0, 3.0e6);
+    let (rho, _cp) = water_film_properties(300.0, 3.0e6).unwrap();
     println!(
         "\nWater p_sat(100 °C) = {:.0} Pa, ρ(300 K, 3 MPa) = {:.1} kg/m³",
         p_sat, rho
