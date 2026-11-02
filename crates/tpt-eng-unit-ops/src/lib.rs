@@ -286,8 +286,13 @@ pub fn mccabe_thiele_stages(
     // Rectifying line: y = (R/(R+1))·x + xd/(R+1), through (xd, xd).
     let rs = r / (r + 1.0);
     let rb = xd / (r + 1.0);
-    // q-line / rectifying-line intersection.
-    let x_i = (xf - rb) / (rs - q + 1.0);
+    // q-line `y = q/(q−1)·x − x_F/(q−1)` meets the rectifying line at
+    // `x_i = (x_F + (q−1)·R_b) / (q − (q−1)·r_s)`; for q = 1 this is x_F.
+    let denom = q - (q - 1.0) * rs;
+    if denom.abs() < 1e-12 {
+        return None;
+    }
+    let x_i = (xf + (q - 1.0) * rb) / denom;
     let y_i = rs * x_i + rb;
     if !(x_i > xb && x_i < xd) || !x_i.is_finite() {
         return None;
@@ -751,6 +756,21 @@ pub fn grey_plate_flux(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn mccabe_thiele_feasible_above_rmin_and_monotone() {
+        // Saturated-liquid feed, α = 2.5: R_min ≈ 1.22, so 1.5 is feasible.
+        let (xd, xb, xf, a) = (0.95, 0.05, 0.50, 2.5);
+        let s15 = mccabe_thiele_stages(xd, xb, xf, 1.0, a, 1.5)
+            .unwrap()
+            .stages;
+        let s3 = mccabe_thiele_stages(xd, xb, xf, 1.0, a, 3.0)
+            .unwrap()
+            .stages;
+        assert!(s15 > s3, "stages must fall with reflux: {s15} vs {s3}");
+        // Below R_min (≈ 2.17 for a saturated-vapour feed) there is no solution.
+        assert!(mccabe_thiele_stages(xd, xb, xf, 0.0, a, 2.0).is_none());
+    }
 
     #[test]
     fn gilliland_eduljee_reference() {
