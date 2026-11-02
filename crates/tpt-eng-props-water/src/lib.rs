@@ -37,6 +37,9 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+mod tagged;
+pub use tagged::{saturation_pressure_tagged, state_tagged};
+
 #[cfg(not(feature = "std"))]
 use tpt_math_numeric::Float;
 #[cfg(not(feature = "std"))]

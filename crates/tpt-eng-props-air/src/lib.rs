@@ -25,6 +25,9 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+mod tagged;
+pub use tagged::{relative_humidity_tagged, saturation_pressure_water_tagged};
+
 #[cfg(not(feature = "std"))]
 use tpt_math_numeric::Float;
 #[cfg(not(feature = "std"))]

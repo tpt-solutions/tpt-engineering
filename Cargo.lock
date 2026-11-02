@@ -1152,6 +1152,7 @@ name = "tpt-eng-props-air"
 version = "0.1.0"
 dependencies = [
  "proptest",
+ "tpt-eng-provenance",
  "tpt-math-numeric 0.1.0",
  "tpt-math-units",
 ]
