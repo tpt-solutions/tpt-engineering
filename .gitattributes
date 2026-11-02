@@ -1,0 +1,4 @@
+# The committed schema is compared byte-for-byte against generated output
+# (tests::committed_schema_is_up_to_date), which emits LF. Keep LF on checkout
+# so Windows runners and autocrlf users don't get CRLF and fail the test.
+crates/tpt-eng-sheet/schema/*.json text eol=lf
