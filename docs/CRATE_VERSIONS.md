@@ -11,12 +11,12 @@ equal **Local** (`cargo xtask pin-check`, run by `cargo xtask check`).
 compares **Local** with it.
 - **Published versions** lists every release on the registry, newest first.
 
-45 publishable crates: 42 in sync, 1 local ahead of crates.io, 0 registry ahead, 2 unpublished.
+45 publishable crates: 39 in sync, 4 local ahead of crates.io, 0 registry ahead, 2 unpublished.
 
 | Crate | Local | Pin | crates.io | State | Published versions |
 |---|---|---|---|---|---|
-| `tpt-eng-props-water` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-props-air` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
+| `tpt-eng-props-water` | 0.1.1 | 0.1.1 | 0.1.0 | local ahead (unreleased) | 0.1.0 |
+| `tpt-eng-props-air` | 0.1.1 | 0.1.1 | 0.1.0 | local ahead (unreleased) | 0.1.0 |
 | `tpt-eng-props-fuels` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-props` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
 | `tpt-eng-provenance` | 0.1.0 | 0.1.0 | - | unpublished | - |
@@ -48,7 +48,7 @@ compares **Local** with it.
 | `tpt-eng-examples` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-electrical` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-heat-transfer` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-props-mixture` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
+| `tpt-eng-props-mixture` | 0.1.1 | 0.1.1 | 0.1.0 | local ahead (unreleased) | 0.1.0 |
 | `tpt-eng-pcb` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-thermal-mgmt` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-power-components` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |

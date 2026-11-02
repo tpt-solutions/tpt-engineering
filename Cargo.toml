@@ -73,8 +73,8 @@ tpt-math-linalg = "0.1.0"
 tpt-math-stats = "0.2.0"
 
 # In-repo crate dependencies (referenced by `workspace = true`).
-tpt-eng-props-water = { version = "0.1.0", path = "crates/tpt-eng-props-water" }
-tpt-eng-props-air = { version = "0.1.0", path = "crates/tpt-eng-props-air" }
+tpt-eng-props-water = { version = "0.1.1", path = "crates/tpt-eng-props-water" }
+tpt-eng-props-air = { version = "0.1.1", path = "crates/tpt-eng-props-air" }
 tpt-eng-props-fuels = { version = "0.1.0", path = "crates/tpt-eng-props-fuels" }
 tpt-eng-props = { version = "0.1.1", path = "crates/tpt-eng-props" }
 tpt-eng-provenance = { version = "0.1.0", path = "crates/tpt-eng-provenance" }
@@ -122,7 +122,7 @@ anyhow = "1.0"
 
 tpt-eng-electrical = { version = "0.1.0", path = "crates/tpt-eng-electrical" }
 tpt-eng-heat-transfer = { version = "0.1.0", path = "crates/tpt-eng-heat-transfer" }
-tpt-eng-props-mixture = { version = "0.1.0", path = "crates/tpt-eng-props-mixture" }
+tpt-eng-props-mixture = { version = "0.1.1", path = "crates/tpt-eng-props-mixture" }
 tpt-eng-pcb = { version = "0.1.0", path = "crates/tpt-eng-pcb" }
 tpt-eng-thermal-mgmt = { version = "0.1.0", path = "crates/tpt-eng-thermal-mgmt" }
 tpt-eng-power-components = { version = "0.1.0", path = "crates/tpt-eng-power-components" }
