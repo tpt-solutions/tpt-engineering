@@ -3,6 +3,18 @@
 //! Provides the standard stack-up methods used in mechanical tolerancing:
 //! worst-case, root-sum-square (RSS), and Monte-Carlo evaluation, together
 //! with sensitivity and contributor-ranking helpers.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_tolerance::{DimTol, worst_case};
+//!
+//! // Two dimensions: 10 ± 0.1 and 25 ± 0.2 stack to 35 ± 0.3.
+//! let dims = [DimTol::new("a", 10.0, 0.1), DimTol::new("b", 25.0, 0.2)];
+//! let (lo, hi) = worst_case(&dims);
+//! assert!((lo - 34.7).abs() < 1e-9);
+//! assert!((hi - 35.3).abs() < 1e-9);
+//! ```
 
 use rand::Rng;
 use rand_distr::{Distribution as Distr, Uniform};
@@ -115,6 +127,20 @@ pub fn rss(dims: &[DimTol]) -> (f64, f64) {
     (nom - 3.0 * sigma, nom + 3.0 * sigma)
 }
 
+/// Draw one uniform sample from a dimension's tolerance interval. A zero-width
+/// interval (zero tolerance) returns the nominal value, since `Uniform` requires
+/// `low < high`.
+fn sample_dim<R: Rng + ?Sized>(d: &DimTol, rng: &mut R) -> f64 {
+    let (lo, hi) = (d.min(), d.max());
+    if hi > lo {
+        Uniform::new(lo, hi)
+            .expect("bounds validated by monte_carlo")
+            .sample(rng)
+    } else {
+        lo
+    }
+}
+
 /// Monte-Carlo stack-up evaluation. Each dimension is sampled uniformly in
 /// its tolerance interval; the stack-up is the sum. If `spec` is provided as
 /// `(low, high)`, the yield fraction is also reported.
@@ -128,13 +154,17 @@ pub fn monte_carlo<R: Rng + ?Sized>(
     spec: Option<(f64, f64)>,
     rng: &mut R,
 ) -> StackupResult {
+    assert!(
+        dims.iter()
+            .all(|d| d.nominal.is_finite() && d.min().is_finite() && d.max().is_finite()),
+        "monte_carlo requires finite nominal values and tolerance bounds"
+    );
     let mut samples = Vec::with_capacity(n);
     let mut in_spec = 0usize;
     for _ in 0..n {
         let mut total = 0.0;
         for d in dims {
-            let u = Uniform::new(d.min(), d.max()).expect("finite tolerance bounds");
-            total += u.sample(rng);
+            total += sample_dim(d, rng);
         }
         if let Some((lo, hi)) = spec {
             if total >= lo && total <= hi {
@@ -203,8 +233,7 @@ pub fn monte_carlo_sensitivities<R: Rng + ?Sized>(
     for _ in 0..n {
         let mut total = 0.0;
         for (j, d) in dims.iter().enumerate() {
-            let u = Uniform::new(d.min(), d.max()).expect("finite tolerance bounds");
-            let v = u.sample(rng);
+            let v = sample_dim(d, rng);
             inputs[j].push(v);
             total += v;
         }
@@ -425,6 +454,15 @@ mod tests {
         let mut rng = rand::rng();
         let r = monte_carlo(&dims(), 50_000, None, &mut rng);
         assert_relative_eq!(r.mean, 35.0, epsilon = 0.05);
+    }
+
+    #[test]
+    fn monte_carlo_zero_tolerance_does_not_panic() {
+        // A zero-width interval must sample the nominal, not hit `Uniform::new`.
+        let mut rng = rand::rng();
+        let dims = vec![DimTol::new("a", 10.0, 0.0), DimTol::new("b", 25.0, 0.0)];
+        let r = monte_carlo(&dims, 1_000, None, &mut rng);
+        assert_relative_eq!(r.mean, 35.0, epsilon = 1e-12);
     }
 
     #[test]

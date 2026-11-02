@@ -12,6 +12,19 @@
 //! All scalar quantities are plain `f64` in SI units (volts, amperes, watts,
 //! metres, seconds, kelvin, °C) unless noted. No unit-typed (uom) arithmetic is
 //! used so the crate stays dependency-light and numerically transparent.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_renewables::{betz_limit_power, PvCell};
+//!
+//! // At V_oc the current is near zero (within 0.1 % of I_sc).
+//! let cell = PvCell::silicon_reference();
+//! assert!(cell.current_at(cell.voc_ref, 1000.0, 25.0).abs() < 0.01);
+//! // The Betz limit caps any turbine at 16/27 of the kinetic power.
+//! let limit = betz_limit_power(1.225, 10.0, 8.0);
+//! assert!(limit > 0.0);
+//! ```
 
 use tpt_eng_reliability::{ReliabilityError, weibull_mean};
 
@@ -83,6 +96,11 @@ impl PvCell {
     /// conditions (25 °C, 1000 W/m²). Useful as a starting point for tests and
     /// examples. `rsh` is taken as a healthy 100 Ω so the shunt leakage at
     /// open circuit is small.
+    ///
+    /// Illustrative 60-cell-class parameters (`I_sc` = 8 A, `V_oc` = 0.6 V per
+    /// cell, `n` = 1.3, `R_s` = 1 mΩ, `R_sh` = 100 Ω). They are representative of
+    /// crystalline silicon, not a specific module datasheet; use the datasheet
+    /// values for a design.
     #[must_use]
     pub fn silicon_reference() -> Self {
         Self::new(8.0, 0.6, 298.15, 1.3, 0.001, 100.0, 1.12)
@@ -111,8 +129,8 @@ impl PvCell {
     ///
     /// `I_0` is anchored at reference conditions from `I_sc` and `V_oc`
     /// (`I_0_ref = I_sc / (exp(V_oc/(n·V_t_ref)) − 1)`) and then scaled with
-    /// temperature through the band-gap term
-    /// `exp(−E_g/(n·k_B)·(1/T − 1/T_ref))`, so leakage grows as the cell
+    /// temperature as `(T/T_ref)³ · exp(−E_g/(n·k_B)·(1/T − 1/T_ref))`, the
+    /// standard single-diode temperature law, so leakage grows as the cell
     /// warms.
     #[must_use]
     pub fn saturation_current(&self, temp_c: f64) -> f64 {
@@ -120,12 +138,13 @@ impl PvCell {
         let vt_ref = Self::thermal_voltage(self.t_ref_k);
         let i0_ref = self.isc_ref / ((self.voc_ref / (self.n * vt_ref)).exp() - 1.0);
         let temp_term = -(self.eg / (self.n * KB_EV)) * (1.0 / t_k - 1.0 / self.t_ref_k);
-        i0_ref * temp_term.exp()
+        i0_ref * (t_k / self.t_ref_k).powi(3) * temp_term.exp()
     }
 
     /// Solve the single-diode equation for the terminal current (A) at a given
     /// terminal voltage `voltage` (V), plane-of-array irradiance `irradiance`
-    /// (W/m²) and cell temperature `temp_c` (°C).
+    /// (W/m²) and cell temperature `temp_c` (°C). Returns `NaN` if the solver
+    /// does not converge.
     ///
     /// The underlying implicit equation is
     ///
@@ -135,9 +154,9 @@ impl PvCell {
     ///
     /// where `I_ph` scales with irradiance and `I_0` scales with temperature
     /// (see [`PvCell::photocurrent`] / [`PvCell::saturation_current`]). It is
-    /// solved by a fixed number of Picard (fixed-point) iterations starting
-    /// from the photocurrent guess; for the well-conditioned parameter ranges
-    /// of real cells this converges to well within engineering tolerance.
+    /// solved by Newton iteration from the photocurrent guess, stopping when the
+    /// update falls below `1e-12` A; a fixed-point iteration was replaced because
+    /// the exponential diode term makes it diverge near `V_oc`.
     ///
     /// Sanity limits: at `V = 0` the current approaches `I_ph` (short
     /// circuit), and at `V = V_oc` (reference conditions) the current
@@ -149,26 +168,39 @@ impl PvCell {
         let i_ph = self.photocurrent(irradiance);
         let i0 = self.saturation_current(temp_c);
 
+        // f(I) = I − I_ph + I_0·(exp(V_d/(n·V_t)) − 1) + V_d/R_sh, with
+        // V_d = V + I·R_s. Monotone in I, so Newton from I_ph is well behaved.
         let mut i = i_ph; // initial guess: short-circuit current.
-        for _ in 0..60 {
-            let v_d = voltage + i * self.rs; // diode (internal) voltage.
-            let i_new = i_ph - i0 * ((v_d / (self.n * vt)).exp() - 1.0) - v_d / self.rsh;
-            i = i_new;
+        for _ in 0..100 {
+            let v_d = voltage + i * self.rs;
+            let e = (v_d / (self.n * vt)).exp();
+            let f = i - i_ph + i0 * (e - 1.0) + v_d / self.rsh;
+            let df = 1.0 + i0 * self.rs / (self.n * vt) * e + self.rs / self.rsh;
+            let step = f / df;
+            i -= step;
             if !i.is_finite() {
-                break;
+                return f64::NAN;
+            }
+            if step.abs() < 1e-12 {
+                return i;
             }
         }
-        i
+        f64::NAN
     }
 }
 
 /// Wind-turbine cut-in speed (m/s) below which the turbine produces no power.
+///
+/// Typical utility-scale value; the speed envelope is machine-specific, so
+/// replace it with the datasheet figure for a real turbine.
 pub const WIND_CUT_IN: f64 = 3.0;
 /// Wind-turbine rated wind speed (m/s) above which output is clamped to the
 /// rated power.
 pub const WIND_RATED: f64 = 12.0;
 /// Wind-turbine cut-out speed (m/s) above which the turbine feathers and
 /// produces no power.
+///
+/// Typical utility-scale value (see [`WIND_CUT_IN`] for the caveat).
 pub const WIND_CUT_OUT: f64 = 25.0;
 
 /// Available kinetic power in the air swept by a rotor of area `rotor_area`
@@ -289,6 +321,31 @@ mod tests {
         let i_low = cell.current_at(0.1, G_REF, 25.0);
         let i_high = cell.current_at(0.5, G_REF, 25.0);
         assert!(i_low > i_high, "i_low={i_low}, i_high={i_high}");
+    }
+
+    #[test]
+    fn pv_solution_satisfies_diode_equation_near_voc() {
+        // The Newton solve must converge across the whole I–V curve, including
+        // the steep region near V_oc where fixed-point iteration diverged.
+        let cell = PvCell::silicon_reference();
+        let (irr, t) = (1000.0, 25.0);
+        let vt = PvCell::thermal_voltage(t + CELSIUS_OFFSET);
+        let i0 = cell.saturation_current(t);
+        let i_ph = cell.photocurrent(irr);
+        for k in 0..=20 {
+            let v = cell.voc_ref * (k as f64) / 20.0 * 0.999;
+            let i = cell.current_at(v, irr, t);
+            assert!(i.is_finite(), "no convergence at V = {v}");
+            let v_d = v + i * cell.rs;
+            let residual = i_ph - i0 * ((v_d / (cell.n * vt)).exp() - 1.0) - v_d / cell.rsh - i;
+            assert!(residual.abs() < 1e-9, "residual {residual} at V = {v}");
+        }
+    }
+
+    #[test]
+    fn saturation_current_grows_with_temperature() {
+        let cell = PvCell::silicon_reference();
+        assert!(cell.saturation_current(50.0) > cell.saturation_current(25.0));
     }
 
     #[test]

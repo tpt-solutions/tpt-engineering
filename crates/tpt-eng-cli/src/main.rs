@@ -6,10 +6,13 @@ use std::path::PathBuf;
 
 use tpt_eng_plot::Drawing;
 
+mod beamfile;
+mod catalog;
 mod controls;
 mod materials;
 mod props;
 mod sections;
+mod sheet;
 mod tolerance;
 mod units;
 
@@ -20,6 +23,9 @@ use units::convert as convert_units;
 #[derive(Parser)]
 #[command(name = "tpt-eng", version, about = "TPT engineering CLI", long_about = None)]
 struct Cli {
+    /// Emit machine-readable JSON instead of text (supported by `props`).
+    #[arg(long, global = true)]
+    json: bool,
     #[command(subcommand)]
     command: Command,
 }
@@ -44,6 +50,23 @@ enum Command {
     Pid(controls::PidArgs),
     /// Dimensional tolerance stack-up analysis.
     Tolerance(tolerance::ToleranceArgs),
+    /// Run declarative calculation sheets (TOML or JSON), or print their schema.
+    Sheet(sheet::SheetArgs),
+    /// List the publishable tpt-eng crates, optionally filtered by words.
+    Crates {
+        /// Words to match in the name, summary or keywords.
+        filter: Vec<String>,
+    },
+    /// Suggest crates for a task, e.g. `recommend pump curve`.
+    Recommend {
+        /// What you want to compute, in a few words.
+        task: Vec<String>,
+    },
+    /// Print a shell completion script to stdout.
+    Completions {
+        /// Target shell: bash | zsh | fish | powershell | elvish.
+        shell: clap_complete::Shell,
+    },
 }
 
 #[derive(Args)]
@@ -136,6 +159,11 @@ struct CalcArgs {
 
 #[derive(Subcommand)]
 enum CalcCmd {
+    /// Analyse a beam described in a JSON file (see crate docs for the schema).
+    BeamFile {
+        /// Path to the beam JSON file.
+        path: PathBuf,
+    },
     /// Simply supported beam under a uniformly distributed load.
     Beam {
         /// Span length (m).
@@ -172,6 +200,7 @@ fn shape_from_cmd(cmd: &ShapeCmd) -> Section {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
+    let json = cli.json;
     match cli.command {
         Command::Validate { path } => cmd_validate(&path),
         Command::Report(args) => cmd_report(args),
@@ -179,9 +208,35 @@ fn main() -> Result<()> {
         Command::Materials(args) => cmd_materials(args),
         Command::Sections(args) => cmd_sections(args),
         Command::Calc(args) => cmd_calc(args),
-        Command::Props(args) => props::run(args),
+        Command::Props(args) => props::run(args, json),
         Command::Pid(args) => controls::run(args),
         Command::Tolerance(args) => tolerance::run(args),
+        Command::Sheet(args) => sheet::run_sheet(args, json),
+        Command::Crates { filter } => {
+            print_catalog(&catalog::search(&filter.join(" ")));
+            Ok(())
+        }
+        Command::Recommend { task } => {
+            let hits = catalog::search(&task.join(" "));
+            if hits.is_empty() {
+                bail!(
+                    "no crate matches `{}`; try `tpt-eng crates`",
+                    task.join(" ")
+                );
+            }
+            print_catalog(&hits);
+            Ok(())
+        }
+        Command::Completions { shell } => {
+            use clap::CommandFactory;
+            clap_complete::generate(
+                shell,
+                &mut Cli::command(),
+                "tpt-eng",
+                &mut std::io::stdout(),
+            );
+            Ok(())
+        }
     }
 }
 
@@ -339,6 +394,7 @@ fn cmd_calc(args: CalcArgs) -> Result<()> {
             report,
             plot,
         } => cmd_calc_beam(span, load, &material, section, report, plot),
+        CalcCmd::BeamFile { path } => beamfile::run(&path),
     }
 }
 
@@ -435,4 +491,11 @@ fn cmd_calc_beam(
     }
 
     Ok(())
+}
+
+fn print_catalog(entries: &[&catalog::Entry]) {
+    for e in entries {
+        println!("{:<26} {}", e.name, e.summary);
+    }
+    println!("{} crate(s)", entries.len());
 }

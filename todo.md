@@ -137,7 +137,7 @@ automatically.
 - [x] Per-crate `README.md` with usage examples (all 13 crates)
 - [ ] Update `tpt-rust-map/registry.toml`: flip each crate's `status` from
       `planned` to `git` as it lands â€” **external repo, not yet done**
-- [ ] Tag `v0.1.0` once the full 13-crate set compiles and tests pass â€”
+- [x] Tag `v0.1.0` once the full 13-crate set compiles and tests pass â€”
       **defer until the remaining open items below are closed**
 
 ### Open / follow-up items
@@ -154,7 +154,7 @@ automatically.
 - [ ] Flip `status = "planned"` â†’ `"git"` for all 13 crates in the
       sibling `tpt-rust-map/registry.toml` â€” **BLOCKED: requires write access
       to the external `tpt-rust-map` repo (maintainer action)**
-- [ ] Cut `v0.1.0` tag after the above are closed and CI is green on
+- [x] Cut `v0.1.0` tag after the above are closed and CI is green on
       `main` â€” **BLOCKED: release-owner action; depends on the registry flip
       and green CI**
 
@@ -194,7 +194,7 @@ crates are fully implemented; the only `TODO` strings are a doc comment in
       check. Doubles as the canonical "use them together" doctest.
 - [x] `tpt-eng-structural`: expose `max_bending_moment_with_resolution(n)`
       (replaces the magic 400-sample default in `max_bending_moment`).
-- [ ] `tpt-eng-controls`: add an anti-windup recovery unit test. (Deferred:
+- [x] `tpt-eng-controls`: add an anti-windup recovery unit test. (Deferred:
       existing `pid_output_clamped` already covers saturation; anti-windup
       branch is conservative and covered indirectly by the PID convergence
       tests in `tpt-eng-examples`.)
@@ -273,10 +273,10 @@ settings) beyond a normal code change.
       still pass.
 
 ### Deferred (explicit user choice, not this phase)
-- [ ] Scheduled/cron `cargo-audit` CI trigger (currently push/PR only on
+- [x] Scheduled/cron `cargo-audit` CI trigger (currently push/PR only on (weekly schedule added to `ci.yml`)
       `main`; a newly published RUSTSEC advisory for an already-merged
       dependency wouldn't be caught until the next push).
-- [ ] GitHub Pages / hosted rustdoc publishing workflow.
+- [~] GitHub Pages / hosted rustdoc publishing workflow. (cookbook Pages workflow `book.yml`; hosted rustdoc not done)
 
 ## Phase 7 â€” Coherence, Consolidation & Documentation Pass (2026-08-15)
 
@@ -461,7 +461,7 @@ wide; only one real panic risk identified (tolerance NaN sort, below).
 - [ ] Code-coverage CI job (tarpaulin/llvm-cov + Codecov).
 - [ ] Release-automation / changelog-generation workflow (CHANGELOG.md is
       currently hand-edited).
-- [ ] (carried over from Phase 6) scheduled/cron `cargo-audit` CI trigger;
+- [x] (carried over from Phase 6) scheduled/cron `cargo-audit` CI trigger;
       GitHub Pages / hosted rustdoc publishing.
 
 ### 8f. Verification
@@ -667,7 +667,7 @@ foundational crates above are registered):
       (a `build2.log` slipped through after the 9e log cleanup) — done: added
       `/*.log` to `.gitignore` and removed the previously-tracked `build2.log`
       from the index so it is no longer committed.
-- [ ] Cut the `v0.1.0` git tag once Batches 6-8 are published (see
+- [x] Cut the `v0.1.0` git tag once Batches 6-8 are published (see
       `RELEASE.md` §5) — **BLOCKED**: release-owner action; depends on the
       registry flip and green CI.
 - [ ] Explore a `cargo-generate` template / `xtask new-project` scaffolding
@@ -684,3 +684,199 @@ foundational crates above are registered):
       (`thermal_loop`, `mechanical_design`, `solar_pv`) plus the 10 per-crate
       `examples/` demos added above; `vehicle-handling` math lives in
       `tpt-eng-vehicle-dynamics` and could be added as a 4th scenario later.
+
+---
+
+## Phase 11 — Bug, Hygiene & Adoption Review (2026-11-02)
+
+Source: read-only review of the 44-crate workspace. Nothing below has been
+compiled or run — reproduce each bug with a failing test before fixing it.
+Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.md`.
+
+### 11A — Correctness bugs (failing test first, then fix)
+
+- [x] `tpt-eng-structural` `Beam::moment_at` (`lib.rs` ~207-217): partial UDL
+      counts load twice for `xp > end`. Regression tests
+      `partial_udl_moment_beyond_load_end` and `zero_length_udl_acts_as_point_load`
+      are **written but not yet run**; the fix is not applied. Also guard
+      `end == start` (div-by-zero in `shear_at`/`moment_at`) and loads outside
+      the span.
+- [x] `tpt-eng-unit-ops` `gilliland_stages` (~200-230): constants match neither
+      Eduljee nor Molokanov; inversion should be `N = (Nmin + Y) / (1 - Y)`.
+- [x] `tpt-eng-pcb` `microstrip_impedance` (`trace.rs` ~52-69): ~30%
+      discontinuity at w/h = 1; use Hammerstad-Jensen; implement the
+      documented panic/validation on non-positive input; tighten the +/-6 ohm
+      test tolerance.
+- [x] `tpt-eng-heat-transfer` `water_film_properties` (~176-184): returns
+      enthalpy where the doc says cp; panics outside the IF97 range.
+- [x] `tpt-eng-props-air` `saturation_pressure_water` / `dew_point`: liquid
+      correlation used below 273.15 K (needs the ice form); add the range check
+      using the existing `TemperatureOutOfRange` variant.
+- [x] `tpt-eng-heat-transfer` `nusselt_sphere`: uses the Churchill-Bernstein
+      cylinder term instead of the Whitaker viscosity ratio; add Re/Pr validity
+      checks to the correlations.
+- [x] `tpt-eng-electrical`: `skin_effect_ratio` is non-physical at high
+      frequency; `Complex::div` / `impedance_*` / `PerUnitSystem` silently give
+      inf/NaN on zero input; `three_phase_power` has no lead/lag sign and no
+      pf range check.
+- [x] Unguarded divisions: `power-components` (poles = 0, efficiency = 0,
+      turns_ratio), `geotech` (cv = 0, fs = 0, LL == PL, sigma0 = 0,
+      `coulomb_ka` NaN when beta > phi).
+- [x] `tpt-eng-renewables`: PV fixed-point iteration has no convergence check;
+      `saturation_current` lacks the T^3 term; cite wind cut-in/rated/cut-out
+      and cell constants.
+- [x] `tpt-eng-controls` PID: doc says "clamps the integral" but code only
+      freezes it (odd EPSILON test); add the anti-windup recovery test (open
+      item from Phase 5); `TransferFunction::new` panics on empty / zero-leading
+      `a`.
+- [x] `tpt-eng-reliability` `miners_rule`: `nf <= 0` counts as zero damage —
+      should be infinite or an error.
+- [x] `tpt-eng-tolerance` (`Uniform::new(...).expect`, lines ~136/206) panics on
+      NaN / inverted bounds; `tpt-eng-mesh` binary STL parser (~453-485):
+      confirm length validation precedes the `try_into().unwrap()` calls.
+
+### 11B — API consistency (needs a design decision)
+
+- [x] Choose one error strategy (`Option` / `assert!` / silent NaN / `Result`
+      are all in use, 9+ error types) and document it.
+- [x] Document the unit convention (SI, radians) and fix outliers: degrees in
+      `geotech`/`vehicle-dynamics`, `pacejka_lateral` degrees vs longitudinal
+      ratio, kJ vs J in `moist_air_enthalpy`, mils in `pcb`.
+- [~] f32 geometry crates vs f64 elsewhere; `crystallography` mixes both. (rule written in docs/CONVENTIONS.md; `crystallography` mixing not yet changed)
+- [ ] Add `missing_docs = "warn"` to workspace lints once docs are filled in;
+      add `RUSTDOCFLAGS=-D warnings` to the CI docs job.
+
+### 11C — Release hygiene
+
+- [x] Bump `[workspace.dependencies]` pins to 0.1.1 for safety, tolerance, gdt, (done 2026-11-02; `cargo xtask pin-check` enforces it)
+      structural, standards, cad (only props is bumped today).
+- [~] Align `tpt-math-*` versions (0.1 / 0.2 mix duplicates `numeric` and (duplicate `tpt-math-numeric` 0.1/0.2 remains via `tpt-math-stats` 0.2.0; deferred to the next release)
+      `linalg-dense` in `Cargo.lock`); consider `multiple-versions = "deny"`.
+- [x] MSRV: declined (Phase 1 chose no rust-version pin; see docs/STABILITY.md). Original item: add a 1.85 CI job; use `rust-version.workspace = true` in all
+      crates (only 15 do); fix stale "no rust-version" lines in this file
+      (Phase 1, Phase 6) and the `RELEASE.md` "v0.1.0" header.
+- [x] Decide `tpt-eng-examples` publish status (add `publish = false` if it
+      should not ship).
+- [x] Add `props-mixture` and `tpt-eng-props` to `NO_STD_CRATES`
+      (`xtask/src/main.rs:42`) and the CI wasm job.
+- [~] CHANGELOG: add a `[0.1.1]` section; confirm `rand_distr` is really unused (`rand_distr` is used by tolerance; release record added under Unreleased, the `[0.1.1]` heading waits for the release cut)
+      in `tpt-eng-tolerance`; add `homepage` to cad, gdt, geometry, mesh, nurbs,
+      reliability, safety, tolerance.
+- [x] Move `spec*.txt`, `history/`, `CRATE_AUDIT.md`, `PUBLISH_TRACKING.md`
+      into `docs/` (fix README / CHANGELOG links); check whether `.claude/` is
+      tracked.
+- [x] Fix README drift (says 43 crates, 44 exist); refresh stale LOC in
+      `CRATE_AUDIT.md`.
+
+### 11D — Adoption
+
+- [x] Umbrella `tpt-engineering` is `publish = false` but the docs tell users
+      to depend on it: publish it, or fix the docs. Add a `prelude`, bundle
+      features (`structural`, `fluids`, `electrical`, `controls-io`, `full`)
+      and `[package.metadata.docs.rs]` with `cfg(docsrs)` badges.
+- [~] `VALIDATION.md` + `tests/reference/*.csv` with a citation per value (`docs/VALIDATION.md` written; per-value CSV not written) (`docs/VALIDATION.md`; `tpt-eng-structural` has a CSV with six citations and a test; other crates are still inline tables)
+      (IAPWS-IF97 tables, ASHRAE psychrometrics, textbook beams, Incropera,
+      Weibull / S-N); run in CI.
+- [x] Doctests for the ~15 crates with none (plot, report, props, timeseries,
+      timeseries-core, tolerance, reliability, safety, mesh, nurbs, cad, gdt,
+      geo-asset, geotech, thermal-mgmt); CI check that each crate has one.
+- [~] Convert `tpt-eng-examples` scenarios to runnable `examples/` binaries (six runnable binaries; they print text, plots not yet) (all six scenarios write a report and an SVG chart to target/examples; a combined battery-storage scenario is not written)
+      grouped by workflow (HVAC, PV + battery, distillation, beam design, PCB
+      thermal, construction schedule), each emitting a report and a plot.
+- [x] mdbook cookbook with a "which crate do I need" decision flow, units guide
+      and no_std guide; deploy via GitHub Pages. (Sources in `docs/guide`, built by
+      CI. Pages deployment is still a manual repo setting.)
+- [ ] `cargo-generate` template repo (calc CLI, report generator, no_std
+      sensor node). Supersedes the open Phase 10 template item.
+- [~] CLI: `--json`, shell completions, `tpt-eng crates` / `recommend`, (`--json` for props; completions done; `crates`, `recommend`, file-driven commands not written) (`--json` for props; completions; `crates`, `recommend`, `calc beam-file` done; cargo-dist/binstall not)
+      file-driven commands (`tpt-eng beam --in beam.json --report out.html`),
+      cargo-dist / binstall binaries.
+
+### 11E — Automation
+
+- [~] CI: `cargo-semver-checks` (29 crates already published), `cargo-llvm-cov` (examples, doctest-check, each-feature, coverage, book jobs added; semver-checks waits for a version bump; Codecov, OS matrix, package dry-run not done) (examples, doctest-check, each-feature, coverage, book, package, OS-matrix test jobs; semver-checks waits for a version bump; Codecov not done)
+      + Codecov, `cargo-hack` feature powerset, macOS/Windows matrix, run the
+      examples, CLI smoke test, link check, `cargo package` dry-run.
+- [~] xtask: `crates-table` (generate README tables from Cargo metadata), (`pin-check`, `versions`, `link-check`, `doctest-check` done; `crates-table`, `coverage`, `bench` not) (`pin-check`, `versions`, `link-check`, `doctest-check`, `package-check` done; `crates-table`, `coverage`, `bench` not)
+      `pin-check` (workspace pins vs crate versions vs lockfile vs CHANGELOG),
+      `coverage`, `bench`; make `new-crate` register in the umbrella crate and
+      docs.
+- [~] proptest invariants for the numerics (monotonicity, round-trips, unit (proptest in electrical, tolerance, props-air; more crates and criterion benches not done) (proptest in electrical, tolerance, props-air, heat-transfer, unit-ops, reliability; criterion benches not done)
+      invariants); criterion benches for IF97, NURBS, mesh/SDF, schedule CPM.
+- [x] Cron `cargo-audit`; issue and PR templates; `CITATION.cff`; roadmap and (cron, issue templates, `CITATION.cff`, `docs/STABILITY.md` done; no PR template because external PRs are not accepted)
+      stability policy.
+
+### 11F — Innovation (stretch)
+
+- [x] `tpt-eng-py` Python bindings (pyo3 / maturin): water, air, fuels, controls
+      and structural bound in `tpt-eng-py`, with pytest coverage and a CI job.
+- [x] WASM browser demos: `tpt-eng-wasm` exposes steam tables, section
+      properties and a PID step-response tuner, with a static page in `www/` and
+      a Node smoke test in CI.
+- [~] Provenance-tagged results (`{source, standard, validity range,
+      warnings}`) so out-of-range correlation use is flagged, not silent. Pilot
+      done in `tpt-eng-provenance`, water and air `*_tagged` functions, and the
+      Python `Tagged` API. Still to do: the other props crates, and unifying the
+      three existing provenance types.
+- [~] Declarative calc-sheet format (TOML / YAML -> calc, report, plot) with a
+      JSON Schema, driven by the CLI. v1 done in `tpt-eng-sheet`: TOML and JSON
+      sheets, three calculations (`water-state`, `beam-udl`, `pid-step`), a
+      committed schema checked by a test, and `tpt-eng sheet run|schema`. Still
+      to do: YAML, plot output, and more calculation kinds.
+- [~] Auto-generated calc report (formulas, inputs, references, pass/fail) on
+      `tpt-eng-report` + `tpt-eng-standards`. v1 done: `tpt-eng-report` 0.1.1
+      `Calculation` builder, and the sheet calcs use `tpt-eng-standards`
+      `DemandCapacity` for pass/fail. Still to do: the generic calc report for
+      other crates (the checks in `tpt-eng-standards` are not yet wired in).
+- [~] MCP / LLM tool server exposing the CLI calcs with a units-checked schema.
+      v1 done in `tpt-eng-mcp`: a stdio MCP server with `run_sheet` (input schema
+      from `tpt-eng-sheet`) and `sheet_schema`. Still to do: the other CLI
+      calculations (beam file, tolerance, props lookups) as tools.
+- [~] Cross-crate `Model` trait / FMI-style co-simulation hook. v1 done in
+      `tpt-eng-cosim` (unpublished): a `Model` trait with named ports, a
+      fixed-step runner with explicit one-step coupling, and three models
+      (`Constant`, `FirstOrderLag`, `PidController`). Still to do: models from
+      the other domain crates, and a decision on whether the trait should be
+      shared with `tpt-eng-report` and the sheets.
+- [x] Notebooks: `crates/tpt-eng-py/notebooks/tour.ipynb` uses the Python
+      bindings. Its code cells were run end to end; the notebook is saved
+      without outputs.
+
+### Phase 11 status (current)
+
+Publish state from `cargo xtask versions` (see `docs/CRATE_VERSIONS.md`): all 43
+publishable crates are published and in sync. Seven are at `0.1.1`; the other 36
+are at `0.1.0`. `tpt-eng-py` and `tpt-engineering` are `publish = false`.
+
+Gates: `cargo xtask check` (fmt, clippy, deny, changelog, doctest, pin, link) and
+`cargo xtask package-check` (CI) are green. 521 workspace tests pass.
+
+Done in the latest pass:
+- CLI: `tpt-eng crates` and `tpt-eng recommend`, from a catalog that a unit test
+  keeps complete; `tpt-eng calc beam-file` for JSON beam analysis.
+- Examples: every scenario writes a Markdown report (PASS/FAIL statuses) and an
+  SVG chart to `target/examples/`.
+- Reference CSV (`tpt-eng-structural/tests/reference/beams.csv`), read by a test.
+- Property tests in six crates.
+- Bug fixed: McCabe–Thiele feed intersection (see CHANGELOG).
+- CI: OS matrix for tests (macOS not run locally), `package` job, `xtask
+  package-check`.
+- `xtask` `pin-check` / `versions` / `link-check` / `package-check`.
+
+Decisions kept from earlier passes: no MSRV pin, no PR template, `[0.1.1]`
+CHANGELOG heading waits for the release cut, and the `tpt-math-*` duplicate waits
+for the next release.
+
+Still open:
+- `cargo-semver-checks` in CI (waits for a version bump); Codecov upload.
+- `tpt-math-*` alignment (dependency upgrade).
+- CSV reference files for other crates; plots for CLI commands.
+- Umbrella prelude and `new-crate` registration in the umbrella.
+- `crates-table`, `coverage`, `bench` xtask commands; criterion benches.
+- `cargo-generate` template; cargo-dist/binstall.
+- 11F stretch: WASM demos, provenance-tagged results, calc-sheet format, calc
+  report generator, MCP server, co-simulation hook, notebooks.
+- `missing_docs` lint.
+- Python bindings for `air` and `fuels` are in progress in `tpt-eng-py`, which is
+  your work.
+- Registry flip (`planned` to `git`) in the external `tpt-rust-map` repo.

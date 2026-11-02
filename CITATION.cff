@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "tpt-engineering"
+abstract: >-
+  Small, single-purpose Rust crates for physical-systems engineering: fluid
+  properties (IAPWS-IF97, ASHRAE psychrometrics), time-series conditioning,
+  topology, controls, structural analysis, tolerancing, reliability, geometry
+  and CAD primitives, and domain component models.
+authors:
+  - name: "TPT Solutions"
+repository-code: "https://github.com/tpt-solutions/tpt-engineering"
+license: "MIT OR Apache-2.0"
+version: "0.1.0"
+date-released: "2026-08-15"
+keywords:
+  - engineering
+  - rust
+  - thermodynamics
+  - structural
+  - controls

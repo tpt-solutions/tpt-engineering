@@ -2,7 +2,18 @@
 //!
 //! Provides a serializable [`Report`] data model plus Markdown, HTML, and JSON (calculation
 //! trail) exporters, and validation helpers used to annotate results with a pass/warn/fail status.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_report::{to_markdown, Report};
+//!
+//! let report = Report::new("Beam check");
+//! let md = to_markdown(&report);
+//! assert!(md.contains("Beam check"));
+//! ```
 
+pub mod calculation;
 pub mod error;
 pub mod html;
 pub mod json;
@@ -10,6 +21,7 @@ pub mod markdown;
 pub mod model;
 pub mod validate;
 
+pub use calculation::{Calculation, Step};
 pub use error::{Error, Result};
 pub use model::{NamedValue, Report, ResultEntry, Section, Table, ValidationStatus};
 pub use validate::{validate_max, validate_min, validate_range};

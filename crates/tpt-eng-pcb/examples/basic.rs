@@ -24,7 +24,7 @@ fn main() {
         stackup.effective_dielectric_constant()
     );
 
-    // 50 Ω microstrip on 1.6 mm FR-4.
+    // Microstrip on 1.6 mm FR-4 (≈ 50 Ω needs w ≈ 2.9 mm).
     let z0 = microstrip_impedance(4.0e-3, 1.6e-3, 4.4, 35e-6);
     println!("Microstrip Z0     : {z0:.1} Ω (w=4.0 mm, h=1.6 mm, er=4.4)");
 

@@ -9,6 +9,16 @@
 //! thermal resistances in kelvin per watt (K/W), heat-transfer
 //! coefficients in watts per square metre per kelvin (W/(m²·K)), and
 //! volumetric flow rates in cubic metres per second (m³/s).
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_thermal_mgmt::fin_efficiency;
+//!
+//! // A fin with mL = 0.2 has efficiency tanh(0.2)/0.2 ≈ 0.987.
+//! let eta = fin_efficiency(10.0, 0.02);
+//! assert!((eta - 0.9869).abs() < 1e-4);
+//! ```
 
 use tpt_eng_heat_transfer::{parallel_resistances, series_resistances};
 

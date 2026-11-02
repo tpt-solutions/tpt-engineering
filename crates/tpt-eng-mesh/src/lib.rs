@@ -15,6 +15,23 @@
 //! `Point3` and `Vector3` are re-exported aliases over [`glam::Vec3`] (positions
 //! vs. directions); the crate builds on [`tpt_eng_geometry`] for the underlying
 //! geometric primitives.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_geometry::Point3;
+//! use tpt_eng_mesh::Mesh;
+//!
+//! // A single right triangle in the z = 0 plane.
+//! let tri = [
+//!     Point3::new(0.0, 0.0, 0.0),
+//!     Point3::new(1.0, 0.0, 0.0),
+//!     Point3::new(0.0, 1.0, 0.0),
+//! ];
+//! let mesh = Mesh::from_triangles(&[tri]);
+//! assert_eq!(mesh.face_count(), 1);
+//! assert_eq!(mesh.vertex_count(), 3);
+//! ```
 
 use std::collections::HashMap;
 

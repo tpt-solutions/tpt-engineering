@@ -14,6 +14,7 @@ categories = ["command-line-utilities", "science"]
 
 [dependencies]
 clap = { workspace = true }
+clap_complete = { workspace = true }
 anyhow = { workspace = true }
 serde_json = { workspace = true }
 tpt-math-units = { workspace = true }
@@ -28,6 +29,7 @@ tpt-eng-props-air = { workspace = true }
 tpt-eng-props-fuels = { workspace = true }
 tpt-eng-controls = { workspace = true }
 tpt-eng-tolerance = { workspace = true }
+tpt-eng-sheet = { workspace = true }
 rand = { workspace = true }
 
 [lints]

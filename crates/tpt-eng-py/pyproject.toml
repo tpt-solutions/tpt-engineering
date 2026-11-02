@@ -1,0 +1,24 @@
+[build-system]
+requires = ["maturin>=1.11,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "tpt-eng"
+version = "0.1.0"
+description = "Python bindings for tpt-engineering: applied engineering primitives."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT OR Apache-2.0"
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.maturin]
+module-name = "tpt_eng"
+features = ["pyo3/extension-module"]
+manifest-path = "Cargo.toml"

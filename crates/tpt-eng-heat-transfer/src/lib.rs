@@ -32,7 +32,10 @@
 use tpt_eng_props_air as air;
 use tpt_eng_props_water as water;
 use tpt_math_units::uom::si::f64::*;
-use tpt_math_units::uom::si::{pressure::pascal, thermodynamic_temperature::kelvin};
+use tpt_math_units::uom::si::{
+    pressure::pascal, specific_heat_capacity::kilojoule_per_kilogram_kelvin,
+    thermodynamic_temperature::kelvin,
+};
 
 /// Stefan–Boltzmann constant, W/(m²·K⁴).
 pub const SIGMA: f64 = 5.670_374_419e-8;
@@ -46,10 +49,28 @@ pub enum FlowRegime {
     Turbulent,
 }
 
+/// Precondition for every Nusselt correlation: Re and Pr must be positive and
+/// finite (a zero or negative dimensionless group has no physical meaning).
+fn check_re_pr(re: f64, pr: f64) {
+    assert!(
+        re.is_finite() && re > 0.0,
+        "Reynolds number must be positive and finite"
+    );
+    assert!(
+        pr.is_finite() && pr > 0.0,
+        "Prandtl number must be positive and finite"
+    );
+}
+
 /// Nusselt number for a flat plate (average over length `L`):
 /// * laminar: `Nu = 0.664·Re^½·Pr^(1/3)`
 /// * turbulent: `Nu = 0.037·Re^0.8·Pr^(1/3)` (valid Re ≳ 5·10⁵).
+///
+/// # Panics
+///
+/// Panics if `re` or `pr` is not positive and finite.
 pub fn nusselt_flat_plate(re: f64, pr: f64, regime: FlowRegime) -> f64 {
+    check_re_pr(re, pr);
     match regime {
         FlowRegime::Laminar => 0.664 * re.sqrt() * pr.powf(1.0 / 3.0),
         FlowRegime::Turbulent => 0.037 * re.powf(0.8) * pr.powf(1.0 / 3.0),
@@ -58,22 +79,46 @@ pub fn nusselt_flat_plate(re: f64, pr: f64, regime: FlowRegime) -> f64 {
 
 /// Nusselt number for a cylinder in cross-flow (Churchill–Bernstein, 1977),
 /// valid across the full Re/Pr range.
+///
+/// # Panics
+///
+/// Panics if `re` or `pr` is not positive and finite.
 pub fn nusselt_cylinder(re: f64, pr: f64) -> f64 {
+    check_re_pr(re, pr);
     let fpr = (1.0 + (0.4 / pr).powf(2.0 / 3.0)).powf(1.0 / 4.0);
     let num = 0.62 * re.sqrt() * pr.powf(1.0 / 3.0) / fpr;
     let corr = (1.0 + (re / 282_000.0).powf(5.0 / 8.0)).powf(4.0 / 5.0);
     0.3 + num * corr
 }
 
-/// Nusselt number for a sphere (Whitaker, 1972).
-pub fn nusselt_sphere(re: f64, pr: f64) -> f64 {
-    2.0 + (0.4 * re.sqrt() + 0.06 * re.powf(2.0 / 3.0)) * pr.powf(0.4)
-        / (1.0 + (0.4 / pr).powf(2.0 / 3.0)).powf(1.0 / 4.0)
+/// Nusselt number for a sphere (Whitaker, 1972):
+/// `Nu = 2 + (0.4·Re^½ + 0.06·Re^⅔)·Pr^0.4·(μ/μ_s)^¼`.
+///
+/// `viscosity_ratio` is `μ_∞ / μ_s`, the free-stream to surface dynamic
+/// viscosity ratio (use `1.0` when the properties are evaluated at the surface).
+/// Valid for `3.5 ≤ Re ≤ 7.6·10⁴`, `0.71 ≤ Pr ≤ 380`, and
+/// `0.25 ≤ μ/μ_s ≤ 5.2`; outside that range the result is an extrapolation.
+///
+/// # Panics
+///
+/// Panics if `re`, `pr` or `viscosity_ratio` is not positive and finite.
+pub fn nusselt_sphere(re: f64, pr: f64, viscosity_ratio: f64) -> f64 {
+    check_re_pr(re, pr);
+    assert!(
+        viscosity_ratio.is_finite() && viscosity_ratio > 0.0,
+        "viscosity ratio must be positive and finite"
+    );
+    2.0 + (0.4 * re.sqrt() + 0.06 * re.powf(2.0 / 3.0)) * pr.powf(0.4) * viscosity_ratio.powf(0.25)
 }
 
 /// Nusselt number for turbulent internal pipe flow (Dittus–Boelter).
 /// `heating = true` uses `Pr^0.4`, `false` uses `Pr^0.3`.
+///
+/// # Panics
+///
+/// Panics if `re` or `pr` is not positive and finite.
 pub fn nusselt_internal_pipe(re: f64, pr: f64, heating: bool) -> f64 {
+    check_re_pr(re, pr);
     let n = if heating { 0.4 } else { 0.3 };
     0.023 * re.powf(0.8) * pr.powf(n)
 }
@@ -168,19 +213,21 @@ pub fn water_saturation_pressure(t_k: f64) -> f64 {
     p.get::<pascal>()
 }
 
-/// Density (kg/m³) and specific heat (kJ/(kg·K)) of water at `t_k`, `p_pa`,
-/// via the [`tpt_eng_props_water`] IAPWS-IF97 `state`.
+/// Density (kg/m³) and isobaric specific heat cp (kJ/(kg·K)) of water at
+/// `t_k`, `p_pa`, via the [`tpt_eng_props_water`] IAPWS-IF97 `state`.
 ///
-/// # Panics
-///
-/// Panics if the requested state is outside the IAPWS-IF97 supported range.
-pub fn water_film_properties(t_k: f64, p_pa: f64) -> (f64, f64) {
+/// Returns `None` when the state is outside the supported IAPWS-IF97 range
+/// (e.g. below 273.15 K or in the unsupported near-critical Region 3).
+pub fn water_film_properties(t_k: f64, p_pa: f64) -> Option<(f64, f64)> {
     let s = water::state(
         ThermodynamicTemperature::new::<kelvin>(t_k),
         Pressure::new::<pascal>(p_pa),
     )
-    .expect("water state within IAPWS-IF97 supported range");
-    (s.density.value, s.enthalpy) // enthalpy is kJ/kg (≈ cp·ΔT for liquid)
+    .ok()?;
+    let cp = s
+        .isobaric_heat_capacity
+        .get::<kilojoule_per_kilogram_kelvin>();
+    Some((s.density.value, cp))
 }
 
 #[cfg(test)]
@@ -255,10 +302,35 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected = "Reynolds number must be positive")]
+    fn nusselt_rejects_zero_reynolds() {
+        let _ = nusselt_cylinder(0.0, 0.7);
+    }
+
+    #[test]
+    #[should_panic(expected = "Prandtl number must be positive")]
+    fn nusselt_rejects_negative_prandtl() {
+        let _ = nusselt_internal_pipe(1.0e4, -0.7, true);
+    }
+
+    #[test]
+    fn sphere_whitaker_viscosity_term() {
+        // Re = 1000, Pr = 0.7: Nu = 2 + (0.4·31.62 + 0.06·100)·0.7^0.4 ≈ 18.17.
+        let nu = nusselt_sphere(1000.0, 0.7, 1.0);
+        assert!((nu - 18.17).abs() < 0.05, "nu = {nu}");
+        // Gas heated (μ_∞ > μ_s) raises Nu via the viscosity-ratio term.
+        assert!(nusselt_sphere(1000.0, 0.7, 2.0) > nu);
+    }
+
+    #[test]
     fn props_integration() {
         // p_sat(373 K) ≈ 101.3 kPa.
         assert!((water_saturation_pressure(373.15) - 101_325.0).abs() < 2000.0);
-        let (rho, _h) = water_film_properties(300.0, 3.0e6);
+        let (rho, cp) = water_film_properties(300.0, 3.0e6).unwrap();
         assert!(rho > 900.0 && rho < 1050.0);
+        // Liquid water cp ≈ 4.1–4.2 kJ/(kg·K) near room temperature.
+        assert!(cp > 4.0 && cp < 4.3, "cp = {cp}");
+        // Below the IAPWS-IF97 domain: None rather than a panic.
+        assert!(water_film_properties(200.0, 3.0e6).is_none());
     }
 }

@@ -10,7 +10,7 @@ ideal-gas + residual Gibbs), and Region 4 (saturation line, closed-form
 out of scope for `v0.1.0`; states that fall in Region 3 return
 [`Error::Region3Unsupported`].
 
-All quantities are [`uom`](tpt_math_units)-typed: temperature in kelvin, pressure
+All quantities are [`uom`](https://docs.rs/uom)-typed: temperature in kelvin, pressure
 in pascals, volume/energy/entropy in SI base units (m³/kg, J/kg, J/(kg·K)).
 
 ## Features
