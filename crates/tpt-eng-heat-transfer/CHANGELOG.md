@@ -11,8 +11,10 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 - **Breaking:** `nusselt_sphere` takes a third argument, `viscosity_ratio`, for the
   Whitaker `(μ/μ_s)^¼` term. `cargo semver-checks` reports `function_parameter_count_changed`.
-  Under the pre-1.0 rules in `docs/STABILITY.md` this needs a minor bump, so the release
-  is 0.2.0, not 0.1.1.
+- **Breaking:** `water_film_properties` returns `Option<(f64, f64)>`, not `(f64, f64)`.
+  `cargo semver-checks` did not report this change.
+- Under the pre-1.0 rules in `docs/STABILITY.md` both changes need a minor bump, so the
+  release is 0.2.0, not 0.1.1. The signature check in `scripts/pub_api_diff.py` finds both.
 
 ### Fixed
 

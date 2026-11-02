@@ -5,6 +5,16 @@ All notable changes to this crate will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- `monte_carlo` no longer panics on a zero-width tolerance. Such a dimension samples its
+  nominal value. Previously the uniform sampler was asked for an empty interval.
+- `monte_carlo` checks that every nominal and tolerance bound is finite before sampling.
+  A non-finite input still panics, now with a documented message. Inverted bounds cannot
+  occur: `DimTol::asymmetric` takes absolute values.
+
 ## [0.1.1] - 2026-08-20
 
 ### Added

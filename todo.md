@@ -731,9 +731,12 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
       `a`.
 - [x] `tpt-eng-reliability` `miners_rule`: `nf <= 0` counts as zero damage —
       should be infinite or an error.
-- [x] `tpt-eng-tolerance` (`Uniform::new(...).expect`, lines ~136/206) panics on
-      NaN / inverted bounds; `tpt-eng-mesh` binary STL parser (~453-485):
-      confirm length validation precedes the `try_into().unwrap()` calls.
+- [x] `tpt-eng-tolerance` `monte_carlo`: a zero-width tolerance no longer panics.
+      Non-finite input is a documented panic. Inverted bounds cannot occur
+      (`asymmetric` takes absolute values). The "`Uniform`" in the original note is
+      `rand_distr::Uniform`, an external type, not a type in this workspace.
+      `tpt-eng-mesh` binary STL: the length check, including overflow, already
+      precedes the unwraps in 0.1.0, so no change was needed.
 
 ### 11B — API consistency (needs a design decision)
 
