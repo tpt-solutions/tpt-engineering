@@ -8,6 +8,7 @@ members = [
     "crates/tpt-eng-provenance",
     "crates/tpt-eng-wasm",
     "crates/tpt-eng-sheet",
+    "crates/tpt-eng-mcp",
     "crates/tpt-eng-timeseries-core",
     "crates/tpt-eng-timeseries-align",
     "crates/tpt-eng-timeseries-gap",

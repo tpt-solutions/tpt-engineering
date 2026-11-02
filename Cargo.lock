@@ -1180,6 +1180,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "tpt-eng-mcp"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "tpt-eng-report",
+ "tpt-eng-sheet",
+]
+
+[[package]]
 name = "tpt-eng-mesh"
 version = "0.1.0"
 dependencies = [

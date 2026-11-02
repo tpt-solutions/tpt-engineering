@@ -1,0 +1,26 @@
+[package]
+name = "tpt-eng-mcp"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Model Context Protocol server exposing tpt-engineering calculation sheets as tools."
+readme = "README.md"
+keywords = ["engineering", "mcp", "llm", "tools"]
+categories = ["science", "command-line-utilities"]
+repository.workspace = true
+homepage.workspace = true
+# A server binary for MCP clients, not a library for crates.io.
+publish = false
+
+[[bin]]
+name = "tpt-eng-mcp"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = { workspace = true }
+tpt-eng-report = { workspace = true }
+tpt-eng-sheet = { workspace = true }
+
+[lints]
+workspace = true
