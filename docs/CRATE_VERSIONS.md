@@ -11,16 +11,16 @@ equal **Local** (`cargo xtask pin-check`, run by `cargo xtask check`).
 compares **Local** with it.
 - **Published versions** lists every release on the registry, newest first.
 
-45 publishable crates: 39 in sync, 4 local ahead of crates.io, 0 registry ahead, 2 unpublished.
+45 publishable crates: 45 in sync, 0 local ahead of crates.io, 0 registry ahead, 0 unpublished.
 
 | Crate | Local | Pin | crates.io | State | Published versions |
 |---|---|---|---|---|---|
-| `tpt-eng-props-water` | 0.1.1 | 0.1.1 | 0.1.0 | local ahead (unreleased) | 0.1.0 |
-| `tpt-eng-props-air` | 0.1.1 | 0.1.1 | 0.1.0 | local ahead (unreleased) | 0.1.0 |
+| `tpt-eng-props-water` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
+| `tpt-eng-props-air` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
 | `tpt-eng-props-fuels` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-props` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
-| `tpt-eng-provenance` | 0.1.0 | 0.1.0 | - | unpublished | - |
-| `tpt-eng-sheet` | 0.1.0 | 0.1.0 | - | unpublished | - |
+| `tpt-eng-provenance` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
+| `tpt-eng-sheet` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-timeseries-core` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-timeseries-align` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-timeseries-gap` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
@@ -28,8 +28,8 @@ compares **Local** with it.
 | `tpt-eng-geo-asset` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-geo-topology` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-network-matrix` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-controls` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-structural` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
+| `tpt-eng-controls` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
+| `tpt-eng-structural` | 0.1.2 | 0.1.2 | 0.1.2 | in sync | 0.1.2, 0.1.1, 0.1.0 |
 | `tpt-eng-materials` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-sections` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-standards` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
@@ -38,25 +38,25 @@ compares **Local** with it.
 | `tpt-eng-nurbs` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-gdt` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
 | `tpt-eng-cad` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
-| `tpt-eng-tolerance` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
-| `tpt-eng-reliability` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
+| `tpt-eng-tolerance` | 0.1.2 | 0.1.2 | 0.1.2 | in sync | 0.1.2, 0.1.1, 0.1.0 |
+| `tpt-eng-reliability` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
 | `tpt-eng-safety` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
 | `tpt-eng-io` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-report` | 0.1.1 | 0.1.1 | 0.1.0 | local ahead (unreleased) | 0.1.0 |
+| `tpt-eng-report` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
 | `tpt-eng-plot` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-cli` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-examples` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-electrical` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-heat-transfer` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-props-mixture` | 0.1.1 | 0.1.1 | 0.1.0 | local ahead (unreleased) | 0.1.0 |
-| `tpt-eng-pcb` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
+| `tpt-eng-cli` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
+| `tpt-eng-examples` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
+| `tpt-eng-electrical` | 0.2.0 | 0.2.0 | 0.2.0 | in sync | 0.2.0, 0.1.0 |
+| `tpt-eng-heat-transfer` | 0.2.0 | 0.2.0 | 0.2.0 | in sync | 0.2.0, 0.1.0 |
+| `tpt-eng-props-mixture` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
+| `tpt-eng-pcb` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
 | `tpt-eng-thermal-mgmt` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-power-components` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-renewables` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
+| `tpt-eng-power-components` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
+| `tpt-eng-renewables` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
 | `tpt-eng-vehicle-dynamics` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
 | `tpt-eng-biomech` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-unit-ops` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
+| `tpt-eng-unit-ops` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
 | `tpt-eng-crystallography` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-geotech` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
-| `tpt-eng-building-sys` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |
+| `tpt-eng-geotech` | 0.1.1 | 0.1.1 | 0.1.1 | in sync | 0.1.1, 0.1.0 |
+| `tpt-eng-building-sys` | 0.2.0 | 0.2.0 | 0.2.0 | in sync | 0.2.0, 0.1.0 |
 | `tpt-eng-schedule` | 0.1.0 | 0.1.0 | 0.1.0 | in sync | 0.1.0 |

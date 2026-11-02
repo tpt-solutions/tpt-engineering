@@ -18,6 +18,11 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 - Example code formatted with `cargo fmt` (no functional change).
 - Depends on `tpt-eng-provenance` 0.1.0.
 
+### Fixed
+
+- `saturation_pressure_water` uses the over-ice correlation (ASHRAE Eq. 5) below 273.15 K. Before, it used the liquid form there. At −10 °C it now gives about 259.9 Pa, where it gave about 286 Pa before. Values below 0 °C change.
+- `dew_point` returns `Error::TemperatureOutOfRange` when the vapour pressure lies outside the saturation pressure over 173.15–373.15 K. Before, it clamped to the bound of the search range.
+
 ## [0.1.0] - 2026-08-16
 
 ### Added

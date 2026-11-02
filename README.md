@@ -37,7 +37,7 @@ at `0.1.0`. The other 11 are at `0.1.1`: `tpt-eng-cad`, `-gdt`, `-props`, `-prop
 `-props-mixture`, `-props-water`, `-report`, `-safety`, `-standards`, `-structural` and
 `-tolerance`. Batches 1–5 covered the original 29 crates; Batches 6–8 covered the 14
 Phase-9 domain crates; Batches 9–10 added the republishes and the `provenance` and `sheet` crates. The batch plan and per-crate state live in
-[`RELEASE.md`](RELEASE.md) and [`docs/PUBLISH_TRACKING.md`](docs/PUBLISH_TRACKING.md).
+[`RELEASE.md`](RELEASE.md).
 The latest version of every crate, with its crates.io state, is in
 [`docs/CRATE_VERSIONS.md`](docs/CRATE_VERSIONS.md). Versioning rules are in
 [`docs/STABILITY.md`](docs/STABILITY.md).
@@ -45,7 +45,7 @@ The latest version of every crate, with its crates.io state, is in
 Per-crate publish state is kept consistent with those tracking docs by
 `cargo xtask publish-status` (also run as part of `cargo xtask check` in CI),
 which asserts the README/CHANGELOG counts and the pending-crate set against
-`Cargo.toml` / `RELEASE.md` / `docs/PUBLISH_TRACKING.md`.
+`Cargo.toml` / `RELEASE.md`.
 
 | Status | Crates | Source |
 |--------|--------|--------|

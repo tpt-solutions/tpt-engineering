@@ -849,9 +849,10 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
 
 ### Phase 11 status (current)
 
-Publish state from `cargo xtask versions` (see `docs/CRATE_VERSIONS.md`): all 43
-publishable crates are published and in sync. Seven are at `0.1.1`; the other 36
-are at `0.1.0`. `tpt-eng-py` and `tpt-engineering` are `publish = false`.
+Publish state from `cargo xtask versions` (see `docs/CRATE_VERSIONS.md`): all 45
+publishable `tpt-eng-*` crates are published and in sync, plus the umbrella
+`tpt-engineering` 0.1.0 (published 2026-11-03 as Batch 11). `tpt-eng-py`,
+`tpt-eng-wasm`, `tpt-eng-mcp` and `tpt-eng-cosim` are `publish = false`.
 
 Gates: `cargo xtask check` (fmt, clippy, deny, changelog, doctest, pin, link) and
 `cargo xtask package-check` (CI) are green. 521 workspace tests pass.

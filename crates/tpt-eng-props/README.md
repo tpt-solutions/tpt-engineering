@@ -63,7 +63,7 @@ assert!((fuels::Fuel::Methane.lhv_mj_kg() - 50.0).abs() < 1.0);
 
 ## Status
 
-Initial `0.1.0` release. `no_std`-capable.
+`0.1.1` re-exports `tpt-eng-props-mixture` as `mixture`. `no_std`-capable. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

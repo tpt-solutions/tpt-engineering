@@ -17,9 +17,8 @@
 //! * `doctest` / `doc` — run documentation tests, or build the docs.
 //! * `publish-status` (`changelog-check`) — assert the workspace's
 //!   human-facing release claims (root `README.md` / `CHANGELOG.md`) stay
-//!   consistent with ground truth in `Cargo.toml`, `RELEASE.md`, and
-//!   `docs/PUBLISH_TRACKING.md` (MSRV, published/unpublished crate counts, and the
-//!   pending-crate name set). Wired into `check` so CI catches this class of
+//!   consistent with ground truth in `Cargo.toml` and `RELEASE.md` (MSRV,
+//!   published/unpublished crate counts, and the pending-crate name set). Wired into `check` so CI catches this class of
 //!   staleness.
 //!
 //! This crate is intentionally dependency-free (pure `std`) so it always builds
@@ -420,8 +419,8 @@ fn render_crate_example_basic(name: &str) -> String {
 // ---------------------------------------------------------------------------
 
 /// Assert that the workspace's human-facing release claims (root `README.md`
-/// and `CHANGELOG.md`) stay consistent with ground truth in `Cargo.toml`,
-/// `RELEASE.md`, and `docs/PUBLISH_TRACKING.md`. This is the guard described in
+/// and `CHANGELOG.md`) stay consistent with ground truth in `Cargo.toml` and
+/// `RELEASE.md`. This is the guard described in
 /// `todo.md` Phase 10: it prevents the publish-status / MSRV claims from
 /// drifting out of sync with reality (the exact staleness class that
 /// previously slipped through). Doubles as the `publish-status` report.
@@ -432,7 +431,6 @@ fn changelog_check() -> Result<(), String> {
     let readme = read_text(&root.join("README.md"))?;
     let changelog = read_text(&root.join("CHANGELOG.md"))?;
     let release = read_text(&root.join("RELEASE.md"))?;
-    let publish_tracking = read_text(&root.join("docs/PUBLISH_TRACKING.md"))?;
 
     let mut errors: Vec<String> = Vec::new();
 
@@ -486,17 +484,6 @@ fn changelog_check() -> Result<(), String> {
         if !pending_in_release_set.contains(c.as_str()) {
             errors.push(format!(
                 "RELEASE.md does not list pending crate `{c}` as `[ ]`"
-            ));
-        }
-    }
-
-    // --- docs/PUBLISH_TRACKING.md covers every pending crate --------------------
-    let tracked = parse_publish_tracking_crates(&publish_tracking);
-    let tracked_set: std::collections::HashSet<&str> = tracked.iter().map(|s| s.as_str()).collect();
-    for c in &unpublished_new {
-        if !tracked_set.contains(c.as_str()) {
-            errors.push(format!(
-                "docs/PUBLISH_TRACKING.md does not list pending crate `{c}`"
             ));
         }
     }
@@ -698,23 +685,6 @@ fn parse_release_md_crates(md: &str, checked: bool) -> Vec<String> {
                 && !out.contains(&name.to_string())
             {
                 out.push(name.to_string());
-            }
-        }
-    }
-    out
-}
-
-fn parse_publish_tracking_crates(tracking: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    for l in tracking.lines() {
-        if let Some(pos) = l.find("cargo publish -p ") {
-            let after = &l[pos + "cargo publish -p ".len()..];
-            let name: String = after
-                .chars()
-                .take_while(|c| c.is_ascii_alphanumeric() || *c == '-')
-                .collect();
-            if !name.is_empty() && !out.contains(&name) {
-                out.push(name);
             }
         }
     }

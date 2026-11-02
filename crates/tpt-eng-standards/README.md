@@ -105,8 +105,8 @@ beam/section checks.
 
 ## Status
 
-Initial `0.1.0` release. Contains no copyrighted standard text; all factors,
-combinations, and factor sets are plain user-supplied data.
+`0.1.1` adds the `basic` and `combination_envelope` examples. Contains no copyrighted standard text; all factors,
+combinations, and factor sets are plain user-supplied data. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

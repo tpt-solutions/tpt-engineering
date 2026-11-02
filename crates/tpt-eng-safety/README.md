@@ -53,7 +53,7 @@ The crate root also re-exports `utilization`, `margin`, `safety_factor`,
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.1` adds the `basic` and `pressure_vessel` examples. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

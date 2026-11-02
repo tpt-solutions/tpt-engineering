@@ -196,9 +196,9 @@ until a version bump + republish. Published in dependency order:
 > than bumping `[workspace.package].version`, to avoid dragging every other
 > crate's version along.
 
-> See `docs/PUBLISH_TRACKING.md` for the working checklist with exact `cargo publish`
-> commands for this round (Batches 6–9 were added 2026-08-19/20, after the
-> workspace grew from 29 to 43 `tpt-eng-*` crates).
+> Batches 6–9 were added 2026-08-19/20, after the workspace grew from 29 to 43
+> `tpt-eng-*` crates. The working checklist for those batches was
+> `docs/PUBLISH_TRACKING.md`, now deleted. This file is the record.
 
 ---
 
@@ -222,7 +222,27 @@ add `*_tagged` functions. `tpt-eng-sheet` depends on all of these, so it went la
 
 `tpt-eng-cli` is already published, but its `sheet` subcommand depends on
 `tpt-eng-sheet`. Release a new `tpt-eng-cli` version after `tpt-eng-sheet` is live.
-This is still outstanding.
+Published as `0.1.1` on 2026-11-03, after `structural` 0.1.2 went live (see Batch 11).
+
+### Batch 11 — fixes from Phase 11A, and the umbrella crate — RELEASED 2026-11-03
+
+Published in dependency order. Versions are the crates.io versions after the batch.
+
+- Level 0: `tpt-eng-electrical` **0.1.0 → 0.2.0** (breaking: `three_phase_power` returns `Option`), `tpt-eng-controls` 0.1.0 → 0.1.1, `tpt-eng-reliability` 0.1.0 → 0.1.1, `tpt-eng-geotech` 0.1.0 → 0.1.1, `tpt-eng-tolerance` 0.1.1 → 0.1.2
+- Level 1: `tpt-eng-heat-transfer` **0.1.0 → 0.2.0** (breaking: `nusselt_sphere` takes `viscosity_ratio`, `water_film_properties` returns `Option`), `tpt-eng-pcb` 0.1.0 → 0.1.1, `tpt-eng-power-components` 0.1.0 → 0.1.1, `tpt-eng-renewables` 0.1.0 → 0.1.1, `tpt-eng-structural` 0.1.1 → 0.1.2, `tpt-eng-unit-ops` 0.1.0 → 0.1.1
+- Level 2: `tpt-eng-building-sys` **0.1.0 → 0.2.0** (breaking: `three_phase_current_to_power_w` returns `Option<f64>`; not in the original plan), `tpt-eng-examples` 0.1.0 → 0.1.1 (seven new scenario functions), `tpt-eng-cli` 0.1.0 → 0.1.1 (`sheet run` / `sheet schema`)
+- Umbrella: `tpt-engineering` 0.1.0 (new crate name; published last)
+
+Not republished: `tpt-eng-safety` (doc-test examples only), `tpt-eng-thermal-mgmt` (no public API change), `tpt-eng-mesh`, `tpt-eng-io`, `tpt-eng-plot`, `tpt-eng-timeseries*`, `tpt-eng-cad`, `tpt-eng-gdt`, `tpt-eng-standards`.
+
+> Dry runs were run for the level 0 crates and the umbrella, and all passed. Levels 1 and 2 were
+> not dry-run separately. `cargo publish` ran its own verify build for each one, and every one passed.
+> The publishes used `--allow-dirty`, so crates.io matches the working tree, not a commit.
+>
+> The `tpt-eng-props-air` 0.1.1 CHANGELOG entry did not mention the Phase 11A fixes (over-ice
+> saturation pressure and the dew-point range check). Its published source already contains them.
+> The entry is now corrected in the repository. The copy on crates.io keeps the old text until
+> the next `tpt-eng-props-air` release.
 
 ## 5. Post-release checklist
 
