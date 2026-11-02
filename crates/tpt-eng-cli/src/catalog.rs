@@ -240,6 +240,11 @@ pub const CATALOG: &[Entry] = &[
         ],
     },
     Entry {
+        name: "tpt-eng-provenance",
+        summary: "Provenance and validity-range tags for engineering results.",
+        keywords: &["engineering", "provenance", "validity", "correlation"],
+    },
+    Entry {
         name: "tpt-eng-reliability",
         summary: "Reliability and life analysis: fatigue, life prediction, failure rates, FMEA, probabilistic design.",
         keywords: &[
@@ -298,6 +303,11 @@ pub const CATALOG: &[Entry] = &[
             "mechanics",
             "geometry",
         ],
+    },
+    Entry {
+        name: "tpt-eng-sheet",
+        summary: "Declarative calculation sheets: a TOML or JSON file names a calculation and its inputs, and produces a report.",
+        keywords: &["engineering", "calculation", "toml", "report", "schema"],
     },
     Entry {
         name: "tpt-eng-standards",
