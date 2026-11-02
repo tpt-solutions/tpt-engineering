@@ -7,8 +7,11 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-03
+
 ### Changed
 
+- **Breaking:** `three_phase_current_to_power_w` returns `Option<f64>`, not `f64`, because `tpt-eng-electrical` 0.2.0 rejects non-finite and out-of-range inputs. Pre-1.0 rules make this a minor bump.
 - Example code formatted with `cargo fmt` (no functional change).
 
 ## [0.1.0] - 2026-08-19

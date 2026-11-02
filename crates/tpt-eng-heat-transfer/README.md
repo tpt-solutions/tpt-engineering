@@ -70,7 +70,7 @@ assert!(h > 3.0 && h < 6.0);
 
 ## Status
 
-Initial `0.1.0` release.
+`0.2.0` is a breaking release: `nusselt_sphere` takes a `viscosity_ratio` argument, and `water_film_properties` returns `Option`. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

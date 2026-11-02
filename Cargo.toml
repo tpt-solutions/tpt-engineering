@@ -120,8 +120,8 @@ plotters = { version = "0.3", default-features = false, features = ["svg_backend
 clap = { version = "4.5", features = ["derive", "cargo"] }
 anyhow = "1.0"
 
-tpt-eng-electrical = { version = "0.1.0", path = "crates/tpt-eng-electrical" }
-tpt-eng-heat-transfer = { version = "0.1.0", path = "crates/tpt-eng-heat-transfer" }
+tpt-eng-electrical = { version = "0.2.0", path = "crates/tpt-eng-electrical" }
+tpt-eng-heat-transfer = { version = "0.2.0", path = "crates/tpt-eng-heat-transfer" }
 tpt-eng-props-mixture = { version = "0.1.1", path = "crates/tpt-eng-props-mixture" }
 tpt-eng-pcb = { version = "0.1.0", path = "crates/tpt-eng-pcb" }
 tpt-eng-thermal-mgmt = { version = "0.1.0", path = "crates/tpt-eng-thermal-mgmt" }

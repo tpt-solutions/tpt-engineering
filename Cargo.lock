@@ -1013,7 +1013,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-building-sys"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "tpt-eng-electrical",
  "tpt-eng-heat-transfer",
@@ -1079,7 +1079,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-electrical"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "proptest",
  "tpt-math-numeric",
@@ -1156,7 +1156,7 @@ dependencies = [
 
 [[package]]
 name = "tpt-eng-heat-transfer"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "proptest",
  "tpt-eng-props-air",

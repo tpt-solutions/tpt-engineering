@@ -78,7 +78,7 @@ assert!(d > 0.0);
 
 ## Status
 
-Initial `0.1.0` release.
+`0.2.0` is a breaking release: `three_phase_current_to_power_w` returns `Option<f64>`. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

@@ -63,7 +63,7 @@ assert!((pu.base_impedance() - 529.0).abs() < 1e-6);
 
 ## Status
 
-Initial `0.1.0` release.
+`0.2.0` is a breaking release: `three_phase_power` returns `Option` and takes a signed power factor (negative = leading). See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

@@ -7,6 +7,8 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-03
+
 ### Changed
 
 - **Breaking:** `nusselt_sphere` takes a third argument, `viscosity_ratio`, for the

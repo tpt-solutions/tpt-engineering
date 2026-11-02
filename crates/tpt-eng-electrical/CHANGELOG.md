@@ -7,6 +7,8 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-03
+
 ### Changed
 
 - **Breaking:** `three_phase_power` returns `Option<(f64, f64)>`, not `(f64, f64)`,
