@@ -12,6 +12,7 @@ mod controls;
 mod materials;
 mod props;
 mod sections;
+mod sheet;
 mod tolerance;
 mod units;
 
@@ -49,6 +50,8 @@ enum Command {
     Pid(controls::PidArgs),
     /// Dimensional tolerance stack-up analysis.
     Tolerance(tolerance::ToleranceArgs),
+    /// Run declarative calculation sheets (TOML or JSON), or print their schema.
+    Sheet(sheet::SheetArgs),
     /// List the publishable tpt-eng crates, optionally filtered by words.
     Crates {
         /// Words to match in the name, summary or keywords.
@@ -208,6 +211,7 @@ fn main() -> Result<()> {
         Command::Props(args) => props::run(args, json),
         Command::Pid(args) => controls::run(args),
         Command::Tolerance(args) => tolerance::run(args),
+        Command::Sheet(args) => sheet::run_sheet(args, json),
         Command::Crates { filter } => {
             print_catalog(&catalog::search(&filter.join(" ")));
             Ok(())
