@@ -24,5 +24,8 @@ default = ["std"]
 std = ["tpt-math-units/std", "tpt-math-numeric/std"]
 alloc = ["tpt-math-units/alloc", "tpt-math-numeric/alloc"]
 
+[dev-dependencies]
+proptest = { workspace = true }
+
 [lints]
 workspace = true

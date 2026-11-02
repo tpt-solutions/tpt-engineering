@@ -17,6 +17,7 @@ tpt-math-stats.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]
+proptest = { workspace = true }
 approx.workspace = true
 
 [lints]
