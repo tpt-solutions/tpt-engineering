@@ -4,8 +4,8 @@ Fuel properties for energy and combustion calculations: lower/higher heating
 values, density, stoichiometric air–fuel ratio, and CO₂ emission factors for
 natural gas, hydrogen, hydrogen–natural-gas blends, and diesel. `no_std`-capable.
 
-Heating values are plain `f64` in MJ/kg; density is [`uom`](tpt_math_units)-typed
-[`MassDensity`](tpt_math_units::uom::si::f64). Properties are literature-typical
+Heating values are plain `f64` in MJ/kg; density is [`uom`](https://docs.rs/uom)-typed
+[`MassDensity`](https://docs.rs/uom). Properties are literature-typical
 values (not vendor data) for steady-state combustion screening.
 
 ## Features

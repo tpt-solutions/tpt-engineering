@@ -1,10 +1,10 @@
 # tpt-eng-network-matrix
 
 Automated generation of network matrices from an infrastructure
-[`Topology`](tpt_eng_geo_topology::Topology) graph: the reduced incidence matrix
+`Topology` graph: the reduced incidence matrix
 `A` and the nodal admittance (Laplacian) matrix `Y`, returned as in-house
-[`DMatrix`](tpt_math_linalg::tpt_math_linalg_dense::DMatrix) from
-[`tpt-math-linalg`](tpt_math_linalg).
+[`DMatrix`](https://docs.rs/uom) from
+[`tpt-math-linalg`](https://docs.rs/uom).
 
 ## Features
 
