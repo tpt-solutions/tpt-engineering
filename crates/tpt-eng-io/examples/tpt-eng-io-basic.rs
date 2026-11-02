@@ -1,6 +1,6 @@
 //! tpt-eng-io basic usage: JSON, CSV, and STL round-trips to a temp directory.
 //!
-//! Run with: `cargo run --example basic -p tpt-eng-io`
+//! Run with: `cargo run --example tpt-eng-io-basic -p tpt-eng-io`
 
 use serde::{Deserialize, Serialize};
 

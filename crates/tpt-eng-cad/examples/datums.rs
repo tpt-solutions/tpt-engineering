@@ -4,7 +4,7 @@
 //!
 //! The bore is represented here as a *probe* volume (a cylinder used for
 //! inspection sampling) rather than a subtracted void: the in-crate `difference`
-//! is not exercised (see `basic.rs` for why). The datum frame A (flange face)
+//! is not exercised (see `tpt-eng-cad-basic.rs` for why). The datum frame A (flange face)
 //! and B (bore axis) are derived from the CAD geometry and used to check a
 //! position tolerance on the bore centerline.
 //!

@@ -1,7 +1,7 @@
 //! Basic `tpt-eng-materials` usage: the three property forms, material queries,
 //! and a small library with provenance tracking.
 //!
-//! Run with `cargo run -p tpt-eng-materials --example basic`.
+//! Run with `cargo run -p tpt-eng-materials --example tpt-eng-materials-basic`.
 
 use std::collections::BTreeMap;
 

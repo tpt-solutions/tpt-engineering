@@ -4,7 +4,7 @@
 //!
 //! Linear values are millimetres.
 //!
-//! Run with `cargo run -p tpt-eng-gdt --example basic`.
+//! Run with `cargo run -p tpt-eng-gdt --example tpt-eng-gdt-basic`.
 
 use tpt_eng_gdt::{
     Datum, DatumReference, DatumReferenceFrame, GeometricCharacteristic, Limits, MaterialCondition,

@@ -10,7 +10,7 @@
 //! Chebyshev-style field, so subtracted voids are not reproduced here. Material
 //! *addition* (union/intersection) is exact and is what this example exercises.
 //!
-//! Run with `cargo run -p tpt-eng-cad --example basic`.
+//! Run with `cargo run -p tpt-eng-cad --example tpt-eng-cad-basic`.
 
 use std::boxed::Box as Heap;
 

@@ -4,7 +4,7 @@
 //! The crate ships no code tables — every factor below is data the engineer
 //! enters. Demands here are bending moments in kN*m.
 //!
-//! Run with `cargo run -p tpt-eng-standards --example basic`.
+//! Run with `cargo run -p tpt-eng-standards --example tpt-eng-standards-basic`.
 
 use std::collections::HashMap;
 

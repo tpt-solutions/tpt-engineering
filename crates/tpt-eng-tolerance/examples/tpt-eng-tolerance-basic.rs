@@ -4,7 +4,7 @@
 //!
 //! All dimensions are millimetres.
 //!
-//! Run with `cargo run -p tpt-eng-tolerance --example basic`.
+//! Run with `cargo run -p tpt-eng-tolerance --example tpt-eng-tolerance-basic`.
 
 use rand::SeedableRng;
 use rand::rngs::StdRng;

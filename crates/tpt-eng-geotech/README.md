@@ -36,6 +36,6 @@ let q_ult = terzaghi_ultimate_bearing_capacity(5_000.0, 28.0, 19_000.0, 2.0, 1.0
 assert!(q_ult > tau_f);
 ```
 
-Run the bundled example with `cargo run -p tpt-eng-geotech --example basic`.
+Run the bundled example with `cargo run -p tpt-eng-geotech --example tpt-eng-geotech-basic`.
 
 Dual-licensed under MIT OR Apache-2.0.

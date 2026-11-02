@@ -2,7 +2,7 @@
 //! `uom`-typed loads, read reactions / shear / bending moment, and run an
 //! allowable-stress section check.
 //!
-//! Run with `cargo run -p tpt-eng-structural --example basic`.
+//! Run with `cargo run -p tpt-eng-structural --example tpt-eng-structural-basic`.
 
 use tpt_eng_structural::{Beam, Load, SectionCheck};
 use tpt_math_units::uom::si::f64::{Force, Length, Pressure, Torque, Volume};

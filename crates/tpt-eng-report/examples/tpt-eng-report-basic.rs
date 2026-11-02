@@ -1,6 +1,6 @@
 //! tpt-eng-report basic usage: build a report and export Markdown/HTML/JSON.
 //!
-//! Run with: `cargo run --example basic -p tpt-eng-report`
+//! Run with: `cargo run --example tpt-eng-report-basic -p tpt-eng-report`
 
 use tpt_eng_report::{
     NamedValue, Report, ResultEntry, to_markdown, write_html, write_json, write_markdown,

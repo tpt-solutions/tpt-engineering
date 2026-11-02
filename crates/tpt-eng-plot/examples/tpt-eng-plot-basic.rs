@@ -2,7 +2,7 @@
 //!
 //! Outputs are written to the temp directory as PNG and SVG (no GUI is opened).
 //!
-//! Run with: `cargo run --example basic -p tpt-eng-plot`
+//! Run with: `cargo run --example tpt-eng-plot-basic -p tpt-eng-plot`
 
 use tpt_eng_plot::{Drawing, ResultChart, SectionDrawing, SectionShape, XyPlot, XySeries};
 

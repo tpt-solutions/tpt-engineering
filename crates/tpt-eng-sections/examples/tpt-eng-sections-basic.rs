@@ -4,7 +4,7 @@
 //! All values are in consistent units — millimetres here, so areas are mm^2,
 //! second moments mm^4, and moduli mm^3.
 //!
-//! Run with `cargo run -p tpt-eng-sections --example basic`.
+//! Run with `cargo run -p tpt-eng-sections --example tpt-eng-sections-basic`.
 
 use tpt_eng_sections::{Circle, Rectangle, Section, SectionProperties, Tube};
 

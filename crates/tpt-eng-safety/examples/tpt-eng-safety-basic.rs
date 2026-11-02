@@ -4,7 +4,7 @@
 //! Every quantity is backed by a real `tpt-math-units` (uom) SI value, so the
 //! numbers you print are genuine pascals and metres.
 //!
-//! Run with `cargo run -p tpt-eng-safety --example basic`.
+//! Run with `cargo run -p tpt-eng-safety --example tpt-eng-safety-basic`.
 
 use tpt_eng_safety::{ApplicationClass, Limit, Quantity, evaluate_limit, max_limit, min_limit};
 use tpt_math_units::uom::si::f64::{Length, Pressure};
