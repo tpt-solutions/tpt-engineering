@@ -33,7 +33,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod tagged;
-pub use tagged::pr_saturation_pressure_tagged;
+pub use tagged::{bubble_point_tagged, dew_point_tagged, pr_saturation_pressure_tagged};
 
 const PI: f64 = core::f64::consts::PI;
 
