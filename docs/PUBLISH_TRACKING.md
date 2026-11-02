@@ -83,8 +83,9 @@ trail.
 ## Batch 10 — tagged results and calc sheets
 
 Mirrors Batch 10 in `RELEASE.md`. `tpt-eng-provenance` has no dependencies.
-`tpt-eng-sheet` must follow it.
+`tpt-eng-report` 0.1.1 must be live before `tpt-eng-sheet`.
 
+- [ ] `tpt-eng-report` 0.1.1 (republish) — `cargo publish -p tpt-eng-report`
 - [ ] `tpt-eng-provenance` — `cargo publish -p tpt-eng-provenance`
 - [ ] `tpt-eng-sheet` — `cargo publish -p tpt-eng-sheet`
 

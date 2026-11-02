@@ -823,8 +823,11 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
       sheets, three calculations (`water-state`, `beam-udl`, `pid-step`), a
       committed schema checked by a test, and `tpt-eng sheet run|schema`. Still
       to do: YAML, plot output, and more calculation kinds.
-- [ ] Auto-generated calc report (formulas, inputs, references, pass/fail) on
-      `tpt-eng-report` + `tpt-eng-standards`.
+- [~] Auto-generated calc report (formulas, inputs, references, pass/fail) on
+      `tpt-eng-report` + `tpt-eng-standards`. v1 done: `tpt-eng-report` 0.1.1
+      `Calculation` builder, and the sheet calcs use `tpt-eng-standards`
+      `DemandCapacity` for pass/fail. Still to do: the generic calc report for
+      other crates (the checks in `tpt-eng-standards` are not yet wired in).
 - [ ] MCP / LLM tool server exposing the CLI calcs with a units-checked schema.
 - [ ] Cross-crate `Model` trait / FMI-style co-simulation hook.
 - [ ] Notebooks (evcxr or Python bindings).

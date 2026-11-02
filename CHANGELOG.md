@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `tpt-eng-sheet` (new, pending publication — Batch 10): declarative calculation
   sheets in TOML or JSON. Three calculations (`water-state`, `beam-udl`,
   `pid-step`), a committed JSON Schema, and `tpt-eng sheet run|schema` in the CLI.
+  Each report lists its inputs, the formula for every step, references, and
+  pass/fail with an overall status.
+- `tpt-eng-report` 0.1.1: `Calculation` and `Step` build a calculation report
+  (inputs, formula table, results with overall status, references, notes) from
+  the existing section types, so the renderers are unchanged.
 - `tpt-eng-cli`: `sheet run <file>` and `sheet schema` subcommands.
 - `tpt-eng-provenance` (new, pending publication — Batch 10): `Tagged<T>`,
   `Provenance`, `Validity`, `Source` and a `Warnings` bitset, for results that
