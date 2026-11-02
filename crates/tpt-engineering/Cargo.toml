@@ -55,6 +55,8 @@ tpt-eng-schedule = { workspace = true, optional = true }
 
 [features]
 default = []
+# Every domain crate. Use this to get the whole toolkit behind one dependency.
+full = ["props-water", "props-air", "props-fuels", "props", "timeseries-core", "timeseries-align", "timeseries-gap", "timeseries", "geo-asset", "geo-topology", "network-matrix", "controls", "structural", "materials", "sections", "standards", "geometry", "mesh", "nurbs", "gdt", "cad", "tolerance", "reliability", "safety", "io", "report", "plot", "examples", "electrical", "heat-transfer", "props-mixture", "pcb", "thermal-mgmt", "power-components", "renewables", "vehicle-dynamics", "biomech", "unit-ops", "crystallography", "geotech", "building-sys", "schedule"]
 props-water = ["tpt-eng-props-water"]
 props-air = ["tpt-eng-props-air"]
 props-fuels = ["tpt-eng-props-fuels"]
@@ -100,3 +102,6 @@ schedule = ["tpt-eng-schedule"]
 
 [lints]
 workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
