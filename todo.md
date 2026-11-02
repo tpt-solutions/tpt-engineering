@@ -818,8 +818,11 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
       done in `tpt-eng-provenance`, water and air `*_tagged` functions, and the
       Python `Tagged` API. Still to do: the other props crates, and unifying the
       three existing provenance types.
-- [ ] Declarative calc-sheet format (TOML / YAML -> calc, report, plot) with a
-      JSON Schema, driven by the CLI.
+- [~] Declarative calc-sheet format (TOML / YAML -> calc, report, plot) with a
+      JSON Schema, driven by the CLI. v1 done in `tpt-eng-sheet`: TOML and JSON
+      sheets, three calculations (`water-state`, `beam-udl`, `pid-step`), a
+      committed schema checked by a test, and `tpt-eng sheet run|schema`. Still
+      to do: YAML, plot output, and more calculation kinds.
 - [ ] Auto-generated calc report (formulas, inputs, references, pass/fail) on
       `tpt-eng-report` + `tpt-eng-standards`.
 - [ ] MCP / LLM tool server exposing the CLI calcs with a units-checked schema.

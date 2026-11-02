@@ -80,12 +80,13 @@ functional or public-API change, so **no version bump or republish is
 needed** for those; the `[Unreleased]` note exists purely for the audit
 trail.
 
-## Batch 10 — tagged results
+## Batch 10 — tagged results and calc sheets
 
-Mirrors Batch 10 in `RELEASE.md`. It has no dependencies, so it can be published
-at any time.
+Mirrors Batch 10 in `RELEASE.md`. `tpt-eng-provenance` has no dependencies.
+`tpt-eng-sheet` must follow it.
 
 - [ ] `tpt-eng-provenance` — `cargo publish -p tpt-eng-provenance`
+- [ ] `tpt-eng-sheet` — `cargo publish -p tpt-eng-sheet`
 
 ## Post-publish
 

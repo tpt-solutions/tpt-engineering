@@ -202,11 +202,16 @@ until a version bump + republish. Published in dependency order:
 
 ---
 
-### Batch 10 — tagged results (after Batch 9)
+### Batch 10 — tagged results and calc sheets (after Batch 9)
 
-Has no dependencies, so it can be published at any time.
+Publish in this order. `tpt-eng-provenance` has no dependencies. `tpt-eng-sheet`
+depends on `tpt-eng-provenance`, so it must follow it on crates.io.
 
 - [ ] `tpt-eng-provenance` — `cargo publish -p tpt-eng-provenance`
+- [ ] `tpt-eng-sheet` — `cargo publish -p tpt-eng-sheet` (after `tpt-eng-provenance`)
+
+`tpt-eng-cli` is already published, but its `sheet` subcommand depends on
+`tpt-eng-sheet`. Release a new `tpt-eng-cli` version after `tpt-eng-sheet` is live.
 
 ## 5. Post-release checklist
 

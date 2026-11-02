@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on crates.io. The other 36 are at `0.1.0`. `docs/CRATE_VERSIONS.md` is the live record.
 
 ### Added
+- `tpt-eng-sheet` (new, pending publication — Batch 10): declarative calculation
+  sheets in TOML or JSON. Three calculations (`water-state`, `beam-udl`,
+  `pid-step`), a committed JSON Schema, and `tpt-eng sheet run|schema` in the CLI.
+- `tpt-eng-cli`: `sheet run <file>` and `sheet schema` subcommands.
 - `tpt-eng-provenance` (new, pending publication — Batch 10): `Tagged<T>`,
   `Provenance`, `Validity`, `Source` and a `Warnings` bitset, for results that
   carry their source and validity range. `no_std`, no dependencies.
