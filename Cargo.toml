@@ -6,6 +6,7 @@ members = [
     "crates/tpt-eng-props-fuels",
     "crates/tpt-eng-props",
     "crates/tpt-eng-provenance",
+    "crates/tpt-eng-wasm",
     "crates/tpt-eng-timeseries-core",
     "crates/tpt-eng-timeseries-align",
     "crates/tpt-eng-timeseries-gap",

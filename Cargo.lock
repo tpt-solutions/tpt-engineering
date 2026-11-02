@@ -1340,6 +1340,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "tpt-eng-wasm"
+version = "0.1.0"
+dependencies = [
+ "tpt-eng-controls",
+ "tpt-eng-props-water",
+ "tpt-eng-provenance",
+ "tpt-eng-sections",
+ "tpt-math-units",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "tpt-engineering"
 version = "0.1.0"
 dependencies = [
