@@ -14,6 +14,7 @@ homepage.workspace = true
 [dependencies]
 tpt-math-units = { workspace = true }
 tpt-eng-safety = { workspace = true }
+thiserror = { workspace = true }
 
 [lints]
 workspace = true

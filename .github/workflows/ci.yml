@@ -5,6 +5,10 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  # Weekly re-scan: a new RUSTSEC advisory for an already-merged dependency
+  # is caught without waiting for the next push.
+  schedule:
+    - cron: "17 5 * * 1"
 
 env:
   CARGO_TERM_COLOR: always
@@ -30,11 +34,25 @@ jobs:
       - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
   test:
-    runs-on: ubuntu-latest
+    # Linux, Windows and macOS. Windows is the primary development platform
+    # for this repository; macOS is not exercised locally.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --workspace --all-features
+
+  # Every publishable crate must package (manifest, files, metadata).
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo xtask package-check
 
   # Doc tests + docs build for every crate (including the integration examples).
   docs:
@@ -46,6 +64,19 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --doc --workspace --all-features
       - run: cargo doc --workspace --no-deps --all-features
+
+  # Python bindings (crates/tpt-eng-py): build the wheel with maturin and run
+  # the pytest suite against the installed package.
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "./crates/tpt-eng-py[test]"
+      - run: pytest crates/tpt-eng-py/tests
 
   # Per ADR 0001 (tpt-rust-map/docs/adr/0001-no-std-via-features-not-forks.md),
   # a blind `cargo build --workspace --target thumbv6m-none-eabi` breaks the
@@ -72,9 +103,23 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
       - run: |
-          for c in tpt-eng-props-water tpt-eng-props-air tpt-eng-props-fuels tpt-eng-props; do
+          for c in tpt-eng-provenance tpt-eng-props-water tpt-eng-props-air tpt-eng-props-fuels tpt-eng-props-mixture tpt-eng-props; do
             cargo build -p "$c" --no-default-features --target wasm32-unknown-unknown
           done
+
+  # Browser/Node package (crates/tpt-eng-wasm): build the wasm32 target, then
+  # build the Node.js package with wasm-pack and run its smoke test.
+  wasm-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - run: cargo build -p tpt-eng-wasm --target wasm32-unknown-unknown
+      - run: curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
+      - run: wasm-pack build crates/tpt-eng-wasm --target nodejs --out-dir pkg-node
+      - run: node crates/tpt-eng-wasm/tests/smoke.js
 
   # Independent RUSTSEC advisory scan (complements cargo-deny's advisory gate).
   cargo-audit:
@@ -97,3 +142,58 @@ jobs:
       - name: Install cargo-deny
         run: cargo install --locked cargo-deny
       - run: cargo deny --all-features --log-level warn --manifest-path ./Cargo.toml check
+
+  # Each runnable scenario must keep building and running end to end.
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: |
+          for e in thermal_loop solar_pv mechanical_design distillation construction_schedule hvac_load pcb_thermal; do
+            cargo run -p tpt-eng-examples --example "$e"
+          done
+
+  # Every library crate must carry a crate-level example (see docs/CONVENTIONS.md).
+  doctest-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo xtask doctest-check
+
+  # Each feature of every crate must compile on its own. The full powerset is
+  # too large for the workspace, so combinations are not covered here.
+  # Avoid `--no-dev-deps`: cargo-hack rewrites manifests with it.
+  each-feature:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@cargo-hack
+      - run: cargo hack check --workspace --each-feature
+
+  # Line coverage report. Uploaded as an artifact only; no third-party upload.
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - run: cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lcov
+          path: lcov.info
+
+  # The cookbook must build; deployment to Pages is a separate, manual step.
+  book:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: latest
+      - run: cd docs/guide && mdbook build

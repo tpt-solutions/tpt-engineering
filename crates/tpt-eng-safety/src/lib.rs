@@ -3,6 +3,16 @@
 //! Evaluates design quantities against allowable limits, computing
 //! utilization, margins, and safety factors, and producing a structured
 //! pass/fail report.
+//!
+//! ## Example
+//!
+//! ```
+//! use tpt_eng_safety::{safety_factor, utilization};
+//!
+//! // 80 applied against 100 allowable.
+//! assert!((utilization(80.0, 100.0) - 0.8).abs() < 1e-12);
+//! assert!((safety_factor(100.0, 80.0) - 1.25).abs() < 1e-12);
+//! ```
 
 pub mod limit;
 pub mod quantity;

@@ -18,6 +18,11 @@ Command-line interface for the TPT engineering ecosystem.
 | `props fuel <methane\|hydrogen\|natural-gas\|diesel\|blend> [--h2 <0..1>]` | Fuel heating values, density, air–fuel ratio, CO₂. |
 | `pid <kp> <ki> <kd> [--setpoint <sp>] [--tau <s>] [--dt <s>] [--steps <n>] [--limit <±>] [--plot <png>] [--csv <path>]` | PID step-response simulation over a first-order plant. |
 | `tolerance stackup -D "name=nominal±tol" ... [--methods worst,rss,monte] [--samples <n>] [--low <L>] [--high <H>] [--seed <s>]` | Worst-case / RSS / Monte-Carlo dimensional stack-up. |
+| `calc beam-file <beam.json>` | Beam reactions, maximum moment, and (with a section) utilisation, from a JSON description. |
+| `crates [words...]` | List the publishable `tpt-eng-*` crates, optionally filtered. |
+| `recommend <task words...>` | Suggest crates for a task, e.g. `recommend pump curve`. |
+| `--json` (global) | Machine-readable output. Supported by `props water` and `props air`. |
+| `completions <bash\|zsh\|fish\|powershell\|elvish>` | Print a shell completion script. |
 
 ## Examples
 
@@ -53,6 +58,9 @@ tpt-eng-cli pid 2 1 0 --setpoint 10 --tau 1 --dt 0.01 --steps 1000
 
 # Tolerance stack-up: two dimensions, yield within [29.5, 30.5]
 tpt-eng-cli tolerance stackup -D "a=10±0.1" -D "b=20±0.2" --low 29.5 --high 30.5
+tpt-eng-cli --json props water 300 3
+tpt-eng-cli calc beam-file beam.json
+tpt-eng-cli recommend pump curve
 ```
 
 ## Notes

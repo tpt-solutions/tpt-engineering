@@ -18,7 +18,7 @@
 //! * `publish-status` (`changelog-check`) — assert the workspace's
 //!   human-facing release claims (root `README.md` / `CHANGELOG.md`) stay
 //!   consistent with ground truth in `Cargo.toml`, `RELEASE.md`, and
-//!   `PUBLISH_TRACKING.md` (MSRV, published/unpublished crate counts, and the
+//!   `docs/PUBLISH_TRACKING.md` (MSRV, published/unpublished crate counts, and the
 //!   pending-crate name set). Wired into `check` so CI catches this class of
 //!   staleness.
 //!
@@ -29,6 +29,8 @@ use std::env;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
+
+mod versions;
 
 /// `no_std`-capable crates, mirroring the CI `no_std` job and the
 /// `no_std = true` entries for this repo in `tpt-rust-map/registry.toml`.
@@ -43,6 +45,8 @@ const NO_STD_CRATES: &[&str] = &[
     "tpt-eng-props-water",
     "tpt-eng-props-air",
     "tpt-eng-props-fuels",
+    "tpt-eng-props-mixture",
+    "tpt-eng-props",
 ];
 
 const NO_STD_TARGET: &str = "thumbv6m-none-eabi";
@@ -89,10 +93,18 @@ fn run(args: &[String]) -> Result<(), String> {
                 ])?;
                 cargo_deny(&["check"])?;
                 changelog_check()?;
+                doctest_check()?;
+                versions::pin_check()?;
+                link_check()?;
                 Ok(())
             }
             "new-crate" => new_crate(rest),
             "publish-status" | "changelog-check" => changelog_check(),
+            "doctest-check" => doctest_check(),
+            "pin-check" => versions::pin_check(),
+            "link-check" => link_check(),
+            "package-check" => package_check(),
+            "versions" => versions::write_report(rest.iter().any(|a| a == "--offline")),
             other => Err(format!(
                 "unknown command `{other}`; run `cargo xtask` with no args for usage"
             )),
@@ -110,6 +122,10 @@ fn print_usage() {
            \x20\x20\x20\x20scaffolds Cargo.toml, src/lib.rs, README.md, tests/basic.rs, examples/basic.rs\n\
            no-std-matrix   build the no_std crates for {NO_STD_TARGET}\n\
            publish-status  verify README/CHANGELOG release claims match reality\n\
+           versions        write docs/CRATE_VERSIONS.md (add --offline to skip the registry)\n\
+           pin-check       workspace pins must equal their crate versions\n\
+           link-check      relative links in Markdown files must resolve\n\
+           package-check   every publishable crate must package (cargo package --list)\n\
            fmt | clippy | test | doctest | doc | deny | check   workspace hygiene gates"
     );
 }
@@ -402,7 +418,7 @@ fn render_crate_example_basic(name: &str) -> String {
 
 /// Assert that the workspace's human-facing release claims (root `README.md`
 /// and `CHANGELOG.md`) stay consistent with ground truth in `Cargo.toml`,
-/// `RELEASE.md`, and `PUBLISH_TRACKING.md`. This is the guard described in
+/// `RELEASE.md`, and `docs/PUBLISH_TRACKING.md`. This is the guard described in
 /// `todo.md` Phase 10: it prevents the publish-status / MSRV claims from
 /// drifting out of sync with reality (the exact staleness class that
 /// previously slipped through). Doubles as the `publish-status` report.
@@ -413,18 +429,20 @@ fn changelog_check() -> Result<(), String> {
     let readme = read_text(&root.join("README.md"))?;
     let changelog = read_text(&root.join("CHANGELOG.md"))?;
     let release = read_text(&root.join("RELEASE.md"))?;
-    let publish_tracking = read_text(&root.join("PUBLISH_TRACKING.md"))?;
+    let publish_tracking = read_text(&root.join("docs/PUBLISH_TRACKING.md"))?;
 
     let mut errors: Vec<String> = Vec::new();
 
     // --- workspace crate count (xtask is a dev tool, not publishable) ------
     let members = parse_workspace_members(&root_cargo);
+    // Only publishable `tpt-eng-*` crates count toward the published/pending
+    // totals. The `tpt-engineering` meta-crate, `xtask`, and any member that
+    // sets `publish = false` (for example the Python bindings) are excluded.
     let member_names: Vec<String> = members
         .iter()
+        .filter(|m| is_publishable_member(&root, m))
         .map(|m| m.rsplit('/').next().unwrap_or(m).to_string())
         .collect();
-    // Only `tpt-eng-*` crates count toward the published/pending totals; the
-    // `tpt-engineering` meta-crate and `xtask` are not publishable libraries.
     let total = member_names
         .iter()
         .filter(|m| m.starts_with("tpt-eng-"))
@@ -469,13 +487,13 @@ fn changelog_check() -> Result<(), String> {
         }
     }
 
-    // --- PUBLISH_TRACKING.md covers every pending crate --------------------
+    // --- docs/PUBLISH_TRACKING.md covers every pending crate --------------------
     let tracked = parse_publish_tracking_crates(&publish_tracking);
     let tracked_set: std::collections::HashSet<&str> = tracked.iter().map(|s| s.as_str()).collect();
     for c in &unpublished_new {
         if !tracked_set.contains(c.as_str()) {
             errors.push(format!(
-                "PUBLISH_TRACKING.md does not list pending crate `{c}`"
+                "docs/PUBLISH_TRACKING.md does not list pending crate `{c}`"
             ));
         }
     }
@@ -706,7 +724,7 @@ fn first_number(s: &str) -> Option<usize> {
 }
 
 /// A plausible crate-name token (used to ignore non-crate backtick spans such
-/// as `PUBLISH_TRACKING.md` that share the README unpublished-claim line).
+/// as `docs/PUBLISH_TRACKING.md` that share the README unpublished-claim line).
 fn is_crate_name(s: &str) -> bool {
     !s.is_empty()
         && !s.contains('.')
@@ -771,4 +789,168 @@ fn workspace_root() -> PathBuf {
 
 fn write_file(path: &std::path::Path, contents: &str) -> Result<(), String> {
     fs::write(path, contents).map_err(|e| format!("write {}: {e}", path.display()))
+}
+
+/// Every library `tpt-eng-*` crate must carry at least one fenced doc example
+/// in its crate-level docs (`//!` block), so the API stays exercised by
+/// `cargo test --doc`. Binary-only crates (no `src/lib.rs`) and crates marked
+/// `publish = false` (for example the Python bindings) are skipped.
+fn doctest_check() -> Result<(), String> {
+    let crates_dir = workspace_root().join("crates");
+    let mut missing: Vec<String> = Vec::new();
+    let entries = std::fs::read_dir(&crates_dir)
+        .map_err(|e| format!("cannot read {}: {e}", crates_dir.display()))?;
+    let mut checked = 0usize;
+    for entry in entries {
+        let entry = entry.map_err(|e| e.to_string())?;
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if !name.starts_with("tpt-eng-") {
+            continue;
+        }
+        let lib = entry.path().join("src").join("lib.rs");
+        if !lib.exists() || !is_publishable_member(&workspace_root(), &format!("crates/{name}")) {
+            continue;
+        }
+        checked += 1;
+        let src = read_text(&lib)?;
+        let has_example = src
+            .lines()
+            .any(|l| l.trim_start().starts_with("//!") && l.contains("```"));
+        if !has_example {
+            missing.push(name);
+        }
+    }
+    if missing.is_empty() {
+        println!("doctest-check: all {checked} library crates have a crate-level example");
+        Ok(())
+    } else {
+        Err(format!(
+            "doctest-check: crates without a crate-level example: {}",
+            missing.join(", ")
+        ))
+    }
+}
+
+/// A workspace member is publishable unless its manifest says `publish = false`.
+fn is_publishable_member(root: &std::path::Path, member: &str) -> bool {
+    match read_text(&root.join(member).join("Cargo.toml")) {
+        Ok(text) => !text.lines().any(|l| l.trim() == "publish = false"),
+        Err(_) => true,
+    }
+}
+
+/// Every relative link in a Markdown file in the repository must point at an
+/// existing file or directory. External URLs, mail links and pure anchors are
+/// not checked. Build output and VCS directories are skipped.
+fn link_check() -> Result<(), String> {
+    let root = workspace_root();
+    let mut files = Vec::new();
+    collect_markdown(&root, &mut files)?;
+    let mut broken: Vec<String> = Vec::new();
+    for file in &files {
+        let text = read_text(file)?;
+        let dir = file.parent().unwrap_or(&root).to_path_buf();
+        for target in markdown_link_targets(&text) {
+            let path_part = target.split('#').next().unwrap_or("");
+            if path_part.is_empty() || path_part.contains("://") || path_part.starts_with("mailto:")
+            {
+                continue;
+            }
+            let resolved = dir.join(path_part);
+            if !resolved.exists() {
+                let rel = file.strip_prefix(&root).unwrap_or(file);
+                broken.push(format!("{}: {target}", rel.display()));
+            }
+        }
+    }
+    if broken.is_empty() {
+        println!(
+            "link-check: {} Markdown files, all relative links resolve",
+            files.len()
+        );
+        Ok(())
+    } else {
+        Err(format!(
+            "link-check: broken links:
+  {}",
+            broken.join(
+                "
+  "
+            )
+        ))
+    }
+}
+
+/// Markdown files under `dir`, skipping build output and VCS metadata.
+fn collect_markdown(dir: &std::path::Path, out: &mut Vec<PathBuf>) -> Result<(), String> {
+    const SKIP: &[&str] = &["target", ".git", "node_modules", "book"];
+    let entries = fs::read_dir(dir).map_err(|e| format!("cannot read {}: {e}", dir.display()))?;
+    for entry in entries {
+        let path = entry.map_err(|e| e.to_string())?.path();
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        if path.is_dir() {
+            if !SKIP.contains(&name) {
+                collect_markdown(&path, out)?;
+            }
+        } else if path.extension().is_some_and(|e| e == "md") {
+            out.push(path);
+        }
+    }
+    Ok(())
+}
+
+/// Targets of inline Markdown links `[text](target)`, in order.
+fn markdown_link_targets(text: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut rest = text;
+    while let Some(open) = rest.find("](") {
+        let after = &rest[open + 2..];
+        let Some(close) = after.find(')') else { break };
+        let target = after[..close].trim();
+        // Skip links whose target contains whitespace (titles) or line breaks.
+        if !target.is_empty() && !target.contains(char::is_whitespace) {
+            out.push(target.to_string());
+        }
+        rest = &after[close + 1..];
+    }
+    out
+}
+
+/// Each publishable `tpt-eng-*` crate must produce a package file list. This
+/// checks manifests, included files and metadata without building the crates.
+fn package_check() -> Result<(), String> {
+    let root = workspace_root();
+    let root_cargo = read_text(&root.join("Cargo.toml"))?;
+    let mut failed: Vec<String> = Vec::new();
+    let mut count = 0usize;
+    for member in parse_workspace_members(&root_cargo) {
+        if !is_publishable_member(&root, &member) {
+            continue;
+        }
+        let name = member.rsplit('/').next().unwrap_or(&member).to_string();
+        if !name.starts_with("tpt-eng-") {
+            continue;
+        }
+        count += 1;
+        let out = Command::new("cargo")
+            .args([
+                "package",
+                "--list",
+                "--allow-dirty",
+                "--no-verify",
+                "-p",
+                &name,
+            ])
+            .output()
+            .map_err(|e| format!("cannot run cargo: {e}"))?;
+        if !out.status.success() {
+            failed.push(name);
+        }
+    }
+    if failed.is_empty() {
+        println!("package-check: {count} crates package cleanly");
+        Ok(())
+    } else {
+        Err(format!("package-check failed for: {}", failed.join(", ")))
+    }
 }

@@ -1,8 +1,8 @@
 # tpt-eng-controls
 
-Control-systems primitives: a discrete-time [PID controller](Pid) (with
+Control-systems primitives: a discrete-time PID controller (with
 derivative-on-measurement and clamped-integral anti-windup), a discrete
-[transfer function](TransferFunction), and a [state-space](StateSpace) model
+transfer function, and a state-space model
 with a forward-Euler step.
 
 All three are `std`-only numerical building blocks. The PID and transfer

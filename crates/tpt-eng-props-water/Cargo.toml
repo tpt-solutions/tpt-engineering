@@ -18,6 +18,7 @@ homepage.workspace = true
 # would break these no_std-capable crates. See Phase 7.2 / todo.md 7.2.
 tpt-math-units = { version = "0.1.0", default-features = false }
 tpt-math-numeric = { version = "0.2.0", default-features = false, features = ["libm"] }
+tpt-eng-provenance = { workspace = true }
 
 [features]
 default = ["std"]

@@ -15,5 +15,8 @@ categories = ["science", "algorithms"]
 tpt-math-units = { workspace = true }
 tpt-math-numeric = { workspace = true }
 
+[dev-dependencies]
+proptest = { workspace = true }
+
 [lints]
 workspace = true

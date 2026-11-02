@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Sheet",
+  "description": "A calculation sheet: a title, an optional author, and one calculation.",
+  "type": "object",
+  "properties": {
+    "author": {
+      "description": "Author shown in the report header.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "calc": {
+      "description": "The calculation to run.",
+      "$ref": "#/$defs/Calc"
+    },
+    "title": {
+      "description": "Title of the generated report.",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "title",
+    "calc"
+  ],
+  "$defs": {
+    "Calc": {
+      "description": "The calculations a sheet can run. Selected by the `kind` field.",
+      "oneOf": [
+        {
+          "description": "Water/steam state from IAPWS-IF97 at one temperature and pressure.\n\nInputs outside the IF97 range are still computed, and the report flags them.",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "water-state"
+            },
+            "pressure_kpa": {
+              "description": "Pressure in kilopascals.",
+              "type": "number",
+              "format": "double"
+            },
+            "temperature_c": {
+              "description": "Temperature in degrees Celsius.",
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "temperature_c",
+            "pressure_kpa"
+          ]
+        },
+        {
+          "description": "Simply supported rectangular beam under a uniform load over its span.",
+          "type": "object",
+          "properties": {
+            "allowable_stress_mpa": {
+              "description": "Allowable bending stress in megapascals. When given, the report\nincludes a utilisation check against 1.0.",
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double",
+              "default": null
+            },
+            "height_m": {
+              "description": "Section depth (height) in metres. Bending is about the x axis.",
+              "type": "number",
+              "format": "double"
+            },
+            "kind": {
+              "type": "string",
+              "const": "beam-udl"
+            },
+            "load_n_per_m": {
+              "description": "Uniform load in newtons per metre (downward).",
+              "type": "number",
+              "format": "double"
+            },
+            "span_m": {
+              "description": "Span in metres.",
+              "type": "number",
+              "format": "double"
+            },
+            "width_m": {
+              "description": "Section width in metres.",
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "span_m",
+            "load_n_per_m",
+            "width_m",
+            "height_m"
+          ]
+        },
+        {
+          "description": "Closed-loop step response of a PID controller on a first-order plant.",
+          "type": "object",
+          "properties": {
+            "dt_s": {
+              "description": "Controller sample period in seconds. Must be smaller than `tau_s`.",
+              "type": "number",
+              "format": "double"
+            },
+            "duration_s": {
+              "description": "Simulated duration in seconds.",
+              "type": "number",
+              "format": "double"
+            },
+            "kd": {
+              "description": "Derivative gain.",
+              "type": "number",
+              "format": "double"
+            },
+            "ki": {
+              "description": "Integral gain.",
+              "type": "number",
+              "format": "double"
+            },
+            "kind": {
+              "type": "string",
+              "const": "pid-step"
+            },
+            "kp": {
+              "description": "Proportional gain.",
+              "type": "number",
+              "format": "double"
+            },
+            "output_limit": {
+              "description": "Symmetric limit on the controller output. Omit for no limit.",
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double",
+              "default": null
+            },
+            "setpoint": {
+              "description": "Target value of the measurement.",
+              "type": "number",
+              "format": "double"
+            },
+            "tau_s": {
+              "description": "Plant time constant in seconds.",
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "kp",
+            "ki",
+            "kd",
+            "setpoint",
+            "tau_s",
+            "dt_s",
+            "duration_s"
+          ]
+        }
+      ]
+    }
+  }
+}

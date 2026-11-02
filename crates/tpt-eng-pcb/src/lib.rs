@@ -16,8 +16,8 @@
 //! ```
 //! use tpt_eng_pcb::microstrip_impedance;
 //!
-//! // A 50 Ω microstrip: ~1.8 mm trace on 1.6 mm FR-4 (er = 4.4).
-//! let z0 = microstrip_impedance(1.8e-3, 1.6e-3, 4.4, 35e-6);
+//! // A 50 Ω microstrip: ~2.9 mm trace on 1.6 mm FR-4 (er = 4.4).
+//! let z0 = microstrip_impedance(2.9e-3, 1.6e-3, 4.4, 35e-6);
 //! assert!((z0 - 50.0).abs() < 6.0);
 //! ```
 

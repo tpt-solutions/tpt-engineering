@@ -79,7 +79,8 @@ pub fn run_solar_pv_sizing() -> SolarPvReport {
 
     // Cross-check with the electrical crate: feeding `line_current_a` at the
     // grid voltage and pf must recover the array's real power.
-    let (p_check, _q) = three_phase_power(grid_v_ll, line_current_a, pf);
+    let (p_check, _q) = three_phase_power(grid_v_ll, line_current_a, pf)
+        .expect("grid voltage, line current and power factor are valid sizing inputs");
     assert!(
         (p_check - array_dc_w).abs() < 1e-6,
         "three-phase power cross-check failed"

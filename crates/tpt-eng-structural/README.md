@@ -4,7 +4,7 @@ Structural-engineering primitives: load definitions, simply-supported beam
 analysis (reactions, shear, and bending moment), and demand/capacity
 code-compliance checks in an ASCE 7 / Eurocode-style utilisation-ratio form.
 
-Positions, forces, and moments are [`uom`](tpt_math_units)-typed. The analysis is
+Positions, forces, and moments are [`uom`](https://docs.rs/uom)-typed. The analysis is
 closed-form (reactions, shear, bending moment, utilisation ratio) and does not
 require a matrix solver. Utilisation and pass/fail evaluation are **consolidated
 in [`tpt-eng-safety`](../tpt-eng-safety)** (`tpt_eng_safety::utilization`); this

@@ -199,8 +199,8 @@ pub fn underwood_rmin(xd: f64, xb: f64, xf: f64, q: f64, alpha: f64) -> Option<f
 
 /// Actual theoretical stages from minimum stages and reflux ratios
 /// (Gilliland correlation, Eduljee form):
-/// `X = (R − R_min) / (R + 1)`, `Y = 1 − exp[(1 + 54.4·X) / 11.0 · (X − 1)
-/// / X^0.982]`, `N = 1 + (N_min − 1) / Y`.
+/// `X = (R − R_min) / (R + 1)`, `Y = 1 − exp[(1 + 54.4·X) / (11 + 117.2·X) ·
+/// (X − 1) / √X]`, and `N = (N_min + Y) / (1 − Y)` (from `Y = (N − N_min) / (N + 1)`).
 ///
 /// This bridges [`fenske_min_stages`] and [`underwood_rmin`] into a single
 /// design-stage estimate.
@@ -223,11 +223,11 @@ pub fn gilliland_stages(n_min: f64, r_min: f64, r: f64) -> Option<f64> {
         return None;
     }
     let x = (r - r_min) / (r + 1.0);
-    let y = 1.0 - ((1.0 + 54.4 * x) / 11.0 * (x - 1.0) / x.powf(0.982)).exp();
-    if y <= 0.0 || !y.is_finite() {
+    let y = 1.0 - ((1.0 + 54.4 * x) / (11.0 + 117.2 * x) * (x - 1.0) / x.sqrt()).exp();
+    if y <= 0.0 || y >= 1.0 || !y.is_finite() {
         return None;
     }
-    Some(1.0 + (n_min - 1.0) / y)
+    Some((n_min + y) / (1.0 - y))
 }
 
 /// Geometry and result of a McCabe–Thiele stage count.
@@ -286,8 +286,13 @@ pub fn mccabe_thiele_stages(
     // Rectifying line: y = (R/(R+1))·x + xd/(R+1), through (xd, xd).
     let rs = r / (r + 1.0);
     let rb = xd / (r + 1.0);
-    // q-line / rectifying-line intersection.
-    let x_i = (xf - rb) / (rs - q + 1.0);
+    // q-line `y = q/(q−1)·x − x_F/(q−1)` meets the rectifying line at
+    // `x_i = (x_F + (q−1)·R_b) / (q − (q−1)·r_s)`; for q = 1 this is x_F.
+    let denom = q - (q - 1.0) * rs;
+    if denom.abs() < 1e-12 {
+        return None;
+    }
+    let x_i = (xf + (q - 1.0) * rb) / denom;
     let y_i = rs * x_i + rb;
     if !(x_i > xb && x_i < xd) || !x_i.is_finite() {
         return None;
@@ -751,6 +756,35 @@ pub fn grey_plate_flux(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn mccabe_thiele_feasible_above_rmin_and_monotone() {
+        // Saturated-liquid feed, α = 2.5: R_min ≈ 1.22, so 1.5 is feasible.
+        let (xd, xb, xf, a) = (0.95, 0.05, 0.50, 2.5);
+        let s15 = mccabe_thiele_stages(xd, xb, xf, 1.0, a, 1.5)
+            .unwrap()
+            .stages;
+        let s3 = mccabe_thiele_stages(xd, xb, xf, 1.0, a, 3.0)
+            .unwrap()
+            .stages;
+        assert!(s15 > s3, "stages must fall with reflux: {s15} vs {s3}");
+        // Below R_min (≈ 2.17 for a saturated-vapour feed) there is no solution.
+        assert!(mccabe_thiele_stages(xd, xb, xf, 0.0, a, 2.0).is_none());
+    }
+
+    #[test]
+    fn gilliland_eduljee_reference() {
+        // X = (2 − 1)/(2 + 1) = 1/3; Eduljee Y ≈ 0.3569, so
+        // N = (10 + Y)/(1 − Y) ≈ 16.1 for N_min = 10, R_min = 1, R = 2.
+        let n = gilliland_stages(10.0, 1.0, 2.0).unwrap();
+        assert!((n - 16.1).abs() < 0.05, "got {n}");
+        // Infinite-reflux limit recovers N_min (X → 1, Y → 0).
+        let n_inf = gilliland_stages(10.0, 1.0, 1.0e9).unwrap();
+        assert!((n_inf - 10.0).abs() < 1e-3);
+        // Stages fall as reflux rises.
+        assert!(gilliland_stages(10.0, 1.0, 3.0).unwrap() < n);
+        assert!(gilliland_stages(10.0, 1.0, 1.0).is_none());
+    }
 
     #[test]
     fn fenske_basics() {

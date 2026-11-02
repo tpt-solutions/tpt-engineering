@@ -562,8 +562,10 @@ pub fn panel_utilization(total_load_w: f64, panel_rating_w: f64) -> Option<f64> 
 /// Thin wrapper over [`tpt_eng_electrical::three_phase_power`] returning the
 /// real-power component for a given line-to-line voltage `v_ll` (V), line
 /// current `i_line` (A) and lagging power factor `pf` ∈ `[0, 1]`.
-pub fn three_phase_current_to_power_w(v_ll: f64, i_line: f64, pf: f64) -> f64 {
-    electrical::three_phase_power(v_ll, i_line, pf).0
+///
+/// Returns `None` for inputs rejected by [`tpt_eng_electrical::three_phase_power`].
+pub fn three_phase_current_to_power_w(v_ll: f64, i_line: f64, pf: f64) -> Option<f64> {
+    electrical::three_phase_power(v_ll, i_line, pf).map(|(p, _q)| p)
 }
 
 /// A scheduled branch circuit on a panel.
@@ -766,9 +768,10 @@ mod tests {
     #[test]
     fn three_phase_power_matches_electrical() {
         // 400 V, 10 A, pf 0.9 → S = √3·400·10·0.9.
-        let p = three_phase_current_to_power_w(400.0, 10.0, 0.9);
-        let expected = electrical::three_phase_power(400.0, 10.0, 0.9).0;
+        let p = three_phase_current_to_power_w(400.0, 10.0, 0.9).unwrap();
+        let expected = electrical::three_phase_power(400.0, 10.0, 0.9).unwrap().0;
         assert!((p - expected).abs() < 1e-9);
+        assert!(three_phase_current_to_power_w(400.0, 10.0, 1.5).is_none());
     }
 
     #[test]

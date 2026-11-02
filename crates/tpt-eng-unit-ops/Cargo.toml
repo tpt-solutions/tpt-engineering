@@ -15,5 +15,8 @@ categories = ["science", "algorithms"]
 tpt-eng-props = { workspace = true }
 tpt-eng-heat-transfer = { workspace = true }
 
+[dev-dependencies]
+proptest = { workspace = true }
+
 [lints]
 workspace = true

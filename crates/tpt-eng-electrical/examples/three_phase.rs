@@ -7,7 +7,7 @@ use tpt_eng_electrical::{
 
 fn main() {
     // Balanced three-phase load: 400 V line-line, 10 A line, power factor 0.9.
-    let (p, q) = three_phase_power(400.0, 10.0, 0.9);
+    let (p, q) = three_phase_power(400.0, 10.0, 0.9).unwrap();
     println!("three-phase: P = {:.1} W, Q = {:.1} var", p, q);
 
     // Per-unit base: 100 MVA, 11 kV line-line.
