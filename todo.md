@@ -832,7 +832,12 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
       v1 done in `tpt-eng-mcp`: a stdio MCP server with `run_sheet` (input schema
       from `tpt-eng-sheet`) and `sheet_schema`. Still to do: the other CLI
       calculations (beam file, tolerance, props lookups) as tools.
-- [ ] Cross-crate `Model` trait / FMI-style co-simulation hook.
+- [~] Cross-crate `Model` trait / FMI-style co-simulation hook. v1 done in
+      `tpt-eng-cosim` (unpublished): a `Model` trait with named ports, a
+      fixed-step runner with explicit one-step coupling, and three models
+      (`Constant`, `FirstOrderLag`, `PidController`). Still to do: models from
+      the other domain crates, and a decision on whether the trait should be
+      shared with `tpt-eng-report` and the sheets.
 - [ ] Notebooks (evcxr or Python bindings).
 
 ### Phase 11 status (current)

@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (inputs, formula table, results with overall status, references, notes) from
   the existing section types, so the renderers are unchanged.
 - `tpt-eng-cli`: `sheet run <file>` and `sheet schema` subcommands.
+- `tpt-eng-cosim` (not published): fixed-step co-simulation. A `Model` trait with
+  named input and output ports, a `Simulation` runner that records every output,
+  and three models: `Constant`, `FirstOrderLag` and `PidController`.
 - `tpt-eng-mcp` (not published): a Model Context Protocol server over stdio.
   It offers `run_sheet`, which returns a sheet's report as Markdown, and
   `sheet_schema`. Sheet errors come back as tool errors, so a client can fix them.
