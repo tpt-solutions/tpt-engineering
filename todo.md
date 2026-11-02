@@ -808,11 +808,16 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
 
 ### 11F — Innovation (stretch)
 
-- [~] `tpt-eng-py` Python bindings (pyo3 / maturin): props, controls, (water, controls, structural bound in `tpt-eng-py`; air and fuels not yet)
-      structural first.
-- [ ] WASM browser demos (steam tables, section properties, PID tuner).
-- [ ] Provenance-tagged results (`{source, standard, validity range,
-      warnings}`) so out-of-range correlation use is flagged, not silent.
+- [x] `tpt-eng-py` Python bindings (pyo3 / maturin): water, air, fuels, controls
+      and structural bound in `tpt-eng-py`, with pytest coverage and a CI job.
+- [x] WASM browser demos: `tpt-eng-wasm` exposes steam tables, section
+      properties and a PID step-response tuner, with a static page in `www/` and
+      a Node smoke test in CI.
+- [~] Provenance-tagged results (`{source, standard, validity range,
+      warnings}`) so out-of-range correlation use is flagged, not silent. Pilot
+      done in `tpt-eng-provenance`, water and air `*_tagged` functions, and the
+      Python `Tagged` API. Still to do: the other props crates, and unifying the
+      three existing provenance types.
 - [ ] Declarative calc-sheet format (TOML / YAML -> calc, report, plot) with a
       JSON Schema, driven by the CLI.
 - [ ] Auto-generated calc report (formulas, inputs, references, pass/fail) on

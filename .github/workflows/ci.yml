@@ -103,9 +103,23 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
       - run: |
-          for c in tpt-eng-props-water tpt-eng-props-air tpt-eng-props-fuels tpt-eng-props-mixture tpt-eng-props; do
+          for c in tpt-eng-provenance tpt-eng-props-water tpt-eng-props-air tpt-eng-props-fuels tpt-eng-props-mixture tpt-eng-props; do
             cargo build -p "$c" --no-default-features --target wasm32-unknown-unknown
           done
+
+  # Browser/Node package (crates/tpt-eng-wasm): build the wasm32 target, then
+  # build the Node.js package with wasm-pack and run its smoke test.
+  wasm-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - run: cargo build -p tpt-eng-wasm --target wasm32-unknown-unknown
+      - run: curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
+      - run: wasm-pack build crates/tpt-eng-wasm --target nodejs --out-dir pkg-node
+      - run: node crates/tpt-eng-wasm/tests/smoke.js
 
   # Independent RUSTSEC advisory scan (complements cargo-deny's advisory gate).
   cargo-audit:
