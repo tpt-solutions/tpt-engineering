@@ -17,6 +17,7 @@ mod air;
 mod controls;
 mod fuels;
 mod structural;
+mod tagged;
 mod water;
 
 use pyo3::prelude::*;
@@ -46,6 +47,7 @@ fn add_submodule(
 
 #[pymodule]
 fn tpt_eng(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<tagged::Tagged>()?;
     water::register(m)?;
     add_submodule(py, m, "air", air::register)?;
     add_submodule(py, m, "fuels", fuels::register)?;

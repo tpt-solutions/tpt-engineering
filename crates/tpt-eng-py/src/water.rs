@@ -3,6 +3,8 @@
 use pyo3::exceptions::{PyNotImplementedError, PyValueError};
 use pyo3::prelude::*;
 use tpt_eng_props_water::{self as water, Error, Region};
+
+use crate::tagged::{Tagged, finish, require_finite, require_positive};
 use tpt_math_units::uom::si::f64::{Pressure, ThermodynamicTemperature};
 use tpt_math_units::uom::si::mass_density::kilogram_per_cubic_meter;
 use tpt_math_units::uom::si::pressure::pascal;
@@ -90,15 +92,10 @@ impl WaterState {
     }
 }
 
-/// Compute the water/steam state at `temperature_k` and `pressure_pa`.
-#[pyfunction]
-fn water_state(temperature_k: f64, pressure_pa: f64) -> PyResult<WaterState> {
-    let s = water::state(
-        kelvin_of(temperature_k),
-        Pressure::new::<pascal>(pressure_pa),
-    )
-    .map_err(to_py_err)?;
-    Ok(WaterState {
+/// Build the Python state object from a core state evaluated at the given
+/// inputs.
+fn to_py_state(temperature_k: f64, pressure_pa: f64, s: water::WaterState) -> WaterState {
+    WaterState {
         temperature_k,
         pressure_pa,
         specific_volume_m3_per_kg: s.specific_volume.get::<cubic_meter_per_kilogram>(),
@@ -117,7 +114,70 @@ fn water_state(temperature_k: f64, pressure_pa: f64) -> PyResult<WaterState> {
             Region::Two => "vapour",
             Region::Saturation => "saturation",
         },
-    })
+    }
+}
+
+/// Compute the water/steam state at `temperature_k` and `pressure_pa`.
+#[pyfunction]
+fn water_state(temperature_k: f64, pressure_pa: f64) -> PyResult<WaterState> {
+    let s = water::state(
+        kelvin_of(temperature_k),
+        Pressure::new::<pascal>(pressure_pa),
+    )
+    .map_err(to_py_err)?;
+    Ok(to_py_state(temperature_k, pressure_pa, s))
+}
+
+/// Saturation pressure of water with provenance. Temperatures outside
+/// 273.15 K to 647.096 K are returned with a warning, not rejected.
+///
+/// With `strict=True`, a warning raises `ValueError`.
+#[pyfunction]
+#[pyo3(signature = (temperature_k, strict=false))]
+fn water_saturation_pressure_tagged(
+    py: Python<'_>,
+    temperature_k: f64,
+    strict: bool,
+) -> PyResult<Tagged> {
+    require_positive("temperature_k", temperature_k)?;
+    let tagged = water::saturation_pressure_tagged(kelvin_of(temperature_k));
+    finish(
+        py,
+        tagged.value.get::<pascal>(),
+        tagged.provenance,
+        &[("temperature", temperature_k)],
+        strict,
+    )
+}
+
+/// Water/steam state with provenance. Temperatures above 1073.15 K and
+/// pressures above 100 MPa are returned with a warning. Hard input errors still
+/// raise, as in `water_state`.
+///
+/// With `strict=True`, a warning raises `ValueError`.
+#[pyfunction]
+#[pyo3(signature = (temperature_k, pressure_pa, strict=false))]
+fn water_state_tagged(
+    py: Python<'_>,
+    temperature_k: f64,
+    pressure_pa: f64,
+    strict: bool,
+) -> PyResult<Tagged> {
+    require_finite("temperature_k", temperature_k)?;
+    require_finite("pressure_pa", pressure_pa)?;
+    let tagged = water::state_tagged(
+        kelvin_of(temperature_k),
+        Pressure::new::<pascal>(pressure_pa),
+    )
+    .map_err(to_py_err)?;
+    let state = to_py_state(temperature_k, pressure_pa, tagged.value);
+    finish(
+        py,
+        state,
+        tagged.provenance,
+        &[("temperature", temperature_k), ("pressure", pressure_pa)],
+        strict,
+    )
 }
 
 /// Register the water bindings on the top-level `tpt_eng` module.
@@ -126,5 +186,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(water_saturation_pressure_pa, m)?)?;
     m.add_function(wrap_pyfunction!(water_saturation_temperature_k, m)?)?;
     m.add_function(wrap_pyfunction!(water_state, m)?)?;
+    m.add_function(wrap_pyfunction!(water_saturation_pressure_tagged, m)?)?;
+    m.add_function(wrap_pyfunction!(water_state_tagged, m)?)?;
     Ok(())
 }

@@ -7,6 +7,8 @@ use tpt_math_units::uom::si::f64::{Pressure, ThermodynamicTemperature};
 use tpt_math_units::uom::si::pressure::pascal;
 use tpt_math_units::uom::si::thermodynamic_temperature::kelvin;
 
+use crate::tagged::{Tagged, finish, require_finite, require_positive};
+
 /// Validity range of the ASHRAE saturation-pressure correlation, in K.
 const T_MIN_K: f64 = 173.15;
 const T_MAX_K: f64 = 473.15;
@@ -95,6 +97,54 @@ fn dew_point_k(vapour_pressure_pa: f64) -> PyResult<f64> {
         .map_err(to_py_err)
 }
 
+/// Saturation vapour pressure with provenance. Temperatures outside
+/// 173.15 K to 473.15 K are returned with a warning, not rejected.
+///
+/// With `strict=True`, a warning raises `ValueError`.
+#[pyfunction]
+#[pyo3(signature = (temperature_k, strict=false))]
+fn saturation_pressure_water_tagged(
+    py: Python<'_>,
+    temperature_k: f64,
+    strict: bool,
+) -> PyResult<Tagged> {
+    require_positive("temperature_k", temperature_k)?;
+    let tagged = air::saturation_pressure_water_tagged(kelvin_of(temperature_k));
+    finish(
+        py,
+        tagged.value.get::<pascal>(),
+        tagged.provenance,
+        &[("temperature", temperature_k)],
+        strict,
+    )
+}
+
+/// Relative humidity with provenance. A temperature outside 173.15 K to
+/// 473.15 K is returned with a warning. Hard input errors still raise, as in
+/// `relative_humidity`.
+///
+/// With `strict=True`, a warning raises `ValueError`.
+#[pyfunction]
+#[pyo3(signature = (vapour_pressure_pa, temperature_k, strict=false))]
+fn relative_humidity_tagged(
+    py: Python<'_>,
+    vapour_pressure_pa: f64,
+    temperature_k: f64,
+    strict: bool,
+) -> PyResult<Tagged> {
+    require_finite("vapour_pressure_pa", vapour_pressure_pa)?;
+    require_positive("temperature_k", temperature_k)?;
+    let tagged = air::relative_humidity_tagged(pa(vapour_pressure_pa), kelvin_of(temperature_k))
+        .map_err(to_py_err)?;
+    finish(
+        py,
+        tagged.value,
+        tagged.provenance,
+        &[("temperature", temperature_k)],
+        strict,
+    )
+}
+
 /// Register the air bindings on the `tpt_eng.air` submodule.
 pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(saturation_pressure_water_pa, m)?)?;
@@ -103,5 +153,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(relative_humidity, m)?)?;
     m.add_function(wrap_pyfunction!(moist_air_enthalpy_kj_per_kg, m)?)?;
     m.add_function(wrap_pyfunction!(dew_point_k, m)?)?;
+    m.add_function(wrap_pyfunction!(saturation_pressure_water_tagged, m)?)?;
+    m.add_function(wrap_pyfunction!(relative_humidity_tagged, m)?)?;
     Ok(())
 }

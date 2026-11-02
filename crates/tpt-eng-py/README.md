@@ -38,6 +38,31 @@ print(section_utilization(10_000.0, 1.0e-4, 200.0e6))  # 0.5
 - Positions are metres from the pin. Downward forces are positive. Moments are
   counter-clockwise positive.
 
+## Provenance-tagged results
+
+Some correlations are only valid over a range of inputs. The `*_tagged`
+functions return the same value as their plain counterparts, wrapped in a
+`tpt_eng.Tagged` object. That object reports the source, the validity range,
+and a warning for each input outside its range.
+
+```python
+from tpt_eng import air
+
+t = air.relative_humidity_tagged(1000.0, 500.0)  # 500 K is above the 473.15 K limit
+t.value          # same number as air.relative_humidity would give
+t.in_range       # False
+t.warnings       # ["temperature = 500 K is outside the validated range ..."]
+t.source         # "ASHRAE Fundamentals, Ch. 1 (Hyland-Wexler)"
+
+air.relative_humidity_tagged(1000.0, 500.0, strict=True)  # raises ValueError
+```
+
+Available: `tpt_eng.water_saturation_pressure_tagged`,
+`tpt_eng.water_state_tagged`, `tpt_eng.air.saturation_pressure_water_tagged`,
+and `tpt_eng.air.relative_humidity_tagged`. Hard input errors, such as
+non-finite values or a temperature of zero, still raise even without
+`strict`.
+
 ## Build and test
 
 Requires Rust 1.85+ and Python 3.10+.
