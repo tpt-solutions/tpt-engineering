@@ -829,9 +829,9 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
       `DemandCapacity` for pass/fail. Still to do: the generic calc report for
       other crates (the checks in `tpt-eng-standards` are not yet wired in).
 - [~] MCP / LLM tool server exposing the CLI calcs with a units-checked schema.
-      v1 done in `tpt-eng-mcp`: a stdio MCP server with `run_sheet` (input schema
-      from `tpt-eng-sheet`) and `sheet_schema`. Still to do: the other CLI
-      calculations (beam file, tolerance, props lookups) as tools.
+      v1 done in `tpt-eng-mcp`: a stdio MCP server with `run_sheet`, `sheet_schema`,
+      `tolerance_stackup`, `fuel_properties` and `moist_air_state`. Still to do:
+      the beam-file calculation, which lives only in the CLI.
 - [~] Cross-crate `Model` trait / FMI-style co-simulation hook. v1 done in
       `tpt-eng-cosim` (unpublished): a `Model` trait with named ports, a
       fixed-step runner with explicit one-step coupling, and three models
