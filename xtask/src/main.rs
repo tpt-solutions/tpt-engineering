@@ -30,6 +30,8 @@ use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
 
+mod versions;
+
 /// `no_std`-capable crates, mirroring the CI `no_std` job and the
 /// `no_std = true` entries for this repo in `tpt-rust-map/registry.toml`.
 ///
@@ -92,11 +94,17 @@ fn run(args: &[String]) -> Result<(), String> {
                 cargo_deny(&["check"])?;
                 changelog_check()?;
                 doctest_check()?;
+                versions::pin_check()?;
+                link_check()?;
                 Ok(())
             }
             "new-crate" => new_crate(rest),
             "publish-status" | "changelog-check" => changelog_check(),
             "doctest-check" => doctest_check(),
+            "pin-check" => versions::pin_check(),
+            "link-check" => link_check(),
+            "package-check" => package_check(),
+            "versions" => versions::write_report(rest.iter().any(|a| a == "--offline")),
             other => Err(format!(
                 "unknown command `{other}`; run `cargo xtask` with no args for usage"
             )),
@@ -114,6 +122,10 @@ fn print_usage() {
            \x20\x20\x20\x20scaffolds Cargo.toml, src/lib.rs, README.md, tests/basic.rs, examples/basic.rs\n\
            no-std-matrix   build the no_std crates for {NO_STD_TARGET}\n\
            publish-status  verify README/CHANGELOG release claims match reality\n\
+           versions        write docs/CRATE_VERSIONS.md (add --offline to skip the registry)\n\
+           pin-check       workspace pins must equal their crate versions\n\
+           link-check      relative links in Markdown files must resolve\n\
+           package-check   every publishable crate must package (cargo package --list)\n\
            fmt | clippy | test | doctest | doc | deny | check   workspace hygiene gates"
     );
 }
@@ -423,12 +435,14 @@ fn changelog_check() -> Result<(), String> {
 
     // --- workspace crate count (xtask is a dev tool, not publishable) ------
     let members = parse_workspace_members(&root_cargo);
+    // Only publishable `tpt-eng-*` crates count toward the published/pending
+    // totals. The `tpt-engineering` meta-crate, `xtask`, and any member that
+    // sets `publish = false` (for example the Python bindings) are excluded.
     let member_names: Vec<String> = members
         .iter()
+        .filter(|m| is_publishable_member(&root, m))
         .map(|m| m.rsplit('/').next().unwrap_or(m).to_string())
         .collect();
-    // Only `tpt-eng-*` crates count toward the published/pending totals; the
-    // `tpt-engineering` meta-crate and `xtask` are not publishable libraries.
     let total = member_names
         .iter()
         .filter(|m| m.starts_with("tpt-eng-"))
@@ -779,7 +793,8 @@ fn write_file(path: &std::path::Path, contents: &str) -> Result<(), String> {
 
 /// Every library `tpt-eng-*` crate must carry at least one fenced doc example
 /// in its crate-level docs (`//!` block), so the API stays exercised by
-/// `cargo test --doc`. Binary-only crates (no `src/lib.rs`) are skipped.
+/// `cargo test --doc`. Binary-only crates (no `src/lib.rs`) and crates marked
+/// `publish = false` (for example the Python bindings) are skipped.
 fn doctest_check() -> Result<(), String> {
     let crates_dir = workspace_root().join("crates");
     let mut missing: Vec<String> = Vec::new();
@@ -793,7 +808,7 @@ fn doctest_check() -> Result<(), String> {
             continue;
         }
         let lib = entry.path().join("src").join("lib.rs");
-        if !lib.exists() {
+        if !lib.exists() || !is_publishable_member(&workspace_root(), &format!("crates/{name}")) {
             continue;
         }
         checked += 1;
@@ -813,5 +828,129 @@ fn doctest_check() -> Result<(), String> {
             "doctest-check: crates without a crate-level example: {}",
             missing.join(", ")
         ))
+    }
+}
+
+/// A workspace member is publishable unless its manifest says `publish = false`.
+fn is_publishable_member(root: &std::path::Path, member: &str) -> bool {
+    match read_text(&root.join(member).join("Cargo.toml")) {
+        Ok(text) => !text.lines().any(|l| l.trim() == "publish = false"),
+        Err(_) => true,
+    }
+}
+
+/// Every relative link in a Markdown file in the repository must point at an
+/// existing file or directory. External URLs, mail links and pure anchors are
+/// not checked. Build output and VCS directories are skipped.
+fn link_check() -> Result<(), String> {
+    let root = workspace_root();
+    let mut files = Vec::new();
+    collect_markdown(&root, &mut files)?;
+    let mut broken: Vec<String> = Vec::new();
+    for file in &files {
+        let text = read_text(file)?;
+        let dir = file.parent().unwrap_or(&root).to_path_buf();
+        for target in markdown_link_targets(&text) {
+            let path_part = target.split('#').next().unwrap_or("");
+            if path_part.is_empty() || path_part.contains("://") || path_part.starts_with("mailto:")
+            {
+                continue;
+            }
+            let resolved = dir.join(path_part);
+            if !resolved.exists() {
+                let rel = file.strip_prefix(&root).unwrap_or(file);
+                broken.push(format!("{}: {target}", rel.display()));
+            }
+        }
+    }
+    if broken.is_empty() {
+        println!(
+            "link-check: {} Markdown files, all relative links resolve",
+            files.len()
+        );
+        Ok(())
+    } else {
+        Err(format!(
+            "link-check: broken links:
+  {}",
+            broken.join(
+                "
+  "
+            )
+        ))
+    }
+}
+
+/// Markdown files under `dir`, skipping build output and VCS metadata.
+fn collect_markdown(dir: &std::path::Path, out: &mut Vec<PathBuf>) -> Result<(), String> {
+    const SKIP: &[&str] = &["target", ".git", "node_modules", "book"];
+    let entries = fs::read_dir(dir).map_err(|e| format!("cannot read {}: {e}", dir.display()))?;
+    for entry in entries {
+        let path = entry.map_err(|e| e.to_string())?.path();
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        if path.is_dir() {
+            if !SKIP.contains(&name) {
+                collect_markdown(&path, out)?;
+            }
+        } else if path.extension().is_some_and(|e| e == "md") {
+            out.push(path);
+        }
+    }
+    Ok(())
+}
+
+/// Targets of inline Markdown links `[text](target)`, in order.
+fn markdown_link_targets(text: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut rest = text;
+    while let Some(open) = rest.find("](") {
+        let after = &rest[open + 2..];
+        let Some(close) = after.find(')') else { break };
+        let target = after[..close].trim();
+        // Skip links whose target contains whitespace (titles) or line breaks.
+        if !target.is_empty() && !target.contains(char::is_whitespace) {
+            out.push(target.to_string());
+        }
+        rest = &after[close + 1..];
+    }
+    out
+}
+
+/// Each publishable `tpt-eng-*` crate must produce a package file list. This
+/// checks manifests, included files and metadata without building the crates.
+fn package_check() -> Result<(), String> {
+    let root = workspace_root();
+    let root_cargo = read_text(&root.join("Cargo.toml"))?;
+    let mut failed: Vec<String> = Vec::new();
+    let mut count = 0usize;
+    for member in parse_workspace_members(&root_cargo) {
+        if !is_publishable_member(&root, &member) {
+            continue;
+        }
+        let name = member.rsplit('/').next().unwrap_or(&member).to_string();
+        if !name.starts_with("tpt-eng-") {
+            continue;
+        }
+        count += 1;
+        let out = Command::new("cargo")
+            .args([
+                "package",
+                "--list",
+                "--allow-dirty",
+                "--no-verify",
+                "-p",
+                &name,
+            ])
+            .output()
+            .map_err(|e| format!("cannot run cargo: {e}"))?;
+        if !out.status.success() {
+            failed.push(name);
+        }
+    }
+    if failed.is_empty() {
+        println!("package-check: {count} crates package cleanly");
+        Ok(())
+    } else {
+        Err(format!("package-check failed for: {}", failed.join(", ")))
     }
 }
