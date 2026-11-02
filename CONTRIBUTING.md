@@ -39,3 +39,6 @@ A root `justfile` mirrors these (`just check`, `just test`, `just ci`).
 
 Error handling, units and numeric precision are set out in
 [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md). New code should follow them.
+
+Versioning and compatibility rules are in [`docs/STABILITY.md`](docs/STABILITY.md).
+The current crate versions are tracked in [`docs/CRATE_VERSIONS.md`](docs/CRATE_VERSIONS.md).

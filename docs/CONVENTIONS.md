@@ -4,6 +4,12 @@ These rules decide how the `tpt-eng-*` crates handle errors, units and numeric
 precision. New code follows them. Existing exceptions are listed at the end and
 are kept on purpose.
 
+## 0. Scope of the doc-example rule
+
+Every publishable library crate carries a crate-level example, checked by
+`cargo xtask doctest-check`. Binary-only crates and crates marked
+`publish = false` (such as `tpt-eng-py`, built with maturin) are exempt.
+
 ## 1. Error strategy
 
 Pick the mechanism by what kind of failure it is:
