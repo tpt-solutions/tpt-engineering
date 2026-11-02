@@ -63,6 +63,12 @@ and `tpt_eng.air.relative_humidity_tagged`. Hard input errors, such as
 non-finite values or a temperature of zero, still raise even without
 `strict`.
 
+## Notebook
+
+[`notebooks/tour.ipynb`](notebooks/tour.ipynb) walks through water, air, fuels,
+a PID loop and a beam with the bindings. It has no saved outputs, so run it
+to see the results.
+
 ## Build and test
 
 Requires Rust 1.85+ and Python 3.10+.
