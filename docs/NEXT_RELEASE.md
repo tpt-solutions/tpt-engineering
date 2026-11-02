@@ -117,11 +117,11 @@ Publish in the order given, dependencies first.
 | 8 | `tpt-eng-geotech` | 0.1.0 → 0.1.1 | guards (cv, fs, LL == PL, sigma0 = 0, `coulomb_ka` NaN when beta > phi); bearing capacity, settlement, earth pressure, Atterberg added | `7500f68` | — |
 | 9 | `tpt-eng-unit-ops` | 0.1.0 → 0.1.1 | `gilliland_stages` constants and inversion; McCabe–Thiele feed-line fix (already in CHANGELOG) | `8820b3f` | `props`, `heat-transfer` |
 | 10 | `tpt-eng-structural` | **0.1.1 → 0.1.2** | `Beam::moment_at` double-counts partial UDL for `xp > end`; zero-length UDL; span guards | `d900916` | `safety` |
-| 11 | `tpt-eng-safety` | **0.1.1 → 0.1.2** | touched in `d900916`, verify | `d900916` | — |
-| 12 | `tpt-eng-tolerance` | **0.1.1 → 0.1.2** | `Uniform::new` no longer panics on NaN / inverted bounds; proptests | `d900916` | `gdt` (verify it depends on tolerance) |
-| 13 | `tpt-eng-mesh` / `tpt-eng-io` | verify | binary STL length check before `try_into().unwrap()` | — | — |
-| 14 | `tpt-eng-plot`, `tpt-eng-timeseries*` | verify | touched in `7500f68` (CLI/umbrella/reporting/plotting/timeseries) | `7500f68` | — |
-| 15 | `tpt-eng-cad`, `tpt-eng-gdt`, `tpt-eng-standards` | verify, may need no bump | not identified in Phase 11A | — | — |
+| 11 | `tpt-eng-safety` | no bump | verified 2026-11-03: doc-test examples only | — | — |
+| 12 | `tpt-eng-tolerance` | **0.1.1 → 0.1.2** | zero-width tolerance no longer panics in `monte_carlo`; non-finite input is a documented panic (verified 2026-11-03) | `d900916` | `gdt` (verify it depends on tolerance) |
+| 13 | `tpt-eng-mesh` / `tpt-eng-io` | no bump | verified 2026-11-03: mesh STL check already in 0.1.0; io has no STL parser | — | — |
+| 14 | `tpt-eng-plot`, `tpt-eng-timeseries*` | no bump | verified 2026-11-03: doc-test examples only | — | — |
+| 15 | `tpt-eng-cad`, `tpt-eng-gdt`, `tpt-eng-standards` | no bump | verified 2026-11-03: cad and gdt add doc-test examples only; standards is unchanged | — | — |
 
 **Breaking changes found 2026-11-03 (not patch releases).** `cargo semver-checks`
 flagged `nusselt_sphere` in heat-transfer (a third parameter was added). A
@@ -133,11 +133,21 @@ republish: `building-sys`, `examples`, `pcb`, `power-components`, `renewables`
 umbrella. `building-sys`, `examples` and `power-components` also call the changed
 functions, so they need code updates, not just a version change.
 
-**Row 12 needs checking.** The `Uniform::new` panic fix is not in the tree. No
-type or function called `Uniform` exists in `tpt-eng-tolerance` or anywhere
-else in the workspace. Find the commit that claims it (`d900916`) before
-keeping that claim in the changelog or this table. No tolerance changelog
-entry has been written for it.
+**Row 12 resolved 2026-11-03.** The `Uniform` in the original note is
+`rand_distr::Uniform`, an external type. The Phase 11A change in `d900916` moved the
+call behind a finite-input check, and zero-width tolerances now skip the sampler.
+Inverted bounds cannot occur. The tolerance changelog now says this.
+
+**Verified 2026-11-03 against the published sources** (cached in the cargo
+registry, compared with `scripts/pub_api_diff.py` and a whitespace-insensitive
+source diff):
+
+- `safety`, `cad`, `gdt`, `plot`, `timeseries`: only doc-test examples were added.
+  No code change, so no bump.
+- `mesh`: the binary STL length check was already in 0.1.0. No change, so no bump.
+- `io`, `standards`: no source change, so no bump.
+- Public-signature diff over every changed crate: only `electrical` and
+  `heat-transfer` have breaking signature changes (listed above).
 
 Behaviour-change warning for rows 1–9: several fixes change numbers that
 callers may depend on (renewables PV, unit-ops stage count, pcb microstrip
@@ -223,6 +233,9 @@ Still open:
 - [ ] `cargo xtask check` (fmt, clippy `-D warnings`, deny, changelog,
       doctest, pin, link)
 - [ ] `cargo xtask package-check` (the same as CI's package job)
+- [ ] `scripts/pub_api_diff.py <published src> <current src>` on every crate in
+      section 3. Any `CHANGED` or `REMOVED` line needs a minor bump and a `Breaking`
+      entry, whatever `cargo semver-checks` says. The tool missed two breaks in 2026-11-03.
 - [ ] `cargo test --workspace --all-features` (521 tests in Phase 11 status)
 - [ ] Working tree clean for every crate being published (section 0)
 - [ ] `cargo xtask versions` run after the batch, and `docs/CRATE_VERSIONS.md`
