@@ -99,7 +99,13 @@ pub fn run(args: PropsArgs, json: bool) -> Result<()> {
     }
 }
 
-fn run_water(temp: f64, pressure: f64, temp_unit: &str, pressure_unit: &str, json: bool) -> Result<()> {
+fn run_water(
+    temp: f64,
+    pressure: f64,
+    temp_unit: &str,
+    pressure_unit: &str,
+    json: bool,
+) -> Result<()> {
     let t = ThermodynamicTemperature::new::<kelvin>(to_kelvin(temp, temp_unit));
     let p = Pressure::new::<pascal>(parse_pressure(pressure, pressure_unit)?);
     let s = tpt_eng_props_water::state(t, p)

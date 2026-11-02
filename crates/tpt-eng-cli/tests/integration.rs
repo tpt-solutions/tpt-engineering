@@ -327,3 +327,25 @@ fn test_completions_emit_script() {
     let stdout = String::from_utf8(out.stdout).unwrap();
     assert!(stdout.contains("tpt-eng"), "script should name the binary");
 }
+
+#[test]
+fn test_calc_beam_file_prints_json() {
+    let path = std::env::temp_dir().join("tpt-eng-cli-beam-file.json");
+    std::fs::write(
+        &path,
+        r#"{"span_m": 10.0, "loads": [{"type": "point", "at_m": 5.0, "kn": 10.0}]}"#,
+    )
+    .unwrap();
+    let out = bin()
+        .args(["calc", "beam-file", path.to_str().unwrap()])
+        .output()
+        .unwrap();
+    let _ = std::fs::remove_file(&path);
+    assert!(
+        out.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).expect("valid JSON");
+    assert!((v["max_moment_knm"].as_f64().unwrap() - 25.0).abs() < 1e-6);
+}

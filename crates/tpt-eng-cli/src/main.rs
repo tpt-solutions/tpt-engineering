@@ -6,6 +6,8 @@ use std::path::PathBuf;
 
 use tpt_eng_plot::Drawing;
 
+mod beamfile;
+mod catalog;
 mod controls;
 mod materials;
 mod props;
@@ -47,6 +49,16 @@ enum Command {
     Pid(controls::PidArgs),
     /// Dimensional tolerance stack-up analysis.
     Tolerance(tolerance::ToleranceArgs),
+    /// List the publishable tpt-eng crates, optionally filtered by words.
+    Crates {
+        /// Words to match in the name, summary or keywords.
+        filter: Vec<String>,
+    },
+    /// Suggest crates for a task, e.g. `recommend pump curve`.
+    Recommend {
+        /// What you want to compute, in a few words.
+        task: Vec<String>,
+    },
     /// Print a shell completion script to stdout.
     Completions {
         /// Target shell: bash | zsh | fish | powershell | elvish.
@@ -144,6 +156,11 @@ struct CalcArgs {
 
 #[derive(Subcommand)]
 enum CalcCmd {
+    /// Analyse a beam described in a JSON file (see crate docs for the schema).
+    BeamFile {
+        /// Path to the beam JSON file.
+        path: PathBuf,
+    },
     /// Simply supported beam under a uniformly distributed load.
     Beam {
         /// Span length (m).
@@ -191,6 +208,21 @@ fn main() -> Result<()> {
         Command::Props(args) => props::run(args, json),
         Command::Pid(args) => controls::run(args),
         Command::Tolerance(args) => tolerance::run(args),
+        Command::Crates { filter } => {
+            print_catalog(&catalog::search(&filter.join(" ")));
+            Ok(())
+        }
+        Command::Recommend { task } => {
+            let hits = catalog::search(&task.join(" "));
+            if hits.is_empty() {
+                bail!(
+                    "no crate matches `{}`; try `tpt-eng crates`",
+                    task.join(" ")
+                );
+            }
+            print_catalog(&hits);
+            Ok(())
+        }
         Command::Completions { shell } => {
             use clap::CommandFactory;
             clap_complete::generate(
@@ -358,6 +390,7 @@ fn cmd_calc(args: CalcArgs) -> Result<()> {
             report,
             plot,
         } => cmd_calc_beam(span, load, &material, section, report, plot),
+        CalcCmd::BeamFile { path } => beamfile::run(&path),
     }
 }
 
@@ -454,4 +487,11 @@ fn cmd_calc_beam(
     }
 
     Ok(())
+}
+
+fn print_catalog(entries: &[&catalog::Entry]) {
+    for e in entries {
+        println!("{:<26} {}", e.name, e.summary);
+    }
+    println!("{} crate(s)", entries.len());
 }
