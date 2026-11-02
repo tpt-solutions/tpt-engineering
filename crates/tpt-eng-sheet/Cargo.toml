@@ -1,0 +1,28 @@
+[package]
+name = "tpt-eng-sheet"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Declarative calculation sheets: a TOML or JSON file names a calculation and its inputs, and produces a report."
+readme = "README.md"
+keywords = ["engineering", "calculation", "toml", "report", "schema"]
+categories = ["science", "config"]
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+schemars = "1"
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+toml = "1"
+tpt-math-units = "0.1.0"
+tpt-eng-controls = { workspace = true }
+tpt-eng-props-water = { workspace = true }
+tpt-eng-report = { workspace = true }
+tpt-eng-sections = { workspace = true }
+tpt-eng-structural = { workspace = true }
+
+[lints]
+workspace = true

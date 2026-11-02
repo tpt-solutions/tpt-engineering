@@ -1,0 +1,10 @@
+# Simply supported rectangular beam under a uniform load, with a stress check.
+title = "Lintel check"
+
+[calc]
+kind = "beam-udl"
+span_m = 4.0
+load_n_per_m = 2000.0
+width_m = 0.1
+height_m = 0.2
+allowable_stress_mpa = 12.0

@@ -1,0 +1,13 @@
+# PI loop on a first-order plant with a 1 s time constant.
+title = "Level loop tuning"
+
+[calc]
+kind = "pid-step"
+kp = 2.0
+ki = 1.0
+kd = 0.0
+setpoint = 1.0
+tau_s = 1.0
+dt_s = 0.01
+duration_s = 10.0
+output_limit = 5.0
