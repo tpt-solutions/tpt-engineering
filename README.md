@@ -9,7 +9,7 @@ physical-systems verticals.
 Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE).
 
 > **43 of 43 crates are published on [crates.io](https://crates.io)** at
-> `0.1.0` (Batches 1–8 — see `RELEASE.md`). None are pending. There is no
+> 36 at `0.1.0` and 7 at `0.1.1` (Batches 1–8 — see `RELEASE.md`). None are pending. There is no
 > `v0.1.0` git tag yet. APIs are unstable until the first tagged release.
 
 ## Scope
@@ -33,9 +33,13 @@ environment).
 ## Release & publish status
 
 All 43 `tpt-eng-*` crates are published on [crates.io](https://crates.io) at
-`0.1.0`. Batches 1–5 covered the original 29 crates; Batches 6–8 covered the 14
+`0.1.0`, except `tpt-eng-props`, `-structural`, `-standards`, `-gdt`, `-cad`,
+`-tolerance` and `-safety`, which are at `0.1.1`. Batches 1–5 covered the original 29 crates; Batches 6–8 covered the 14
 Phase-9 domain crates. The batch plan and per-crate state live in
 [`RELEASE.md`](RELEASE.md) and [`docs/PUBLISH_TRACKING.md`](docs/PUBLISH_TRACKING.md).
+The latest version of every crate, with its crates.io state, is in
+[`docs/CRATE_VERSIONS.md`](docs/CRATE_VERSIONS.md). Versioning rules are in
+[`docs/STABILITY.md`](docs/STABILITY.md).
 
 Per-crate publish state is kept consistent with those tracking docs by
 `cargo xtask publish-status` (also run as part of `cargo xtask check` in CI),
@@ -44,7 +48,7 @@ which asserts the README/CHANGELOG counts and the pending-crate set against
 
 | Status | Crates | Source |
 |--------|--------|--------|
-| Published (`0.1.0`) | 43 | `RELEASE.md` Batches 1–8 |
+| Published | 43 (36 at `0.1.0`, 7 at `0.1.1`) | `RELEASE.md` Batches 1–8, `docs/CRATE_VERSIONS.md` |
 | Pending | 0 | — |
 
 > There is no `v0.1.0` git tag yet. APIs are unstable until the first tagged

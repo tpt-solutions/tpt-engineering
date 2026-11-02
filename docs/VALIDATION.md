@@ -45,11 +45,17 @@ against a second source.
 | `tpt-eng-renewables` | Single-diode solve | residual < 10⁻⁹ A across the I–V curve | `pv_solution_satisfies_diode_equation_near_voc` |
 | `tpt-eng-tolerance` | Worst-case stack-up | 34.7–35.3 for 10 ± 0.1 and 25 ± 0.2 | `tpt-eng-tolerance` doctest |
 
+## Reference files
+
+`crates/tpt-eng-structural/tests/reference/beams.csv` holds six closed-form beam
+results, each row with its formula and citation. `tests/reference.rs` reads the
+file and fails if any value differs by more than 1e-9 relative. It runs with
+`cargo test -p tpt-eng-structural`. Other crates still have their checks inline
+in the tables above. Moving them into CSV files is the next step.
+
 ## Not yet validated
 
 - IAPWS-IF97 is checked at a few spot points, not against the full published
   table set. Region 3 is unsupported (see `tpt-eng-props-water`).
-- A CSV of reference values with a citation per row (`tests/reference/`) is
-  planned but not written. Until it is, the table above is the record.
 - Skin-effect and microstrip closed forms are approximations. Their validity
   ranges are in the crate docs, not re-derived here.
