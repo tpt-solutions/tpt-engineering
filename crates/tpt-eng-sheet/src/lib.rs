@@ -300,6 +300,25 @@ pressure_kpa = 100.0
     }
 
     #[test]
+    fn overstressed_beam_fails_and_the_report_says_so() {
+        // Stress is 6 MPa; an allowable of 4 MPa gives utilisation 1.5.
+        let text = BEAM.replace("allowable_stress_mpa = 12.0", "allowable_stress_mpa = 4.0");
+        let sheet = Sheet::from_toml(&text).unwrap();
+        let md = tpt_eng_report::to_markdown(&run(&sheet).unwrap());
+        assert!(md.contains("| Utilisation | 1.5 |  | FAIL |"));
+        assert!(md.contains("Overall status: FAIL."));
+    }
+
+    #[test]
+    fn beam_report_lists_formulas_and_references() {
+        let sheet = Sheet::from_toml(BEAM).unwrap();
+        let md = tpt_eng_report::to_markdown(&run(&sheet).unwrap());
+        assert!(md.contains("Calculation steps"));
+        assert!(md.contains("M_max = w·L² / 8"));
+        assert!(md.contains("Roark's Formulas for Stress and Strain"));
+    }
+
+    #[test]
     fn committed_schema_is_up_to_date() {
         let committed = include_str!("../schema/calc-sheet.schema.json");
         assert_eq!(

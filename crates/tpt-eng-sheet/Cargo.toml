@@ -19,6 +19,7 @@ thiserror = { workspace = true }
 toml = "1"
 tpt-math-units = "0.1.0"
 tpt-eng-controls = { workspace = true }
+tpt-eng-standards = { workspace = true }
 tpt-eng-props-water = { workspace = true }
 tpt-eng-report = { workspace = true }
 tpt-eng-sections = { workspace = true }

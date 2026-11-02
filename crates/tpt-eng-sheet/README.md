@@ -34,6 +34,10 @@ tpt-eng sheet schema --out calc-sheet.schema.json
 Unknown fields and unknown `kind` values are rejected, so a misspelt input is
 an error rather than being ignored.
 
+Each report lists its inputs, the formula for every step (with the reference it
+comes from), the results with pass/fail, and the references. An overall status
+line appears when any result has a pass/fail check.
+
 ## Schema
 
 [`schema/calc-sheet.schema.json`](schema/calc-sheet.schema.json) is generated
