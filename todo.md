@@ -814,10 +814,13 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
       properties and a PID step-response tuner, with a static page in `www/` and
       a Node smoke test in CI.
 - [~] Provenance-tagged results (`{source, standard, validity range,
-      warnings}`) so out-of-range correlation use is flagged, not silent. Pilot
-      done in `tpt-eng-provenance`, water and air `*_tagged` functions, and the
-      Python `Tagged` API. Still to do: the other props crates, and unifying the
-      three existing provenance types.
+      warnings}`) so out-of-range correlation use is flagged, not silent. Done:
+      `tpt-eng-provenance`, the water and air `*_tagged` functions, the mixture
+      Peng–Robinson saturation pressure, and the Python `Tagged` API. Not tagged:
+      `tpt-eng-props-fuels` (constants with no validity range, and no exact
+      references to cite) and the `tpt-eng-props` facade (re-exports only). Still
+      to do: the mixture bubble and dew points, and unifying the three existing
+      provenance types.
 - [~] Declarative calc-sheet format (TOML / YAML -> calc, report, plot) with a
       JSON Schema, driven by the CLI. v1 done in `tpt-eng-sheet`: TOML and JSON
       sheets, three calculations (`water-state`, `beam-udl`, `pid-step`), a

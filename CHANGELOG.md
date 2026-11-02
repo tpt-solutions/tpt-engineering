@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `sheet_schema`. Sheet errors come back as tool errors, so a client can fix them.
   It also offers `tolerance_stackup`, `fuel_properties` and `moist_air_state`,
   which call the tolerance, fuel and air crates directly.
+- `tpt-eng-props-mixture` 0.1.1: `pr_saturation_pressure_tagged`, with the validity
+  range below the component's critical temperature. Existing signatures are unchanged.
+- `tpt-eng-props-water`, `tpt-eng-props-air` and `tpt-eng-props-mixture` are at 0.1.1.
+  Their `*_tagged` functions depend on `tpt-eng-provenance`, so they are republished
+  after it.
 - `tpt-eng-provenance` (new, pending publication — Batch 10): `Tagged<T>`,
   `Provenance`, `Validity`, `Source` and a `Warnings` bitset, for results that
   carry their source and validity range. `no_std`, no dependencies.

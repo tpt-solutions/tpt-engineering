@@ -204,13 +204,17 @@ until a version bump + republish. Published in dependency order:
 
 ### Batch 10 — tagged results and calc sheets (after Batch 9)
 
-Publish in this order. `tpt-eng-provenance` has no dependencies. `tpt-eng-report`
-0.1.1 adds the `Calculation` builder. `tpt-eng-sheet` depends on both, so it must
-follow them on crates.io.
+Publish in this order. `tpt-eng-provenance` has no dependencies, and the
+republished crates below depend on it, so it goes first. `tpt-eng-report` 0.1.1
+adds the `Calculation` builder. `tpt-eng-props-water`, `-air` and `-mixture` 0.1.1
+add `*_tagged` functions. `tpt-eng-sheet` depends on all of these, so it goes last.
 
-- [ ] `tpt-eng-report` 0.1.1 (republish) — `cargo publish -p tpt-eng-report`
 - [ ] `tpt-eng-provenance` — `cargo publish -p tpt-eng-provenance`
-- [ ] `tpt-eng-sheet` — `cargo publish -p tpt-eng-sheet` (after the two above)
+- [ ] `tpt-eng-report` 0.1.1 (republish) — `cargo publish -p tpt-eng-report`
+- [ ] `tpt-eng-props-water` 0.1.1 (republish) — `cargo publish -p tpt-eng-props-water`
+- [ ] `tpt-eng-props-air` 0.1.1 (republish) — `cargo publish -p tpt-eng-props-air`
+- [ ] `tpt-eng-props-mixture` 0.1.1 (republish) — `cargo publish -p tpt-eng-props-mixture`
+- [ ] `tpt-eng-sheet` — `cargo publish -p tpt-eng-sheet` (after all of the above)
 
 `tpt-eng-cli` is already published, but its `sheet` subcommand depends on
 `tpt-eng-sheet`. Release a new `tpt-eng-cli` version after `tpt-eng-sheet` is live.
