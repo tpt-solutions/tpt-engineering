@@ -28,6 +28,12 @@ tpt-eng-tolerance = { workspace = true }
 tpt-eng-gdt = { workspace = true }
 tpt-eng-geometry = { workspace = true }
 tpt-eng-report = { workspace = true }
+tpt-eng-plot = { workspace = true }
+tpt-eng-unit-ops = { workspace = true }
+tpt-eng-schedule = { workspace = true }
+tpt-eng-building-sys = { workspace = true }
+tpt-eng-pcb = { workspace = true }
+tpt-eng-thermal-mgmt = { workspace = true }
 tpt-math-units = { workspace = true }
 
 [features]

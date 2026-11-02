@@ -981,6 +981,7 @@ dependencies = [
 name = "tpt-eng-electrical"
 version = "0.1.0"
 dependencies = [
+ "proptest",
  "tpt-math-numeric 0.1.0",
  "tpt-math-units",
 ]
@@ -989,6 +990,7 @@ dependencies = [
 name = "tpt-eng-examples"
 version = "0.1.0"
 dependencies = [
+ "tpt-eng-building-sys",
  "tpt-eng-controls",
  "tpt-eng-electrical",
  "tpt-eng-gdt",
@@ -996,15 +998,20 @@ dependencies = [
  "tpt-eng-geometry",
  "tpt-eng-materials",
  "tpt-eng-network-matrix",
+ "tpt-eng-pcb",
+ "tpt-eng-plot",
  "tpt-eng-props-fuels",
  "tpt-eng-renewables",
  "tpt-eng-report",
+ "tpt-eng-schedule",
  "tpt-eng-sections",
  "tpt-eng-structural",
+ "tpt-eng-thermal-mgmt",
  "tpt-eng-timeseries-align",
  "tpt-eng-timeseries-core",
  "tpt-eng-timeseries-gap",
  "tpt-eng-tolerance",
+ "tpt-eng-unit-ops",
  "tpt-math-units",
 ]
 
@@ -1051,6 +1058,7 @@ dependencies = [
 name = "tpt-eng-heat-transfer"
 version = "0.1.0"
 dependencies = [
+ "proptest",
  "tpt-eng-props-air",
  "tpt-eng-props-water",
  "tpt-math-units",
@@ -1143,6 +1151,7 @@ dependencies = [
 name = "tpt-eng-props-air"
 version = "0.1.0"
 dependencies = [
+ "proptest",
  "tpt-math-numeric 0.1.0",
  "tpt-math-units",
 ]
@@ -1189,6 +1198,7 @@ name = "tpt-eng-reliability"
 version = "0.1.0"
 dependencies = [
  "approx",
+ "proptest",
  "rand",
  "thiserror",
  "tpt-math-stats",
@@ -1308,6 +1318,7 @@ dependencies = [
 name = "tpt-eng-unit-ops"
 version = "0.1.0"
 dependencies = [
+ "proptest",
  "tpt-eng-heat-transfer",
  "tpt-eng-props",
 ]
