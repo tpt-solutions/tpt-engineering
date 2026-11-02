@@ -816,11 +816,10 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
 - [~] Provenance-tagged results (`{source, standard, validity range,
       warnings}`) so out-of-range correlation use is flagged, not silent. Done:
       `tpt-eng-provenance`, the water and air `*_tagged` functions, the mixture
-      Peng–Robinson saturation pressure, and the Python `Tagged` API. Not tagged:
-      `tpt-eng-props-fuels` (constants with no validity range, and no exact
-      references to cite) and the `tpt-eng-props` facade (re-exports only). Still
-      to do: the mixture bubble and dew points, and unifying the three existing
-      provenance types.
+      Peng–Robinson saturation pressure, bubble point and dew point, and the Python
+      `Tagged` API. Not tagged: `tpt-eng-props-fuels` (constants with no validity
+      range, and no exact references to cite) and the `tpt-eng-props` facade
+      (re-exports only). Still to do: unifying the three existing provenance types.
 - [~] Declarative calc-sheet format (TOML / YAML -> calc, report, plot) with a
       JSON Schema, driven by the CLI. v1 done in `tpt-eng-sheet`: TOML and JSON
       sheets, three calculations (`water-state`, `beam-udl`, `pid-step`), a
