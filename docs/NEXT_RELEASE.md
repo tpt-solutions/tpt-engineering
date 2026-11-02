@@ -46,17 +46,22 @@ examples differ from its commit. Nothing to do before publishing.
 
 Order matters. Each line depends on the lines above it.
 
-- [ ] `tpt-eng-provenance` 0.1.0 (new crate, no `tpt-eng` deps). New-crate
-      name, so it counts toward the crates.io new-crate burst limit.
-- [ ] `tpt-eng-report` 0.1.1 (republish; adds the `Calculation` builder).
-- [ ] `tpt-eng-props-water` 0.1.1 (needs `provenance`; adds `*_tagged`).
-- [ ] `tpt-eng-props-air` 0.1.1 (needs `provenance`; dew point range check and
-      ice-form saturation pressure from Phase 11A).
-- [ ] `tpt-eng-props-mixture` 0.1.1 (needs `provenance`; tagged bubble/dew/PR
-      saturation).
-- [ ] `tpt-eng-sheet` 0.1.0 (new crate; needs `report` 0.1.1, `props-water`
-      0.1.1, `standards`, `structural`, `controls`, `sections`).
-- [ ] `tpt-eng-cli` **0.1.1** — **not in `RELEASE.md` yet**. The published
+- [x] `tpt-eng-provenance` 0.1.0 (new crate, no `tpt-eng` deps). New-crate
+      name, so it counts toward the crates.io new-crate burst limit. Published 2026-11-03.
+- [x] `tpt-eng-report` 0.1.1 (republish; adds the `Calculation` builder). Published 2026-11-03.
+- [x] `tpt-eng-props-water` 0.1.1 (needs `provenance`; adds `*_tagged`). Published 2026-11-03.
+- [x] `tpt-eng-props-air` 0.1.1 (needs `provenance`; dew point range check and
+      ice-form saturation pressure from Phase 11A). Published 2026-11-03. Its
+      CHANGELOG entry does not yet mention the Phase 11A fixes; fix that in the wave.
+- [x] `tpt-eng-props-mixture` 0.1.1 (needs `provenance`; tagged bubble/dew/PR
+      saturation). Published 2026-11-03.
+- [x] `tpt-eng-sheet` 0.1.0 (new crate; needs `report` 0.1.1, `props-water`
+      0.1.1, `standards`, `structural`, `controls`, `sections`). Published 2026-11-03.
+- [ ] `tpt-eng-cli` **0.1.1** — **blocked**. Its verify build fails:
+      `Beam::try_add` (from Phase 11A, commit `d900916`) is not in the published
+      `tpt-eng-structural` 0.1.1. Publish after `structural` 0.1.2 (wave, row 10).
+      The `cli` manifest still says `version.workspace = true`, and its CHANGELOG
+      entry is under `[Unreleased]`. — **not in `RELEASE.md` yet**. The published
       0.1.0 has no `sheet run` / `sheet schema`. Needs its own version
       override, because `cli` uses `version.workspace = true`. Publish after
       `sheet`.

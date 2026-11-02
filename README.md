@@ -8,8 +8,8 @@ physical-systems verticals.
 
 Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE).
 
-> **43 of 45 crates are published on [crates.io](https://crates.io)** at
-> 36 at `0.1.0` and 7 at `0.1.1` (Batches 1–8 — see `RELEASE.md`). Two are pending, both in Batch 10: `tpt-eng-provenance` and `tpt-eng-sheet`.
+> **45 of 45 crates are published on [crates.io](https://crates.io)** at
+> 34 at `0.1.0` and 11 at `0.1.1` (Batches 1–10 — see `RELEASE.md`). None are pending.
 > The `v0.1.0` git tag is cut. APIs are still unstable; see [`docs/STABILITY.md`](docs/STABILITY.md).
 
 ## Scope
@@ -32,10 +32,11 @@ environment).
 
 ## Release & publish status
 
-43 of 45 `tpt-eng-*` crates are published on [crates.io](https://crates.io) at
-`0.1.0`, except `tpt-eng-props`, `-structural`, `-standards`, `-gdt`, `-cad`,
-`-tolerance` and `-safety`, which are at `0.1.1`. Batches 1–5 covered the original 29 crates; Batches 6–8 covered the 14
-Phase-9 domain crates. The batch plan and per-crate state live in
+45 of 45 `tpt-eng-*` crates are published on [crates.io](https://crates.io). 34 are
+at `0.1.0`. The other 11 are at `0.1.1`: `tpt-eng-cad`, `-gdt`, `-props`, `-props-air`,
+`-props-mixture`, `-props-water`, `-report`, `-safety`, `-standards`, `-structural` and
+`-tolerance`. Batches 1–5 covered the original 29 crates; Batches 6–8 covered the 14
+Phase-9 domain crates; Batches 9–10 added the republishes and the `provenance` and `sheet` crates. The batch plan and per-crate state live in
 [`RELEASE.md`](RELEASE.md) and [`docs/PUBLISH_TRACKING.md`](docs/PUBLISH_TRACKING.md).
 The latest version of every crate, with its crates.io state, is in
 [`docs/CRATE_VERSIONS.md`](docs/CRATE_VERSIONS.md). Versioning rules are in
@@ -48,8 +49,8 @@ which asserts the README/CHANGELOG counts and the pending-crate set against
 
 | Status | Crates | Source |
 |--------|--------|--------|
-| Published | 43 (36 at `0.1.0`, 7 at `0.1.1`) | `RELEASE.md` Batches 1–8, `docs/CRATE_VERSIONS.md` |
-| Pending | 2 (`tpt-eng-provenance`, `tpt-eng-sheet`) | `RELEASE.md` Batch 10 |
+| Published | 45 (34 at `0.1.0`, 11 at `0.1.1`) | `RELEASE.md` Batches 1–10, `docs/CRATE_VERSIONS.md` |
+| Pending | 0 | |
 
 > The `v0.1.0` git tag is cut. APIs are still unstable; see
 > [`docs/STABILITY.md`](docs/STABILITY.md) for the versioning rules.
@@ -101,8 +102,8 @@ which asserts the README/CHANGELOG counts and the pending-crate set against
 | `tpt-eng-geotech` | earth | no | Soil constitutive models, borehole stratigraphy |
 | `tpt-eng-building-sys` | construction | no | HVAC loads, plumbing fixture units, panel scheduling |
 | `tpt-eng-schedule` | construction | no | CPM/PERT, resource leveling, Earned Value Management |
-| `tpt-eng-provenance` | foundation | yes | Provenance and validity-range tags for results (pending, Batch 10) |
-| `tpt-eng-sheet` | integration | | Declarative TOML/JSON calculation sheets with reports (pending, Batch 10) |
+| `tpt-eng-provenance` | foundation | yes | Provenance and validity-range tags for results |
+| `tpt-eng-sheet` | integration | | Declarative TOML/JSON calculation sheets with reports |
 | `tpt-eng-cosim` | integration | | Fixed-step co-simulation of connected models (not published) |
 | `tpt-eng-mcp` | integration | | Model Context Protocol server exposing calculation sheets as tools (not published) |
 | `tpt-eng-py` | integration | | Python (PyO3) bindings (not published) |
