@@ -7,7 +7,6 @@ authors.workspace = true
 description = "Umbrella meta-crate re-exporting the tpt-eng-* engineering primitives behind per-crate feature flags"
 repository.workspace = true
 homepage.workspace = true
-publish = false
 
 [dependencies]
 tpt-eng-props-water = { workspace = true, optional = true }
