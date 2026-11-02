@@ -7,6 +7,11 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+### Fixed
+
+- PID anti-windup has a recovery test. The integral is frozen while the output is saturated, as the documentation says.
+- `TransferFunction::new` documents its panic on an empty or zero-leading denominator. The assertion message says why.
+
 ### Changed
 
 - Example code formatted with `cargo fmt` (no functional change).

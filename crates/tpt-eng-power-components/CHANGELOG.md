@@ -7,6 +7,10 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+### Fixed
+
+- Guards for zero poles, zero efficiency and zero `turns_ratio`, which previously divided by zero.
+
 ### Changed
 
 - Example code formatted with `cargo fmt` (no functional change).

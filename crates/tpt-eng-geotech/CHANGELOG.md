@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Guards for `cv = 0`, `fs = 0`, `LL == PL`, `sigma0 = 0`, and for `coulomb_ka` when the slope angle is not less than the friction angle.
+
 ### Changed
 
 - Example code formatted with `cargo fmt` (no functional change).

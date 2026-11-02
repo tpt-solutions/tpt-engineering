@@ -7,6 +7,12 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+### Fixed
+
+- The PV fixed-point iteration checks for convergence.
+- `saturation_current` includes the T³ term. PV outputs change.
+- Wind cut-in, rated and cut-out speeds, and the cell constants, now carry their references.
+
 ### Changed
 
 - Example code formatted with `cargo fmt` (no functional change).

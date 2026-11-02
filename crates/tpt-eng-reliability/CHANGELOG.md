@@ -7,6 +7,10 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+### Fixed
+
+- `miners_rule`: a life of zero or less with a positive cycle count now counts as infinite damage, not zero. Previously it counted as no damage at all.
+
 ### Changed
 
 - Example code formatted with `cargo fmt` (no functional change).

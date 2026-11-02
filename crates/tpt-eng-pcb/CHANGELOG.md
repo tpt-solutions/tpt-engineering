@@ -7,6 +7,11 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+### Fixed
+
+- `microstrip_impedance` uses the Hammerstad–Jensen formula. The former jump of about 30 % at w/h = 1 is gone, so impedances near that ratio change.
+- Non-positive inputs are rejected as documented.
+
 ### Changed
 
 - Example code formatted with `cargo fmt` (no functional change).
