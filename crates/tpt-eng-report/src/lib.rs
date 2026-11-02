@@ -13,6 +13,7 @@
 //! assert!(md.contains("Beam check"));
 //! ```
 
+pub mod calculation;
 pub mod error;
 pub mod html;
 pub mod json;
@@ -20,6 +21,7 @@ pub mod markdown;
 pub mod model;
 pub mod validate;
 
+pub use calculation::{Calculation, Step};
 pub use error::{Error, Result};
 pub use model::{NamedValue, Report, ResultEntry, Section, Table, ValidationStatus};
 pub use validate::{validate_max, validate_min, validate_range};

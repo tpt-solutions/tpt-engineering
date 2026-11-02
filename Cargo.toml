@@ -98,7 +98,7 @@ tpt-eng-tolerance = { version = "0.1.1", path = "crates/tpt-eng-tolerance" }
 tpt-eng-reliability = { version = "0.1.0", path = "crates/tpt-eng-reliability" }
 tpt-eng-safety = { version = "0.1.1", path = "crates/tpt-eng-safety" }
 tpt-eng-io = { version = "0.1.0", path = "crates/tpt-eng-io" }
-tpt-eng-report = { version = "0.1.0", path = "crates/tpt-eng-report" }
+tpt-eng-report = { version = "0.1.1", path = "crates/tpt-eng-report" }
 tpt-eng-plot = { version = "0.1.0", path = "crates/tpt-eng-plot" }
 tpt-eng-cli = { version = "0.1.0", path = "crates/tpt-eng-cli" }
 tpt-eng-examples = { version = "0.1.0", path = "crates/tpt-eng-examples" }
