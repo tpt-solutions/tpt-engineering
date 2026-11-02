@@ -14,6 +14,11 @@ or several. The crates do not depend on a shared runtime.
 tpt-eng-structural = "0.1"
 ```
 
+Once the umbrella crate `tpt-engineering` is published, it gives one dependency
+with a feature for each domain crate, such as `features = ["structural",
+"controls"]`, or `"full"` for all of them. Until then, depend on the individual
+crates as shown above.
+
 ```rust,ignore
 use tpt_eng_structural::{Beam, Load};
 use tpt_math_units::uom::si::f64::{Force, Length};

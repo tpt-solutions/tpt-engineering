@@ -180,6 +180,16 @@ Add the crates you need (they re-export `tpt-math`'s `uom`-typed units):
 cargo add tpt-eng-props tpt-eng-controls tpt-eng-structural
 ```
 
+Once the umbrella crate is published (see `docs/NEXT_RELEASE.md`), one dependency
+can pull in the crates you choose by feature:
+
+```toml
+[dependencies]
+tpt-engineering = { version = "0.1", features = ["structural", "controls"] }
+```
+
+Until then, depend on the individual `tpt-eng-*` crates as above.
+
 ```rust
 use tpt_eng_controls::{Pid, PidGains};
 
