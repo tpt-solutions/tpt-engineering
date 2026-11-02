@@ -589,11 +589,11 @@ fn check_readme_unpublished_names(readme: &str, unpublished: &[String], errors: 
     let lines: Vec<&str> = readme.lines().collect();
     // The "not yet published" claim is a multi-line blockquote, so gather
     // crate-name tokens from the whole publish-status block (from the
-    // "crates are published" line through the "git tag yet" line).
+    // "crates are published" line through the "git tag is cut" line).
     let start = lines
         .iter()
         .position(|l| l.contains("crates are published"));
-    let end = lines.iter().position(|l| l.contains("git tag yet"));
+    let end = lines.iter().position(|l| l.contains("git tag is cut"));
     let (s, e) = match (start, end) {
         (Some(s), Some(e)) if e >= s => (s, e),
         _ => {

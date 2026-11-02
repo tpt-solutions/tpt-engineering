@@ -34,6 +34,10 @@ default.
 - **[`FixedVec`]** — fixed-capacity (8-element) vector used throughout to
   keep the crate `alloc`-free by default.
 - **[`R`]** — universal gas constant, J/(mol·K).
+- **Provenance-tagged variants** — [`pr_saturation_pressure_tagged`],
+  [`bubble_point_tagged`], and [`dew_point_tagged`] return the same value as
+  their untagged counterparts, plus the source, the validity ranges, and an
+  out-of-range warning (see [tpt-eng-provenance](../tpt-eng-provenance/)).
 
 ## Installation
 
@@ -64,13 +68,14 @@ assert!(z.vapour().unwrap() > 0.0);
 | `peng_robinson_z` / `ZRoots` | Compressibility-factor roots. |
 | `pr_saturation_pressure` | Pure-component saturation pressure. |
 | `bubble_point` / `dew_point` | Multicomponent VLE pressure and composition. |
+| `pr_saturation_pressure_tagged` / `bubble_point_tagged` / `dew_point_tagged` | Provenance-tagged versions of the functions above. |
 | `FixedVec` | Fixed-capacity (8-element) `no_std`-friendly vector. |
 | `R` | Universal gas constant. |
 
 ## Status
 
-Initial `0.1.0` release. `no_std`-capable via the `std` (default) / `alloc`
-feature flags.
+`0.1.1` adds the provenance-tagged functions. `no_std`-capable via the `std`
+(default) / `alloc` feature flags.
 
 ## Changelog
 

@@ -26,6 +26,10 @@ non-physical values.
   of the saturation correlation).
 - Input validation returning [`Error`] for non-physical temperatures, pressures,
   and ratios.
+- **Provenance-tagged variants** — [`saturation_pressure_water_tagged`] and
+  [`relative_humidity_tagged`] return the same value as their untagged
+  counterparts, plus the source, the validity range, and an out-of-range warning
+  (see [tpt-eng-provenance](../tpt-eng-provenance/)).
 
 ## Installation
 
@@ -62,6 +66,7 @@ assert!((w - 0.0125).abs() < 1e-3);
 | `relative_humidity` | `φ = p_w / p_sat` in `[0, 1]`. |
 | `moist_air_enthalpy` | Specific enthalpy of moist air, kJ/kg dry air. |
 | `dew_point` | Dew-point temperature (K) from a vapour partial pressure. |
+| `saturation_pressure_water_tagged` / `relative_humidity_tagged` | Provenance-tagged `saturation_pressure_water` and `relative_humidity`. |
 | `Error` | Validation errors for non-physical inputs. |
 
 ## Related crates
@@ -72,7 +77,7 @@ assert!((w - 0.0125).abs() < 1e-3);
 
 ## Status
 
-Initial `0.1.0` release. `no_std`-capable.
+`0.1.1` adds the provenance-tagged functions. `no_std`-capable.
 
 ## Changelog
 

@@ -7,9 +7,16 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-03
+
+### Added
+
+- `pr_saturation_pressure_tagged`, `bubble_point_tagged`, and `dew_point_tagged`: provenance-tagged variants of the Peng–Robinson saturation pressure, bubble point, and dew point. Each returns the same value as its untagged counterpart, with the source, the documented validity ranges, and an out-of-range warning. Uses `tpt-eng-provenance`.
+
 ### Changed
 
 - Example code formatted with `cargo fmt` (no functional change).
+- Depends on `tpt-eng-provenance` 0.1.0.
 
 ## [0.1.0] - 2026-08-19
 

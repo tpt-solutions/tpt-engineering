@@ -7,6 +7,12 @@ and this crate adheres to [semantic versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-03
+
+### Added
+
+- `Calculation` builder and `Step` for formula-based reports. A calculation lists its inputs, the formula for each step (with an optional unit and reference), its results, references, and notes. `Calculation::into_report` converts it to an ordinary `Report`, so the existing renderers need no changes.
+
 ### Changed
 
 - Example code formatted with `cargo fmt` (no functional change).

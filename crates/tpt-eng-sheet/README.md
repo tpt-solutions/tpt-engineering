@@ -53,3 +53,15 @@ let sheet = Sheet::from_toml(&std::fs::read_to_string("lintel.toml")?)?;
 let report = run(&sheet)?;
 println!("{}", tpt_eng_report::to_markdown(&report));
 ```
+
+## Status
+
+Initial `0.1.0` release.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
+
+## License
+
+Dual-licensed under [MIT](../../LICENSE-MIT) OR [Apache-2.0](../../LICENSE-APACHE).

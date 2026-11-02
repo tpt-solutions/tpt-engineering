@@ -7,6 +7,7 @@ Calculation-report data model and exporters for the TPT ecosystem. Provides a se
 - Serializable `Report` model: assumptions, results, tables, headings, paragraphs.
 - Markdown, HTML, and JSON exporters (to string or file).
 - Validation helpers (`validate_min` / `validate_max` / `validate_range`) that assign a `ValidationStatus`.
+- `Calculation` builder for formula-based reports: inputs, a formula for each step, results, and references. `Calculation::into_report` produces an ordinary `Report`.
 - JSON calculation trail that round-trips through `serde`.
 
 ## Installation
@@ -44,6 +45,7 @@ assert_eq!(report.overall_status(), ValidationStatus::Pass);
 | Module | Purpose |
 | --- | --- |
 | `model` | `Report`, `Section`, `Table`, `NamedValue`, `ResultEntry`, `ValidationStatus`. |
+| `calculation` | `Calculation` and `Step` builder for formula-based reports. |
 | `markdown` | Markdown renderer. |
 | `html` | HTML renderer (with escaping). |
 | `json` | JSON calculation-trail renderer. |
@@ -57,7 +59,7 @@ assert_eq!(report.overall_status(), ValidationStatus::Pass);
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.1` adds the `Calculation` builder. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## Changelog
 

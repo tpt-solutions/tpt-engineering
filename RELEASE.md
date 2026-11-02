@@ -202,22 +202,27 @@ until a version bump + republish. Published in dependency order:
 
 ---
 
-### Batch 10 — tagged results and calc sheets (after Batch 9)
+### Batch 10 — tagged results and calc sheets (after Batch 9) — RELEASED 2026-11-03
 
-Publish in this order. `tpt-eng-provenance` has no dependencies, and the
-republished crates below depend on it, so it goes first. `tpt-eng-report` 0.1.1
+Published in this order. `tpt-eng-provenance` has no dependencies, and the
+republished crates below depend on it, so it went first. `tpt-eng-report` 0.1.1
 adds the `Calculation` builder. `tpt-eng-props-water`, `-air` and `-mixture` 0.1.1
-add `*_tagged` functions. `tpt-eng-sheet` depends on all of these, so it goes last.
+add `*_tagged` functions. `tpt-eng-sheet` depends on all of these, so it went last.
 
-- [ ] `tpt-eng-provenance` — `cargo publish -p tpt-eng-provenance`
-- [ ] `tpt-eng-report` 0.1.1 (republish) — `cargo publish -p tpt-eng-report`
-- [ ] `tpt-eng-props-water` 0.1.1 (republish) — `cargo publish -p tpt-eng-props-water`
-- [ ] `tpt-eng-props-air` 0.1.1 (republish) — `cargo publish -p tpt-eng-props-air`
-- [ ] `tpt-eng-props-mixture` 0.1.1 (republish) — `cargo publish -p tpt-eng-props-mixture`
-- [ ] `tpt-eng-sheet` — `cargo publish -p tpt-eng-sheet` (after all of the above)
+- [x] `tpt-eng-provenance` 0.1.0 (new crate)
+- [x] `tpt-eng-report` **0.1.0 → 0.1.1**
+- [x] `tpt-eng-props-water` **0.1.0 → 0.1.1**
+- [x] `tpt-eng-props-air` **0.1.0 → 0.1.1**
+- [x] `tpt-eng-props-mixture` **0.1.0 → 0.1.1**
+- [x] `tpt-eng-sheet` 0.1.0 (new crate)
+
+> Dry run: `cargo publish --dry-run --allow-dirty` passed for `tpt-eng-provenance`
+> and `tpt-eng-report`. The other four cannot be dry-run until `tpt-eng-provenance`
+> is live, so they were checked by publishing in order.
 
 `tpt-eng-cli` is already published, but its `sheet` subcommand depends on
 `tpt-eng-sheet`. Release a new `tpt-eng-cli` version after `tpt-eng-sheet` is live.
+This is still outstanding.
 
 ## 5. Post-release checklist
 

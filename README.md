@@ -9,8 +9,8 @@ physical-systems verticals.
 Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE).
 
 > **43 of 45 crates are published on [crates.io](https://crates.io)** at
-> 36 at `0.1.0` and 7 at `0.1.1` (Batches 1–8 — see `RELEASE.md`). Two are pending, both in Batch 10: `tpt-eng-provenance` and `tpt-eng-sheet`. There is no
-> `v0.1.0` git tag yet. APIs are unstable until the first tagged release.
+> 36 at `0.1.0` and 7 at `0.1.1` (Batches 1–8 — see `RELEASE.md`). Two are pending, both in Batch 10: `tpt-eng-provenance` and `tpt-eng-sheet`.
+> The `v0.1.0` git tag is cut. APIs are still unstable; see [`docs/STABILITY.md`](docs/STABILITY.md).
 
 ## Scope
 
@@ -20,7 +20,7 @@ infrastructure topology, controls, structural/mechanical analysis,
 geometry/CAD primitives, and domain-specific component models — drawn out of
 the product verticals as foundation-pillar building blocks rather than
 product-shaped packages. The workspace has grown from the original 14-crate
-Phase-0 scope (see `docs/spec.txt`) to 43 crates: structural/mechanical and
+Phase-0 scope (see `docs/spec.txt`) to 45 `tpt-eng-*` crates: structural/mechanical and
 geometry/CAD domains were added post-Phase-4, and a further 14
 electronics/energy/transport/medical/process/earth/construction
 component-model crates were added per `docs/spec2.txt` (Phase 9).
@@ -51,8 +51,8 @@ which asserts the README/CHANGELOG counts and the pending-crate set against
 | Published | 43 (36 at `0.1.0`, 7 at `0.1.1`) | `RELEASE.md` Batches 1–8, `docs/CRATE_VERSIONS.md` |
 | Pending | 2 (`tpt-eng-provenance`, `tpt-eng-sheet`) | `RELEASE.md` Batch 10 |
 
-> There is no `v0.1.0` git tag yet. APIs are unstable until the first tagged
-> release.
+> The `v0.1.0` git tag is cut. APIs are still unstable; see
+> [`docs/STABILITY.md`](docs/STABILITY.md) for the versioning rules.
 
 ## Crate inventory
 
@@ -101,6 +101,13 @@ which asserts the README/CHANGELOG counts and the pending-crate set against
 | `tpt-eng-geotech` | earth | no | Soil constitutive models, borehole stratigraphy |
 | `tpt-eng-building-sys` | construction | no | HVAC loads, plumbing fixture units, panel scheduling |
 | `tpt-eng-schedule` | construction | no | CPM/PERT, resource leveling, Earned Value Management |
+| `tpt-eng-provenance` | foundation | yes | Provenance and validity-range tags for results (pending, Batch 10) |
+| `tpt-eng-sheet` | integration | | Declarative TOML/JSON calculation sheets with reports (pending, Batch 10) |
+| `tpt-eng-cosim` | integration | | Fixed-step co-simulation of connected models (not published) |
+| `tpt-eng-mcp` | integration | | Model Context Protocol server exposing calculation sheets as tools (not published) |
+| `tpt-eng-py` | integration | | Python (PyO3) bindings (not published) |
+| `tpt-eng-wasm` | integration | | WebAssembly bindings and browser demos (not published) |
+| `tpt-engineering` | integration | | Umbrella: re-exports the domain crates behind feature flags (not yet published) |
 
 ## Building
 
@@ -171,6 +178,13 @@ The inventory above is a flat list. For choosing a starting point by task:
 | Model soil behavior or borehole stratigraphy | `tpt-eng-geotech` |
 | Compute HVAC loads, plumbing, or electrical panel schedules | `tpt-eng-building-sys` |
 | Plan/schedule projects (CPM/PERT, Earned Value Management) | `tpt-eng-schedule` |
+| Attach a source and validity range to a result | `tpt-eng-provenance` |
+| Write a calculation as a TOML/JSON sheet and get a report | `tpt-eng-sheet` |
+| Co-simulate connected models with a fixed time step | `tpt-eng-cosim` |
+| Expose calculations to AI agents over MCP | `tpt-eng-mcp` |
+| Call the primitives from Python | `tpt-eng-py` |
+| Run the primitives in the browser | `tpt-eng-wasm` |
+| Depend on many domain crates through one feature-gated crate | `tpt-engineering` (umbrella) |
 
 ## Quickstart
 
@@ -209,9 +223,11 @@ time-series conditioning → structural check), see
 
 ## Developer tooling
 
-`cargo xtask` provides one-stop hygiene and scaffolding (`check`, `test`,
-`doctest`, `doc`, `no-std-matrix`, `new-crate`). A root [`justfile`](justfile)
-mirrors these for non-Cargo users.
+`cargo xtask` provides one-stop hygiene, scaffolding and release checks:
+`check`, `fmt`, `clippy`, `test`, `doctest`, `doc`, `deny`, `no-std-matrix`,
+`new-crate`, `publish-status`, `versions`, `pin-check`, `link-check` and
+`package-check`. A root [`justfile`](justfile) runs the main tasks through
+`cargo xtask` for users who prefer `just`.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the issues-only contribution
 policy and where to report problems.

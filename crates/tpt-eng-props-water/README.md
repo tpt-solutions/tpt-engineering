@@ -22,6 +22,10 @@ in pascals, volume/energy/entropy in SI base units (m³/kg, J/kg, J/(kg·K)).
   saturation line in both directions.
 - **Input validation** — returns [`Error`] for sub-273.15 K temperatures,
   negative pressures, and out-of-scope Region 3 states.
+- **Provenance-tagged variants** — [`saturation_pressure_tagged`] and
+  [`state_tagged`] return the same value as their untagged counterparts, plus
+  the source, the validity ranges, and an out-of-range warning (see
+  [tpt-eng-provenance](../tpt-eng-provenance/)).
 
 ## Installation
 
@@ -63,6 +67,7 @@ assert!((s2.specific_volume.get::<cubic_meter_per_kilogram>() - 39.4913866).abs(
 | `state` | Full `WaterState` at `(T, p)`. |
 | `WaterState` / `Region` | Result bundle and the IF97 region evaluated. |
 | `saturation_pressure` / `saturation_temperature` | Region 4 saturation line. |
+| `saturation_pressure_tagged` / `state_tagged` | Provenance-tagged `saturation_pressure` and `state`. |
 | `Error` | Validation errors (range, negative pressure, Region 3). |
 
 ## Related crates
@@ -74,7 +79,7 @@ assert!((s2.specific_volume.get::<cubic_meter_per_kilogram>() - 39.4913866).abs(
 
 ## Status
 
-Initial `0.1.0` release. `no_std`-capable.
+`0.1.1` adds the provenance-tagged functions. `no_std`-capable.
 
 ## Changelog
 
