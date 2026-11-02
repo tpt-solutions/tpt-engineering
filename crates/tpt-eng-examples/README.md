@@ -64,7 +64,7 @@ The examples pull together many crates; the most prominent are
 
 ## Status
 
-Initial `0.1.0` release.
+`0.1.1` adds scenario functions for the construction, distillation, HVAC, mechanical, PCB and solar and thermal loops. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Changelog
 

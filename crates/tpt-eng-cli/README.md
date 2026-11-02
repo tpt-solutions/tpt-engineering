@@ -63,6 +63,10 @@ tpt-eng-cli calc beam-file beam.json
 tpt-eng-cli recommend pump curve
 ```
 
+## Status
+
+`0.1.1` adds the `sheet run` and `sheet schema` subcommands. See [CHANGELOG.md](CHANGELOG.md).
+
 ## Notes
 
 - The `calc beam` example uses SI units (metres, newtons). Material properties and section
