@@ -14,6 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on crates.io. The other 36 are at `0.1.0`. `docs/CRATE_VERSIONS.md` is the live record.
 
 ### Added
+- `tpt-eng-provenance` (new, pending publication — Batch 10): `Tagged<T>`,
+  `Provenance`, `Validity`, `Source` and a `Warnings` bitset, for results that
+  carry their source and validity range. `no_std`, no dependencies.
+- `tpt-eng-props-water` and `tpt-eng-props-air`: `*_tagged` functions that return
+  the same value as the untagged functions, plus an `OUT_OF_RANGE` warning when an
+  input is outside the documented range. Existing signatures are unchanged.
+- `tpt-eng-py` (not published): `tpt_eng.Tagged` results with `strict=True`, and
+  air, fuels and structural bindings alongside water and controls.
+- `tpt-eng-wasm` (not published): steam-table, section-property and PID demos
+  for the browser, with a Node smoke test.
 - 14 new domain crates (Phase 9, `docs/spec2.txt`): `tpt-eng-props-mixture`,
   `tpt-eng-electrical`, `tpt-eng-schedule`, `tpt-eng-biomech`,
   `tpt-eng-crystallography`, `tpt-eng-geotech`, `tpt-eng-heat-transfer`,

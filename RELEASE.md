@@ -202,6 +202,12 @@ until a version bump + republish. Published in dependency order:
 
 ---
 
+### Batch 10 — tagged results (after Batch 9)
+
+Has no dependencies, so it can be published at any time.
+
+- [ ] `tpt-eng-provenance` — `cargo publish -p tpt-eng-provenance`
+
 ## 5. Post-release checklist
 
 - [x] All 43 `tpt-eng-*` crates show as published on crates.io.

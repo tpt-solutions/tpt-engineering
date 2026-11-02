@@ -80,6 +80,13 @@ functional or public-API change, so **no version bump or republish is
 needed** for those; the `[Unreleased]` note exists purely for the audit
 trail.
 
+## Batch 10 — tagged results
+
+Mirrors Batch 10 in `RELEASE.md`. It has no dependencies, so it can be published
+at any time.
+
+- [ ] `tpt-eng-provenance` — `cargo publish -p tpt-eng-provenance`
+
 ## Post-publish
 
 - [ ] Flip the `[ ]` → `[x]` checkboxes for Batches 6–8 in `RELEASE.md`, matching

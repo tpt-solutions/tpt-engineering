@@ -8,8 +8,8 @@ physical-systems verticals.
 
 Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE).
 
-> **43 of 43 crates are published on [crates.io](https://crates.io)** at
-> 36 at `0.1.0` and 7 at `0.1.1` (Batches 1–8 — see `RELEASE.md`). None are pending. There is no
+> **43 of 44 crates are published on [crates.io](https://crates.io)** at
+> 36 at `0.1.0` and 7 at `0.1.1` (Batches 1–8 — see `RELEASE.md`). One is pending: `tpt-eng-provenance` (Batch 10). There is no
 > `v0.1.0` git tag yet. APIs are unstable until the first tagged release.
 
 ## Scope
@@ -32,7 +32,7 @@ environment).
 
 ## Release & publish status
 
-All 43 `tpt-eng-*` crates are published on [crates.io](https://crates.io) at
+43 of 44 `tpt-eng-*` crates are published on [crates.io](https://crates.io) at
 `0.1.0`, except `tpt-eng-props`, `-structural`, `-standards`, `-gdt`, `-cad`,
 `-tolerance` and `-safety`, which are at `0.1.1`. Batches 1–5 covered the original 29 crates; Batches 6–8 covered the 14
 Phase-9 domain crates. The batch plan and per-crate state live in
@@ -49,7 +49,7 @@ which asserts the README/CHANGELOG counts and the pending-crate set against
 | Status | Crates | Source |
 |--------|--------|--------|
 | Published | 43 (36 at `0.1.0`, 7 at `0.1.1`) | `RELEASE.md` Batches 1–8, `docs/CRATE_VERSIONS.md` |
-| Pending | 0 | — |
+| Pending | 1 (`tpt-eng-provenance`) | `RELEASE.md` Batch 10 |
 
 > There is no `v0.1.0` git tag yet. APIs are unstable until the first tagged
 > release.
