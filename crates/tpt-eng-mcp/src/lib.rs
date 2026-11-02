@@ -15,6 +15,8 @@ use std::io::{self, BufRead, Write};
 use serde_json::{Value, json};
 use tpt_eng_sheet::{Sheet, json_schema, run};
 
+mod calculations;
+
 /// The MCP protocol revision this server implements.
 pub const PROTOCOL_VERSION: &str = "2024-11-05";
 
@@ -105,7 +107,7 @@ fn dispatch(method: &str, params: &Value) -> Result<Value, RpcError> {
 fn tools() -> Result<Vec<Value>, RpcError> {
     let sheet_schema: Value = serde_json::from_str(&schema_text()?)
         .map_err(|e| RpcError::new(-32603, format!("schema is not JSON: {e}")))?;
-    Ok(vec![
+    let mut tools = vec![
         json!({
             "name": "run_sheet",
             "description": "Run a calculation sheet and return its report as Markdown. \
@@ -121,7 +123,9 @@ fn tools() -> Result<Vec<Value>, RpcError> {
             "inputSchema": { "type": "object", "properties": {}, "additionalProperties": false },
             "annotations": { "readOnlyHint": true },
         }),
-    ])
+    ];
+    tools.extend(calculations::tool_definitions());
+    Ok(tools)
 }
 
 fn schema_text() -> Result<String, RpcError> {
@@ -137,6 +141,12 @@ fn call_tool(params: &Value) -> Result<Value, RpcError> {
         .get("arguments")
         .cloned()
         .unwrap_or_else(|| json!({}));
+    if let Some(outcome) = calculations::call(name, &arguments) {
+        return Ok(match outcome {
+            Ok(value) => text_result(&value.to_string(), false),
+            Err(message) => text_result(&message, true),
+        });
+    }
     match name {
         "run_sheet" => Ok(run_sheet_result(&arguments)),
         "sheet_schema" => Ok(text_result(&schema_text()?, false)),

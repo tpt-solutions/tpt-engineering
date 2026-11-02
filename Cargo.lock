@@ -1191,8 +1191,12 @@ name = "tpt-eng-mcp"
 version = "0.1.0"
 dependencies = [
  "serde_json",
+ "tpt-eng-props-air",
+ "tpt-eng-props-fuels",
  "tpt-eng-report",
  "tpt-eng-sheet",
+ "tpt-eng-tolerance",
+ "tpt-math-units",
 ]
 
 [[package]]

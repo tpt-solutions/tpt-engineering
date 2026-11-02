@@ -10,6 +10,9 @@ assistant, can run a calculation and read the report without writing code.
 | --- | --- | --- |
 | `run_sheet` | A calculation sheet as JSON. Its input schema is the sheet schema from `tpt-eng-sheet`. | The report as Markdown. Invalid sheets return `isError: true` with the reason, so the client can correct them. |
 | `sheet_schema` | none | The JSON Schema for sheets. |
+| `tolerance_stackup` | `dimensions`: a list of `name`, `nominal_mm` and `tolerance_mm`. | Worst-case and RSS limits in mm, and each dimension's share of the RSS variance. |
+| `fuel_properties` | `fuel` (`methane`, `hydrogen`, `natural-gas`, `diesel` or `blend`), and `h2_fraction` for a blend. | Heating values, density, stoichiometric air-fuel ratio and CO₂ factor. |
+| `moist_air_state` | `temperature_c`, `relative_humidity` (0 to 1), and optional `pressure_kpa`. | Saturation and vapour pressure, humidity ratio, enthalpy and dew point. `in_range` flags temperatures outside the ASHRAE range. |
 
 A sheet names one calculation (`water-state`, `beam-udl` or `pid-step`) and its
 inputs. Field names carry the units, such as `pressure_kpa` and `span_m`.

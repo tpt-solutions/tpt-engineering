@@ -19,8 +19,12 @@ path = "src/main.rs"
 
 [dependencies]
 serde_json = { workspace = true }
+tpt-math-units = "0.1.0"
+tpt-eng-props-air = { workspace = true }
+tpt-eng-props-fuels = { workspace = true }
 tpt-eng-report = { workspace = true }
 tpt-eng-sheet = { workspace = true }
+tpt-eng-tolerance = { workspace = true }
 
 [lints]
 workspace = true
