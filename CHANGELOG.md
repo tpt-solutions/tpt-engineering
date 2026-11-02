@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (inputs, formula table, results with overall status, references, notes) from
   the existing section types, so the renderers are unchanged.
 - `tpt-eng-cli`: `sheet run <file>` and `sheet schema` subcommands.
+- `tpt-eng-py` (not published): a Jupyter tour notebook at `notebooks/tour.ipynb`.
 - `tpt-eng-cosim` (not published): fixed-step co-simulation. A `Model` trait with
   named input and output ports, a `Simulation` runner that records every output,
   and three models: `Constant`, `FirstOrderLag` and `PidController`.

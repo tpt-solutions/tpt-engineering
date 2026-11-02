@@ -838,7 +838,9 @@ Full plan: `C:\Users\phill\.claude\plans\review-platform-for-bugs-melodic-star.m
       (`Constant`, `FirstOrderLag`, `PidController`). Still to do: models from
       the other domain crates, and a decision on whether the trait should be
       shared with `tpt-eng-report` and the sheets.
-- [ ] Notebooks (evcxr or Python bindings).
+- [x] Notebooks: `crates/tpt-eng-py/notebooks/tour.ipynb` uses the Python
+      bindings. Its code cells were run end to end; the notebook is saved
+      without outputs.
 
 ### Phase 11 status (current)
 
