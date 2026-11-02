@@ -1,0 +1,17 @@
+[package]
+name = "tpt-eng-provenance"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Provenance and validity-range tags for engineering results."
+keywords = ["engineering", "provenance", "validity", "correlation"]
+categories = ["science", "no-std"]
+repository.workspace = true
+homepage.workspace = true
+
+# No dependencies and no features: the crate is `no_std` unconditionally, so
+# every property crate can use it without enabling `std`.
+
+[lints]
+workspace = true

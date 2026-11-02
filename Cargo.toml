@@ -5,6 +5,7 @@ members = [
     "crates/tpt-eng-props-air",
     "crates/tpt-eng-props-fuels",
     "crates/tpt-eng-props",
+    "crates/tpt-eng-provenance",
     "crates/tpt-eng-timeseries-core",
     "crates/tpt-eng-timeseries-align",
     "crates/tpt-eng-timeseries-gap",
@@ -72,6 +73,7 @@ tpt-eng-props-water = { version = "0.1.0", path = "crates/tpt-eng-props-water" }
 tpt-eng-props-air = { version = "0.1.0", path = "crates/tpt-eng-props-air" }
 tpt-eng-props-fuels = { version = "0.1.0", path = "crates/tpt-eng-props-fuels" }
 tpt-eng-props = { version = "0.1.1", path = "crates/tpt-eng-props" }
+tpt-eng-provenance = { version = "0.1.0", path = "crates/tpt-eng-provenance" }
 tpt-eng-timeseries-core = { version = "0.1.0", path = "crates/tpt-eng-timeseries-core" }
 tpt-eng-timeseries-align = { version = "0.1.0", path = "crates/tpt-eng-timeseries-align" }
 tpt-eng-timeseries-gap = { version = "0.1.0", path = "crates/tpt-eng-timeseries-gap" }
